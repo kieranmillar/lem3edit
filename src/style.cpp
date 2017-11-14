@@ -169,7 +169,7 @@ void Style::blit_object( SDL_Surface *surface, signed int x, signed int y, int t
 	}
 }
 
-void Style::draw_object_texture(SDL_Renderer *renderer, signed int x, signed int y, int type, unsigned int object, int zoom ) const
+void Style::draw_object_texture(Window window, signed int x, signed int y, int type, unsigned int object, int zoom ) const
 {
 	assert((unsigned)type < COUNTOF(this->object));
 
@@ -182,7 +182,7 @@ void Style::draw_object_texture(SDL_Renderer *renderer, signed int x, signed int
 	rdest.w = this->object[type][object].width * 8 * zoom;
 	rdest.h = this->object[type][object].height * 2 * zoom;
 
-	if (rdest.x > 640 || rdest.y > 480 || rdest.x + rdest.w < 0 || rdest.y + rdest.h < 0)
+	if (rdest.x > window.width || rdest.y > window.height || rdest.x + rdest.w < 0 || rdest.y + rdest.h < 0)
 	{
 		return;
 	}
@@ -193,7 +193,7 @@ void Style::draw_object_texture(SDL_Renderer *renderer, signed int x, signed int
 	rsource.w = this->object[type][object].width * 8;
 	rsource.h = this->object[type][object].height * 2;
 
-	SDL_RenderCopy(renderer, megatex, &rsource, &rdest);
+	SDL_RenderCopy(window.screen_renderer, megatex, &rsource, &rdest);
 }
 
 bool Style::load(unsigned int n, Window window, SDL_Color *pal2)

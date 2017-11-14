@@ -17,6 +17,10 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
+
+#define DEFAULT_WINDOW_WIDTH 640
+#define DEFAULT_WINDOW_HEIGHT 480
+
 #include "editor.hpp"
 #include "lem3edit.hpp"
 #include "level.hpp"
@@ -55,7 +59,7 @@ int main( int argc, char *argv[] )
 
 	Window window;
 
-	if (window.initialise() == false) { // Initialise the main program window
+	if (window.initialise(DEFAULT_WINDOW_WIDTH, DEFAULT_WINDOW_HEIGHT) == false) { // Initialise the main program window
 		return EXIT_FAILURE;
 	}
 	
@@ -84,6 +88,18 @@ int main( int argc, char *argv[] )
 
 		switch (event.type)
 		{
+			case SDL_WINDOWEVENT:
+			{
+				SDL_WindowEvent &e = event.window;
+
+				if (e.event == SDL_WINDOWEVENT_RESIZED)
+				{
+					window.width = e.data1;
+					window.height = e.data2;
+					window.resize();
+					editor.redraw = true;
+				}
+			}
 			case SDL_MOUSEMOTION:
 			{
 				SDL_MouseMotionEvent &e = event.motion;
@@ -216,14 +232,14 @@ int main( int argc, char *argv[] )
 				const Uint8 *key_state = SDL_GetKeyboardState(NULL);
 				
 				{ // scroll if ijkl or mouse at border
-					const int mouse_scroll_trigger = min(640, 480) / 32;//TODO: replace with window edges
+					const int mouse_scroll_trigger = min(window.width, window.height) / 32;
 					
 					const signed int left = (mouse_x_window < mouse_scroll_trigger) ? 2 : 0 + key_state[SDL_GetScancodeFromKey(SDLK_j)] ? 1 : 0;
-					const signed int right = (mouse_x_window >= (signed)640 - mouse_scroll_trigger) ? 2 : 0 + key_state[SDL_GetScancodeFromKey(SDLK_l)] ? 1 : 0;
+					const signed int right = (mouse_x_window >= (signed)window.width - mouse_scroll_trigger) ? 2 : 0 + key_state[SDL_GetScancodeFromKey(SDLK_l)] ? 1 : 0;
 					signed int delta_x = (-left + right) * delta_multiplier;
 					
 					const signed int up = (mouse_y_window < mouse_scroll_trigger) ? 2 : 0 + key_state[SDL_GetScancodeFromKey(SDLK_i)] ? 1 : 0;
-					const signed int down = (mouse_y_window >= (signed)480 - mouse_scroll_trigger) ? 2 : 0 + key_state[SDL_GetScancodeFromKey(SDLK_k)] ? 1 : 0;
+					const signed int down = (mouse_y_window >= (signed)window.height - mouse_scroll_trigger) ? 2 : 0 + key_state[SDL_GetScancodeFromKey(SDLK_k)] ? 1 : 0;
 					signed int delta_y = (-up + down) * delta_multiplier;
 
 

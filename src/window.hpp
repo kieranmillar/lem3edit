@@ -27,6 +27,9 @@ class Window
 {
 public:
 	
+	Uint16 width;
+	Uint16 height;
+
 	SDL_Window *screen;
 	SDL_Renderer *screen_renderer;
 	SDL_Texture *screen_texture;
@@ -35,8 +38,9 @@ public:
 
 	SDL_Palette palette_buffer[256];
 
-	bool initialise(void);
+	bool initialise(int w, int h);
 	void destroy(void);
+	bool resize(void);
 
 };
 

@@ -22,9 +22,6 @@
 This file handles the initialisation of the program, so setting up the window and SDL, etc.
 */
 
-#define DEFAULT_WINDOW_WIDTH 640
-#define DEFAULT_WINDOW_HEIGHT 480
-
 #include "window.hpp"
 
 #include <iomanip>
@@ -33,8 +30,10 @@ This file handles the initialisation of the program, so setting up the window an
 #include <string>
 using namespace std;
 
-bool Window::initialise( void )
+bool Window::initialise( int w, int h )
 {
+	width = w;
+	height = h;
 	screen = NULL;
 	screen_renderer = NULL;
 	screen_texture = NULL;
@@ -52,7 +51,7 @@ bool Window::initialise( void )
 	//if (already_init)
 		//memcpy(palette_buffer, main_surface->format->palette->colors, sizeof(palette_buffer));
 
-	screen = SDL_CreateWindow("Lem3Edit", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, DEFAULT_WINDOW_WIDTH, DEFAULT_WINDOW_HEIGHT, /*SDL_WINDOW_RESIZABLE*/0);
+	screen = SDL_CreateWindow("Lem3Edit", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, width, height, SDL_WINDOW_RESIZABLE);
 	if (screen == NULL)
 	{
 		cerr << "failed to initialize window: " << SDL_GetError() << endl;
@@ -66,7 +65,7 @@ bool Window::initialise( void )
 		return false;
 	}
 
-	screen_texture = SDL_CreateTexture(screen_renderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, 640, 480);
+	screen_texture = SDL_CreateTexture(screen_renderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, width, height);
 	if (screen_texture == NULL)
 	{
 		cerr << "failed to initialize texture: " << SDL_GetError() << endl;
@@ -75,10 +74,10 @@ bool Window::initialise( void )
 
 	SDL_SetRenderDrawColor(screen_renderer, 255, 255, 255, 255);
 
+	SDL_RenderSetViewport(screen_renderer, NULL);
+
 	//if (already_init)
 		//SDL_SetSurfacePalette(main_surface, palette_buffer);
-
-	//SDL_RenderSetLogicalSize(screen_renderer, 640, 480);
 
 	return true;
 }
@@ -94,6 +93,20 @@ void Window::destroy(void)
 	if (screen != NULL) SDL_DestroyWindow(screen);
 
 	SDL_Quit();
+}
+
+bool Window::resize(void)
+{
+	SDL_RenderSetLogicalSize(screen_renderer, width, height);
+	if (screen_texture != NULL) SDL_DestroyTexture(screen_texture);
+	screen_texture = SDL_CreateTexture(screen_renderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, width, height);
+	if (screen_texture == NULL)
+	{
+		cerr << "failed to initialize texture: " << SDL_GetError() << endl;
+		return false;
+	}
+
+	return true;
 }
 
 Uint32 loop_timer(Uint32 interval, void *param)
