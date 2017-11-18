@@ -69,7 +69,7 @@ int main( int argc, char *argv[] )
 	int level_id = (argc > 1) ? atoi(argv[1]) : 1;
 	
 	Editor editor;
-	editor.load(level_id, window);
+	editor.load(level_id, &window);
 
 	mouse_prev_x = mouse_prev_y = 0;
 
@@ -248,7 +248,7 @@ int main( int argc, char *argv[] )
 
 				}
 
-				editor.draw(window);
+				editor.draw();
 							
 				break;
 			}

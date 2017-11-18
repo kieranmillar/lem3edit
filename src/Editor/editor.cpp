@@ -34,11 +34,12 @@ Editor::Editor(void)
 	font.load("FONT");
 }
 
-bool Editor::load( int n, Window window )
+bool Editor::load( int n, Window * w )
 {
+	window_ptr = w;
 	level.load(n);
 	tribe.load(level.tribe);
-	style.load(level.style, window, tribe.palette);
+	style.load(level.style, *w, tribe.palette);
 	
 	return redraw = true;
 }
@@ -221,54 +222,107 @@ bool Editor::scroll( signed int delta_x, signed int delta_y, bool drag )
 	return false;
 }
 
-void Editor::draw( Window window )
+void Editor::draw()
 {
-	
+
 	SDL_Rect level_area;
-	level_area.x = (0 - scroll_x)*zoom;
-	level_area.y = (0 - scroll_y)*zoom;
+	level_area.x = 0 - scroll_x * zoom;
+	level_area.y = 0 - scroll_y * zoom;
 	level_area.w = level.width*zoom;
 	level_area.h = level.height*zoom;
 
 	if (redraw)
 	{
-		SDL_SetRenderDrawBlendMode(window.screen_renderer, SDL_BLENDMODE_BLEND);
-		SDL_SetRenderTarget(window.screen_renderer, window.screen_texture);
-		SDL_SetRenderDrawColor(window.screen_renderer, 100, 100, 100, 255);
-		SDL_RenderFillRect(window.screen_renderer, NULL);
+		SDL_SetRenderDrawBlendMode(window_ptr->screen_renderer, SDL_BLENDMODE_BLEND);
+		SDL_SetRenderTarget(window_ptr->screen_renderer, window_ptr->screen_texture);
+		SDL_SetRenderDrawColor(window_ptr->screen_renderer, 100, 100, 100, 255);
+		SDL_RenderFillRect(window_ptr->screen_renderer, NULL);
 
-		SDL_SetRenderDrawColor(window.screen_renderer, 0, 0, 0, 255);
-		SDL_RenderFillRect(window.screen_renderer, &level_area);
+		SDL_SetRenderDrawColor(window_ptr->screen_renderer, 0, 0, 0, 255);
+		SDL_RenderFillRect(window_ptr->screen_renderer, &level_area);
 
-		level.draw(window, scroll_x, scroll_y, style, backgroundOnly, zoom);
+		level.draw(*window_ptr, scroll_x, scroll_y, style, backgroundOnly, zoom);
 
 		for (Selection::const_iterator i = selection.begin(); i != selection.end(); ++i)
 		{
 			Level::Object &o = level.object[i->type][i->i];
 			int so = style.object_by_id(i->type, o.id);
-			draw_selection_box(window.screen_renderer, (o.x - scroll_x)*zoom, (o.y - scroll_y)*zoom, style.object[i->type][so].width * 8 * zoom, style.object[i->type][so].height * 2 * zoom);
+			draw_selection_box((o.x - scroll_x)*zoom, (o.y - scroll_y)*zoom, style.object[i->type][so].width * 8 * zoom, style.object[i->type][so].height * 2 * zoom);
 		}
 
-		SDL_SetRenderDrawColor(window.screen_renderer, 0, 0, 0, 255);
-		SDL_SetRenderTarget(window.screen_renderer, NULL);
+		SDL_SetRenderDrawColor(window_ptr->screen_renderer, 0, 0, 0, 255);
+
+		//Draw dotted lines on the level border
+		if (scroll_x < 0 && (scroll_x * zoom) + window_ptr->width > 0)
+		{
+			draw_dashed_level_border(vertical, ((0 - scroll_x) * zoom) - 1, scroll_y * zoom);
+		}
+		if (scroll_x < level.width && scroll_x + (window_ptr->width / zoom) > level.width)
+		{
+			draw_dashed_level_border(vertical, ((level.width - scroll_x) * zoom) + 1, scroll_y * zoom);
+		}
+		if (scroll_y < 0 && (scroll_y * zoom) + window_ptr->height > 0)
+		{
+			draw_dashed_level_border(horizontal, ((0 - scroll_y) * zoom) - 1, scroll_x * zoom);
+		}
+		if (scroll_y < level.height && scroll_y + (window_ptr->height / zoom) > level.height)
+		{
+			draw_dashed_level_border(horizontal, ((level.height - scroll_y) * zoom) + 1, scroll_x * zoom);
+		}
+
+		SDL_SetRenderTarget(window_ptr->screen_renderer, NULL);
 
 		redraw = false;
 	}
 
-	SDL_RenderCopy(window.screen_renderer, window.screen_texture, NULL, NULL);
-	SDL_RenderPresent(window.screen_renderer);
+	SDL_RenderCopy(window_ptr->screen_renderer, window_ptr->screen_texture, NULL, NULL);
+	SDL_RenderPresent(window_ptr->screen_renderer);
 
 }
 
-void Editor::draw_selection_box(SDL_Renderer *renderer, int x, int y, int width, int height)
+void Editor::draw_selection_box(int x, int y, int width, int height)
 {
-	SDL_SetRenderDrawColor(renderer, 255, 0, 255, 255/8);
+	SDL_SetRenderDrawColor(window_ptr->screen_renderer, 255, 0, 255, 255 / 8);
 	SDL_Rect r;
 	r.x = x - 1;
 	r.y = y - 1;
 	r.w = width + 1;
 	r.h = height + 1;
-	SDL_RenderFillRect(renderer, &r);
-	SDL_SetRenderDrawColor(renderer, 255, 0, 255, 255);
-	SDL_RenderDrawRect(renderer, &r);
+	SDL_RenderFillRect(window_ptr->screen_renderer, &r);
+	SDL_SetRenderDrawColor(window_ptr->screen_renderer, 255, 0, 255, 255);
+	SDL_RenderDrawRect(window_ptr->screen_renderer, &r);
+}
+
+void Editor::draw_dashed_level_border(borderType type, int pos, int offset)
+{
+	//We have an offset so the lines don't scroll out of synch with the view when scrolling
+	int initialOffset = offset % 20;
+	SDL_SetRenderDrawColor(window_ptr->screen_renderer, 200, 200, 200, 255);
+	int end, x1, y1, x2, y2;
+	if (type == horizontal)
+	{
+		end = window_ptr->width;
+		x1 = 0 - initialOffset;
+		x2 = 10 - initialOffset;
+		y1 = pos;
+		y2 = pos;
+		for (x1; x1 < end; x1 += 20)
+		{
+			SDL_RenderDrawLine(window_ptr->screen_renderer, x1, y1, x2, y2);
+			x2 += 20;
+		}
+	}
+	if (type == vertical)
+	{
+		end = window_ptr->height;
+		x1 = pos;
+		x2 = pos;
+		y1 = 0 - initialOffset;
+		y2 = 10 - initialOffset;
+		for (y1; y1 < end; y1 += 20)
+		{
+			SDL_RenderDrawLine(window_ptr->screen_renderer, x1, y1, x2, y2);
+			y2 += 20;
+		}
+	}
 }

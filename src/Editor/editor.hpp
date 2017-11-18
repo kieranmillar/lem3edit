@@ -33,9 +33,11 @@
 class Editor
 {
 public:
+	Window * window_ptr;
+
 	bool redraw;
 	
-	void draw( Window window );
+	void draw();
 	
 	Del font;
 	
@@ -68,10 +70,13 @@ public:
 	
 	bool scroll( signed int delta_x, signed int delta_y, bool drag );
 	
-	bool load( int n, Window window );
+	bool load(int n, Window * w);
 	bool save(int n);
 
-	void draw_selection_box(SDL_Renderer *renderer, int x, int y, int width, int height);
+	void draw_selection_box(int x, int y, int width, int height);
+
+	enum borderType { horizontal, vertical };
+	void draw_dashed_level_border(borderType type, int pos, int offset);
 	
 	Editor( void );
 	~Editor( void ) { /* nothing to do */ }
