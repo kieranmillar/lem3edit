@@ -18,11 +18,12 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
-#define DEFAULT_WINDOW_WIDTH 640
-#define DEFAULT_WINDOW_HEIGHT 480
+#define DEFAULT_WINDOW_WIDTH 800
+#define DEFAULT_WINDOW_HEIGHT 600
 
-#include "editor.hpp"
 #include "lem3edit.hpp"
+
+#include "Editor/editor.hpp"
 #include "level.hpp"
 #include "raw.hpp"
 #include "style.hpp"
@@ -53,13 +54,13 @@ Sint32 mouse_prev_x, mouse_prev_y;
 
 int main( int argc, char *argv[] )
 {
-	//SDL_SetHint(SDL_HINT_MOUSE_RELATIVE_MODE_WARP, "1");
 
 	version();
 
 	Window window;
 
-	if (window.initialise(DEFAULT_WINDOW_WIDTH, DEFAULT_WINDOW_HEIGHT) == false) { // Initialise the main program window
+	if (window.initialise(DEFAULT_WINDOW_WIDTH, DEFAULT_WINDOW_HEIGHT) == false) // Initialise the main program window
+	{ 
 		return EXIT_FAILURE;
 	}
 	

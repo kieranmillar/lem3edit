@@ -58,6 +58,8 @@ bool Window::initialise( int w, int h )
 		return false;
 	}
 
+	SDL_SetWindowMinimumSize(screen, 300, 200);
+
 	screen_renderer = SDL_CreateRenderer(screen, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
 	if (screen_renderer == NULL)
 	{

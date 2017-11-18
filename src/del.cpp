@@ -18,7 +18,7 @@
  */
 
 /*
-This file contains code for reading from Lemmings 3's DEL files
+This file contains code for reading from Lemmings 3's DEL files. These contain game fonts
 */
 
 #include "del.hpp"
