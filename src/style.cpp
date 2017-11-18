@@ -308,6 +308,11 @@ bool Style::load_objects( int type, const string &obj_filename, const string &fr
 
 		if (!obj_f)
 			break;
+
+		if (o.id == 10008 || o.id == 10009) //Don't load game-crashing unimplemented monster
+		{
+			continue;
+		}
 		
 		for (int j = 0; j < frames; ++j)
 		{
