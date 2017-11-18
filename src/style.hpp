@@ -82,17 +82,17 @@ public:
 	signed int object_next_id(int type, unsigned int id) const;
 	signed int object_prev_id(int type, unsigned int id) const;
 	
-	void blit_object( SDL_Surface *surface, signed int x, signed int y, int type, unsigned int object, unsigned int frame ) const;
-	void draw_object_texture(Window window, signed int x, signed int y, int type, unsigned int object, int zoom) const;
+	void blit_object( SDL_Surface * surface, signed int x, signed int y, int type, unsigned int object, unsigned int frame ) const;
+	void draw_object_texture(Window * window, signed int x, signed int y, int type, unsigned int object, int zoom) const;
 
-	bool load(unsigned int n, Window window, SDL_Color *pal2);
+	bool load(unsigned int n, Window * window, SDL_Color *pal2);
 	bool load_palette( std::string path, std::string name, unsigned int n );
 	bool load_palette( std::string pal_filename );
 	bool load_objects( int type, const std::string &path, const std::string &name, unsigned int n);
 	bool load_objects( int type, const std::string &obj_filename, const std::string &frl_filename );
 	bool load_blocks( int type, const std::string &path, const std::string &name, unsigned int n );
 	bool load_blocks( int type, const std::string &blk_filename );
-	bool create_object_textures( int type, Window window, SDL_Color *pal2 );
+	bool create_object_textures( int type, Window * window, SDL_Color *pal2 );
 	bool destroy_all_objects( int type );
 	
 	Style( void ) { /* nothing to do */ }

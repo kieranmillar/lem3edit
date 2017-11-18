@@ -39,7 +39,7 @@ bool Editor::load( int n, Window * w )
 	window_ptr = w;
 	level.load(n);
 	tribe.load(level.tribe);
-	style.load(level.style, *w, tribe.palette);
+	style.load(level.style, w, tribe.palette);
 	
 	return redraw = true;
 }
@@ -241,7 +241,7 @@ void Editor::draw()
 		SDL_SetRenderDrawColor(window_ptr->screen_renderer, 0, 0, 0, 255);
 		SDL_RenderFillRect(window_ptr->screen_renderer, &level_area);
 
-		level.draw(*window_ptr, scroll_x, scroll_y, style, backgroundOnly, zoom);
+		level.draw(window_ptr, scroll_x, scroll_y, style, backgroundOnly, zoom);
 
 		for (Selection::const_iterator i = selection.begin(); i != selection.end(); ++i)
 		{

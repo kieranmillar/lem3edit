@@ -169,7 +169,7 @@ void Style::blit_object( SDL_Surface *surface, signed int x, signed int y, int t
 	}
 }
 
-void Style::draw_object_texture(Window window, signed int x, signed int y, int type, unsigned int object, int zoom ) const
+void Style::draw_object_texture(Window * window, signed int x, signed int y, int type, unsigned int object, int zoom ) const
 {
 	assert((unsigned)type < COUNTOF(this->object));
 
@@ -182,7 +182,7 @@ void Style::draw_object_texture(Window window, signed int x, signed int y, int t
 	rdest.w = this->object[type][object].width * 8 * zoom;
 	rdest.h = this->object[type][object].height * 2 * zoom;
 
-	if (rdest.x > window.width || rdest.y > window.height || rdest.x + rdest.w < 0 || rdest.y + rdest.h < 0)
+	if (rdest.x > window->width || rdest.y > window->height || rdest.x + rdest.w < 0 || rdest.y + rdest.h < 0)
 	{
 		return;
 	}
@@ -193,10 +193,10 @@ void Style::draw_object_texture(Window window, signed int x, signed int y, int t
 	rsource.w = this->object[type][object].width * 8;
 	rsource.h = this->object[type][object].height * 2;
 
-	SDL_RenderCopy(window.screen_renderer, megatex, &rsource, &rdest);
+	SDL_RenderCopy(window->screen_renderer, megatex, &rsource, &rdest);
 }
 
-bool Style::load(unsigned int n, Window window, SDL_Color *pal2)
+bool Style::load(unsigned int n, Window * window, SDL_Color *pal2)
 {
 	const string path = "STYLES/";
 	const string data = "DATA";
@@ -207,10 +207,10 @@ bool Style::load(unsigned int n, Window window, SDL_Color *pal2)
 	//So we just draw objects to the screen by drawing the section of the megatexture.
 	//This should be faster than a separate texture for each object
 
-	megatex = SDL_CreateTexture(window.screen_renderer, SDL_PIXELFORMAT_RGB888, SDL_TEXTUREACCESS_TARGET, 1024, 1024);
+	megatex = SDL_CreateTexture(window->screen_renderer, SDL_PIXELFORMAT_RGB888, SDL_TEXTUREACCESS_TARGET, 1024, 1024);
 	SDL_SetTextureBlendMode(megatex, SDL_BLENDMODE_BLEND);
 	SDL_SetTextureAlphaMod(megatex, 0);
-	SDL_RenderCopy(window.screen_renderer, megatex, NULL, NULL);
+	SDL_RenderCopy(window->screen_renderer, megatex, NULL, NULL);
 	SDL_SetTextureAlphaMod(megatex, 255);
 	megatexAddX = 0;
 	megatexAddY = 0;
@@ -423,7 +423,7 @@ bool Style::load_blocks( int type, const string &blk_filename )
 	return true;
 }
 
-bool Style::create_object_textures (int type, Window window, SDL_Color *pal2)
+bool Style::create_object_textures (int type, Window * window, SDL_Color *pal2)
 {
 	assert((unsigned)type < COUNTOF(this->object));
 
@@ -448,7 +448,7 @@ bool Style::create_object_textures (int type, Window window, SDL_Color *pal2)
 		SDL_SetColorKey(tempSurface2, SDL_TRUE, SDL_MapRGB(tempSurface2->format, 255, 0, 255));//Convert dummy magenta into transparency
 		
 		SDL_Texture *tempTexture;//Need to turn surface into a texture so can draw it with transparency onto our megatexture
-		tempTexture = SDL_CreateTextureFromSurface(window.screen_renderer, tempSurface2);
+		tempTexture = SDL_CreateTextureFromSurface(window->screen_renderer, tempSurface2);
 		
 		if (megatexAddX + (i->width*8) > 1024) {
 			megatexAddX = 0;
@@ -462,9 +462,9 @@ bool Style::create_object_textures (int type, Window window, SDL_Color *pal2)
 		r.w = i->width * 8;
 		r.h = i->height * 2;
 
-		SDL_SetRenderTarget(window.screen_renderer, megatex);
-		SDL_RenderCopy(window.screen_renderer, tempTexture, NULL, &r);
-		SDL_SetRenderTarget(window.screen_renderer, NULL);
+		SDL_SetRenderTarget(window->screen_renderer, megatex);
+		SDL_RenderCopy(window->screen_renderer, tempTexture, NULL, &r);
+		SDL_SetRenderTarget(window->screen_renderer, NULL);
 
 		i->texX = megatexAddX;
 		i->texY = megatexAddY;

@@ -25,7 +25,7 @@
 #include <iostream>
 using namespace std;
 
-void Level::draw( Window window, signed int x, signed int y, const Style &style, bool backgroundOnly, int zoom ) const
+void Level::draw( Window * window, signed int x, signed int y, const Style &style, bool backgroundOnly, int zoom ) const
 {
 	draw_objects(window, x, y, PERM, 0, 4999, style, zoom);
 	if (backgroundOnly == false)
@@ -35,7 +35,7 @@ void Level::draw( Window window, signed int x, signed int y, const Style &style,
 	}
 }
 
-void Level::draw_objects(Window window, signed int x, signed int y, int type, unsigned int id_min, unsigned int id_max, const Style &style, int zoom) const
+void Level::draw_objects(Window * window, signed int x, signed int y, int type, unsigned int id_min, unsigned int id_max, const Style &style, int zoom) const
 {
 	assert((unsigned)type < COUNTOF(this->object));
 	
