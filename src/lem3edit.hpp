@@ -33,6 +33,6 @@ static const int PERM = 0, TEMP = 1;
 std::string l3_filename( const std::string &path, const std::string &name, const std::string &ext );
 std::string l3_filename( const std::string &path, const std::string &name, int n, const std::string &ext);
 
-void box_dashed( SDL_Surface *dest, int x, int y, int width, int height, int dash );
+void printDebugNumber(int n);
 
 #endif // LEM3EDIT_HPP

@@ -21,6 +21,9 @@
 #ifndef BAR_HPP
 #define BAR_HPP
 
+#define BAR_HEIGHT 150
+#define PIECESIZE 132
+
 #include "SDL.h"
 
 class Window;
@@ -36,13 +39,16 @@ public:
 	Style * style_ptr;
 
 	int barScrollX;
+	int barPERMCount;
 	int barMaxPERM;
+	int barTEMPCount;
 	int barMaxTEMP;
-	int barMaxObj;
+	SDL_Rect barScrollRect;
 
-	bool redraw;
+	void load(Window * w, Editor * e, Style * s);
 
-	void setReferences(Window * w, Editor * e, Style * s);
+	void resizeBarScrollRect(int windowWidth, int windowHeight);
+	void updateBarScrollPos(int xPos);
 
 	void draw( void );
 

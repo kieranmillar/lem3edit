@@ -37,11 +37,10 @@ Editor::Editor(void)
 bool Editor::load( int n, Window * w )
 {
 	window_ptr = w;
-	bar.setReferences(window_ptr, this, &style);
-	bar.redraw = true;
 	level.load(n);
 	tribe.load(level.tribe);
 	style.load(level.style, window_ptr, tribe.palette);
+	bar.load(window_ptr, this, &style);
 	
 	return redraw = true;
 }

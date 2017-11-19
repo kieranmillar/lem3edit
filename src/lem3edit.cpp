@@ -99,6 +99,7 @@ int main( int argc, char *argv[] )
 					window.height = e.data2;
 					window.resize();
 					editor.redraw = true;
+					editor.bar.resizeBarScrollRect(e.data1, e.data2);
 				}
 			}
 			case SDL_MOUSEMOTION:
@@ -235,12 +236,12 @@ int main( int argc, char *argv[] )
 				{ // scroll if ijkl or mouse at border
 					const int mouse_scroll_trigger = min(window.width, window.height) / 32;
 					
-					const signed int left = (mouse_x_window < mouse_scroll_trigger) ? 2 : 0 + key_state[SDL_GetScancodeFromKey(SDLK_j)] ? 1 : 0;
-					const signed int right = (mouse_x_window >= (signed)window.width - mouse_scroll_trigger) ? 2 : 0 + key_state[SDL_GetScancodeFromKey(SDLK_l)] ? 1 : 0;
+					const signed int left = (mouse_x_window < mouse_scroll_trigger) ? /*2*/0 : 0 + key_state[SDL_GetScancodeFromKey(SDLK_j)] ? 1 : 0;
+					const signed int right = (mouse_x_window >= (signed)window.width - mouse_scroll_trigger) ? /*2*/0 : 0 + key_state[SDL_GetScancodeFromKey(SDLK_l)] ? 1 : 0;
 					signed int delta_x = (-left + right) * delta_multiplier;
 					
-					const signed int up = (mouse_y_window < mouse_scroll_trigger) ? 2 : 0 + key_state[SDL_GetScancodeFromKey(SDLK_i)] ? 1 : 0;
-					const signed int down = (mouse_y_window >= (signed)window.height - mouse_scroll_trigger) ? 2 : 0 + key_state[SDL_GetScancodeFromKey(SDLK_k)] ? 1 : 0;
+					const signed int up = (mouse_y_window < mouse_scroll_trigger) ? /*2*/0 : 0 + key_state[SDL_GetScancodeFromKey(SDLK_i)] ? 1 : 0;
+					const signed int down = (mouse_y_window >= (signed)window.height - mouse_scroll_trigger) ? /*2*/0 : 0 + key_state[SDL_GetScancodeFromKey(SDLK_k)] ? 1 : 0;
 					signed int delta_y = (-up + down) * delta_multiplier;
 
 
@@ -296,4 +297,11 @@ void version(void)
 	cerr << "This is free software.  You may redistribute copies of it under the terms of" << endl
 		<< "the GNU General Public License <http://www.gnu.org/licenses/gpl.html>." << endl
 		<< "There is NO WARRANTY, to the extent permitted by law." << endl << endl;
+}
+
+void printDebugNumber(int n)
+{
+	std::string str = std::to_string(n);
+	char const *pchar = str.c_str();  //use char const* as target type
+	SDL_ShowSimpleMessageBox(0, "Debug", pchar, NULL);
 }
