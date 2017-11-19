@@ -260,7 +260,7 @@ void Editor::draw()
 		}
 		if (scroll_x < level.width && scroll_x + (window_ptr->width / zoom) > level.width)
 		{
-			draw_dashed_level_border(vertical, ((level.width - scroll_x) * zoom) + 1, scroll_y * zoom);
+			draw_dashed_level_border(vertical, ((level.width - scroll_x) * zoom), scroll_y * zoom);
 		}
 		if (scroll_y < 0 && (scroll_y * zoom) + window_ptr->height > 0)
 		{
@@ -268,7 +268,7 @@ void Editor::draw()
 		}
 		if (scroll_y < level.height && scroll_y + (window_ptr->height / zoom) > level.height)
 		{
-			draw_dashed_level_border(horizontal, ((level.height - scroll_y) * zoom) + 1, scroll_x * zoom);
+			draw_dashed_level_border(horizontal, ((level.height - scroll_y) * zoom), scroll_x * zoom);
 		}
 
 		SDL_SetRenderTarget(window_ptr->screen_renderer, NULL);
@@ -287,6 +287,8 @@ void Editor::draw()
 
 void Editor::draw_selection_box(int x, int y, int width, int height)
 {
+	if (x > window_ptr->width || y > (window_ptr->height - BAR_HEIGHT) || (x + width) < 0 || (x + height) < 0)
+		return;
 	SDL_SetRenderDrawColor(window_ptr->screen_renderer, 255, 0, 255, 255 / 8);
 	SDL_Rect r;
 	r.x = x - 1;

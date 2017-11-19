@@ -16,8 +16,8 @@ escape        -- select none
 delete        -- delete selected objects
 ctrl + c      -- copy
 ctrl + v      -- paste
-z             -- decrease object ID
-x             -- increase object ID
+z             -- scroll object bar left
+x             -- scroll object bar right
 
 scroll-wheel  -- zoom in and out
 b             -- toggle background-only mode

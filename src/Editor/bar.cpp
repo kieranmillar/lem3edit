@@ -37,24 +37,34 @@ void Bar::load(Window * w, Editor * e, Style * s)
 	window_ptr = w;
 	editor_ptr = e;
 	style_ptr = s;
-	barScrollX = 7000;
+	barScrollX = 0;
 	barPERMCount = style_ptr->object[0].size();
 	barMaxPERM = barPERMCount * PIECESIZE;
 	barTEMPCount = style_ptr->object[1].size();
 	barMaxTEMP = barTEMPCount * PIECESIZE;
 	
 	resizeBarScrollRect(window_ptr->width, window_ptr->height);
-	barScrollRect.h = 14;
+	barScrollRect.h = 13;
 }
 
 void Bar::resizeBarScrollRect(int windowWidth, int windowHeight)
 {
-	barScrollRect.y = windowHeight - 15;
+	barScrollRect.y = windowHeight - 14;
 	barScrollRect.w = (windowWidth - BAR_HEIGHT - 33) * 1000 / barMaxPERM;
 	barScrollRect.w *= (windowWidth - BAR_HEIGHT - 33);
 	barScrollRect.w /= 1000;
-	updateBarScrollPos(barScrollX);
+	barScrollRect.w += 1;
+	scroll(0);
+}
 
+void Bar::scroll(signed int moveAmount)
+{
+	barScrollX += moveAmount;
+	if (barScrollX < 0)
+		barScrollX = 0;
+	if (barScrollX > barMaxPERM - (window_ptr->width - BAR_HEIGHT))
+		barScrollX = barMaxPERM - (window_ptr->width - BAR_HEIGHT);
+	updateBarScrollPos(barScrollX);
 }
 
 void Bar::updateBarScrollPos(int xPos)
@@ -62,7 +72,7 @@ void Bar::updateBarScrollPos(int xPos)
 	barScrollRect.x = (xPos * 1000) / barMaxPERM;
 	barScrollRect.x *= (window_ptr->width - BAR_HEIGHT - 33);
 	barScrollRect.x /= 1000;
-	barScrollRect.x += BAR_HEIGHT + 17;
+	barScrollRect.x += BAR_HEIGHT + 18;
 }
 
 void Bar::draw( void )

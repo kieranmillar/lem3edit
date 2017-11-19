@@ -17,6 +17,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
+#include "Editor/bar.hpp"
 #include "lem3edit.hpp"
 #include "level.hpp"
 
@@ -49,8 +50,10 @@ void Level::draw_objects(Window * window, signed int x, signed int y, int type, 
 		if (so == -1)
 			continue;
 
-		style.draw_object_texture(window, (o.x - x)*zoom, (o.y - y)*zoom, type, so, zoom, NULL);
-
+		int onScreenX = (o.x - x)*zoom;
+		int onScreenY = (o.y - y)*zoom;
+		if (onScreenY < window->height - BAR_HEIGHT)
+			style.draw_object_texture(window, onScreenX, onScreenY, type, so, zoom, NULL);
 	}
 }
 

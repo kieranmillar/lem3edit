@@ -48,6 +48,7 @@ public:
 	void load(Window * w, Editor * e, Style * s);
 
 	void resizeBarScrollRect(int windowWidth, int windowHeight);
+	void scroll(signed int moveAmount);
 	void updateBarScrollPos(int xPos);
 
 	void draw( void );

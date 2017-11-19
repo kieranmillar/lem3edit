@@ -189,10 +189,12 @@ int main( int argc, char *argv[] )
 						}
 						break;
 					case SDLK_z:
-						editor.decrease_obj_id();
+						//editor.decrease_obj_id();
+						editor.bar.scroll(-25 * delta_multiplier);
 						break;
 					case SDLK_x:
-						editor.increase_obj_id();
+						//editor.increase_obj_id();
+						editor.bar.scroll(25 * delta_multiplier);
 						break;
 					case SDLK_UP:
 					case SDLK_DOWN:
