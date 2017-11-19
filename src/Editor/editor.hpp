@@ -21,6 +21,7 @@
 #ifndef EDITOR_HPP
 #define EDITOR_HPP
 
+#include "bar.hpp"
 #include "../del.hpp"
 #include "../level.hpp"
 #include "../tribe.hpp"
@@ -34,6 +35,8 @@ class Editor
 {
 public:
 	Window * window_ptr;
+
+	Bar bar;
 
 	bool redraw;
 	

@@ -37,9 +37,11 @@ Editor::Editor(void)
 bool Editor::load( int n, Window * w )
 {
 	window_ptr = w;
+	bar.setReferences(window_ptr, this, &style);
+	bar.redraw = true;
 	level.load(n);
 	tribe.load(level.tribe);
-	style.load(level.style, w, tribe.palette);
+	style.load(level.style, window_ptr, tribe.palette);
 	
 	return redraw = true;
 }
@@ -273,8 +275,12 @@ void Editor::draw()
 		SDL_SetRenderTarget(window_ptr->screen_renderer, NULL);
 
 		redraw = false;
+
 	}
 
+	bar.draw();
+
+	SDL_SetRenderTarget(window_ptr->screen_renderer, NULL);
 	SDL_RenderCopy(window_ptr->screen_renderer, window_ptr->screen_texture, NULL, NULL);
 	SDL_RenderPresent(window_ptr->screen_renderer);
 

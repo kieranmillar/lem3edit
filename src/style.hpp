@@ -83,7 +83,7 @@ public:
 	signed int object_prev_id(int type, unsigned int id) const;
 	
 	void blit_object( SDL_Surface * surface, signed int x, signed int y, int type, unsigned int object, unsigned int frame ) const;
-	void draw_object_texture(Window * window, signed int x, signed int y, int type, unsigned int object, int zoom) const;
+	void draw_object_texture(Window * window, signed int x, signed int y, int type, unsigned int object, int zoom, int maxSize) const;
 
 	bool load(unsigned int n, Window * window, SDL_Color *pal2);
 	bool load_palette( std::string path, std::string name, unsigned int n );

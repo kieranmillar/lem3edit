@@ -49,7 +49,7 @@ void Level::draw_objects(Window * window, signed int x, signed int y, int type, 
 		if (so == -1)
 			continue;
 
-		style.draw_object_texture(window, o.x - x, o.y - y, type, so, zoom);
+		style.draw_object_texture(window, (o.x - x)*zoom, (o.y - y)*zoom, type, so, zoom, NULL);
 
 	}
 }

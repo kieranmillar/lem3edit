@@ -21,16 +21,30 @@
 #ifndef BAR_HPP
 #define BAR_HPP
 
+#include "SDL.h"
+
+class Window;
+class Editor;
+class Style;
+
 class Bar
 {
 public:
 
+	Window * window_ptr;
+	Editor * editor_ptr;
+	Style * style_ptr;
 
 	int barScrollX;
 	int barMaxPERM;
 	int barMaxTEMP;
 	int barMaxObj;
 
+	bool redraw;
+
+	void setReferences(Window * w, Editor * e, Style * s);
+
+	void draw( void );
 
 	Bar(void) { /* nothing to do */ }
 

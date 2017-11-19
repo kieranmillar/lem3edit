@@ -169,7 +169,8 @@ void Style::blit_object( SDL_Surface *surface, signed int x, signed int y, int t
 	}
 }
 
-void Style::draw_object_texture(Window * window, signed int x, signed int y, int type, unsigned int object, int zoom ) const
+// NOTE TO SELF: Have this return the rectangle, not do the drawing itself! Put Get in the title
+void Style::draw_object_texture(Window * window, signed int x, signed int y, int type, unsigned int object, int zoom, int maxSize ) const
 {
 	assert((unsigned)type < COUNTOF(this->object));
 
@@ -177,10 +178,18 @@ void Style::draw_object_texture(Window * window, signed int x, signed int y, int
 		return assert(false);
 
 	SDL_Rect rdest;
-	rdest.x = x*zoom;
-	rdest.y = y*zoom;
+	rdest.x = x;
+	rdest.y = y;
 	rdest.w = this->object[type][object].width * 8 * zoom;
 	rdest.h = this->object[type][object].height * 2 * zoom;
+	if (maxSize != 0) {
+		if (max(rdest.w, rdest.h) > maxSize)
+		{
+			int factor = (max(rdest.w, rdest.h)*100) / maxSize;
+			rdest.w = (rdest.w * 100) / (factor);
+			rdest.h = (rdest.h * 100) / (factor);
+		}
+	}
 
 	if (rdest.x > window->width || rdest.y > window->height || rdest.x + rdest.w < 0 || rdest.y + rdest.h < 0)
 	{
