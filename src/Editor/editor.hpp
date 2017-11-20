@@ -22,6 +22,7 @@
 #define EDITOR_HPP
 
 #include "bar.hpp"
+#include "canvas.hpp"
 #include "../del.hpp"
 #include "../level.hpp"
 #include "../tribe.hpp"
@@ -37,6 +38,7 @@ public:
 	Window * window_ptr;
 
 	Bar bar;
+	Canvas canvas;
 
 	bool redraw;
 	
@@ -59,6 +61,8 @@ public:
 	typedef std::vector< std::pair<Level::Object::Index, Level::Object> > Clipboard;
 	Clipboard clipboard;
 	
+	void resize(int w, int h);
+
 	bool select( signed int x, signed int y, bool modify );
 	bool select_none( void );
 	bool select_all( void );

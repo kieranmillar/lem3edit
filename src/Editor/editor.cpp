@@ -34,13 +34,22 @@ Editor::Editor(void)
 	font.load("FONT");
 }
 
+void Editor::resize( int w, int h)
+{
+	canvas.resize(h);
+	bar.resizeBarScrollRect(w, h);
+}
+
 bool Editor::load( int n, Window * w )
 {
 	window_ptr = w;
+	bar.setReferences(window_ptr, this, &canvas, &style);
+	canvas.setReferences(window_ptr, this, &bar, &style);
 	level.load(n);
 	tribe.load(level.tribe);
 	style.load(level.style, window_ptr, tribe.palette);
-	bar.load(window_ptr, this, &style);
+	bar.load();
+	canvas.load();
 	
 	return redraw = true;
 }

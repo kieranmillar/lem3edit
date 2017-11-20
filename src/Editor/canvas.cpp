@@ -18,50 +18,29 @@
 * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#ifndef BAR_HPP
-#define BAR_HPP
+/*
+This file includes code to manage drawing in the editor, and the properties fo the part of the screen
+where the level is displayed
+*/
 
-#define BAR_HEIGHT 150
-#define PIECESIZE 132
+#include "bar.hpp"
+#include "canvas.hpp"
+#include "../window.hpp"
 
-#include "SDL.h"
-
-class Window;
-class Editor;
-class Canvas;
-class Style;
-
-class Bar
+void Canvas::setReferences(Window * w, Editor * e, Bar * b, Style * s)
 {
-public:
+	window_ptr = w;
+	editor_ptr = e;
+	bar_ptr = b;
+	style_ptr = s;
+}
 
-	Window * window_ptr;
-	Editor * editor_ptr;
-	Canvas * canvas_ptr;
-	Style * style_ptr;
+void Canvas::load(void)
+{
+	resize(window_ptr->height);
+}
 
-	int barScrollX;
-	int barPERMCount;
-	int barMaxPERM;
-	int barTEMPCount;
-	int barMaxTEMP;
-	int type;
-	int barMax;
-	SDL_Rect barScrollRect;
-
-	void setReferences(Window * w, Editor * e, Canvas * c, Style * s);
-	void load(void);
-
-	void resizeBarScrollRect(int windowWidth, int windowHeight);
-	void scroll(signed int moveAmount);
-	void updateBarScrollPos(int xPos);
-
-	void changeType( int t);
-
-	void draw( void );
-
-	Bar(void) { /* nothing to do */ };
-
-};
-
-#endif // EDITOR_HPP
+void Canvas::resize(int h)
+{
+	height = h - BAR_HEIGHT;
+}

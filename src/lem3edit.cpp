@@ -98,8 +98,8 @@ int main( int argc, char *argv[] )
 					window.width = e.data1;
 					window.height = e.data2;
 					window.resize();
+					editor.resize(e.data1, e.data2);
 					editor.redraw = true;
-					editor.bar.resizeBarScrollRect(e.data1, e.data2);
 				}
 			}
 			case SDL_MOUSEMOTION:
@@ -169,6 +169,12 @@ int main( int argc, char *argv[] )
 				
 				switch (e.keysym.sym)
 				{
+					case SDLK_1:
+						editor.bar.changeType(PERM);
+						break;
+					case SDLK_2:
+						editor.bar.changeType(TEMP);
+						break;
 					case SDLK_s:
 						editor.save(level_id);
 						break;

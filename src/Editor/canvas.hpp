@@ -18,50 +18,35 @@
 * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#ifndef BAR_HPP
-#define BAR_HPP
-
-#define BAR_HEIGHT 150
-#define PIECESIZE 132
+#ifndef CANVAS_HPP
+#define CANVAS_HPP
 
 #include "SDL.h"
 
 class Window;
 class Editor;
-class Canvas;
+class Bar;
 class Style;
 
-class Bar
+class Canvas
 {
 public:
 
 	Window * window_ptr;
 	Editor * editor_ptr;
-	Canvas * canvas_ptr;
+	Bar * bar_ptr;
 	Style * style_ptr;
 
-	int barScrollX;
-	int barPERMCount;
-	int barMaxPERM;
-	int barTEMPCount;
-	int barMaxTEMP;
-	int type;
-	int barMax;
-	SDL_Rect barScrollRect;
+	int height;
 
-	void setReferences(Window * w, Editor * e, Canvas * c, Style * s);
+	void setReferences(Window * w, Editor * e, Bar * b, Style * s);
 	void load(void);
+	void resize(int h);
 
-	void resizeBarScrollRect(int windowWidth, int windowHeight);
-	void scroll(signed int moveAmount);
-	void updateBarScrollPos(int xPos);
+	void draw(void);
 
-	void changeType( int t);
-
-	void draw( void );
-
-	Bar(void) { /* nothing to do */ };
+	Canvas(void) { /* nothing to do */ }
 
 };
 
-#endif // EDITOR_HPP
+#endif // CANVAS_HPP
