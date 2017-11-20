@@ -56,6 +56,8 @@ public:
 
 	void draw_selection_box(int x, int y, int width, int height);
 
+	void drawHeldObject(int holdingType, int holdingID, int x, int y);
+
 	enum borderType { horizontal, vertical };
 	void draw_dashed_level_border(borderType type, int pos, int offset);
 

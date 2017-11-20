@@ -58,6 +58,8 @@ public:
 
 	void changeType( int t);
 
+	int getPieceIDByScreenPos ( int mousePos );
+
 	void draw( void );
 
 	Bar(void) { /* nothing to do */ };

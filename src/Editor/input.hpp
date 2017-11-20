@@ -46,6 +46,8 @@ public:
 	Sint32 mouse_prev_x, mouse_prev_y;
 	bool dragging, leftScrollButtonHolding, rightScrollButtonHolding;
 
+	int holdingID, holdingType;
+
 	void setReferences(Window * w, Editor * e, Bar * b, Canvas * c, Style * s, Level * l);
 	void load(void);
 

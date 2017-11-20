@@ -94,6 +94,17 @@ void Bar::changeType(int t)
 	resizeBarScrollRect(window_ptr->width, window_ptr->height);
 }
 
+int Bar::getPieceIDByScreenPos(int mousePos)
+{
+	int piece = mousePos + barScrollX - BAR_HEIGHT;
+	piece /= PIECESIZE;
+
+	if (piece > style_ptr->object[type].size())
+		return -1;
+	int id = style_ptr->object[type][piece].id;
+	return id;
+}
+
 void Bar::draw( void )
 {
 	{ // bar background in the absense of a proper graphic

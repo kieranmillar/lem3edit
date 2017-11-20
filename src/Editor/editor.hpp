@@ -60,6 +60,8 @@ public:
 	bool select_none( void );
 	bool select_all( void );
 	
+	bool addObject(int idToAdd, int typeToAdd, int xToAdd, int yToAdd);
+
 	bool copy_selected( void );
 	bool paste( void );
 	bool decrease_obj_id(void);

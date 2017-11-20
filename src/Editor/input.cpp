@@ -48,6 +48,8 @@ void Editor_input::load(void)
 	dragging = false;
 	leftScrollButtonHolding = false;
 	rightScrollButtonHolding = false;
+	holdingID = -1;
+	holdingType = -1;
 }
 
 void Editor_input::handleEvents(SDL_Event event)
@@ -99,24 +101,48 @@ void Editor_input::handleEvents(SDL_Event event)
 		{
 			canvas_ptr->mouse_remainder_x = 0;
 			canvas_ptr->mouse_remainder_y = 0;
-		}
-
-		if (e.button == SDL_BUTTON_LEFT || e.button == SDL_BUTTON_RIGHT)
-		{
 			if (mouse_y_window < canvas_ptr->height)
 				// canvas
 			{
-				editor_ptr->select(mouse_x, mouse_y, ctrl_down);
+				if (holdingType != -1 && holdingID != -1)
+				{
+					editor_ptr->addObject(holdingID, holdingType, mouse_x - (mouse_x % 8), mouse_y - (mouse_y % 2));
+					
+					Level::Object::Index o(holdingType, level_ptr->object[holdingType].size() - 1);
+					editor_ptr->selection.insert(o);
+
+					holdingType = -1;
+					holdingID = -1;
+				}
+				else
+				{
+					editor_ptr->select(mouse_x, mouse_y, ctrl_down);
+				}
 			}
 			else if (mouse_x_window < BAR_HEIGHT)
 				// options panel
 			{
-
+				holdingType = -1;
+				holdingID = -1;
 			}
 			else if (mouse_y_window < window_ptr->height - 16)
 				// piece browser
 			{
-
+				if (holdingType == -1 && holdingID == -1)
+				{
+					int pieceSelected = bar_ptr->getPieceIDByScreenPos(mouse_x_window);
+					if (pieceSelected != -1)
+					{
+						holdingType = bar_ptr->type;
+						holdingID = pieceSelected;
+						editor_ptr->select_none();
+					}
+				}
+				else
+				{
+					holdingType = -1;
+					holdingID = -1;
+				}
 			}
 			else if (mouse_x_window < BAR_HEIGHT + 16)
 				// piece browser scroll bar left button
@@ -289,6 +315,10 @@ void Editor_input::handleEvents(SDL_Event event)
 		}
 
 		canvas_ptr->draw();
+		if (holdingType != -1 && holdingID != -1)
+			canvas_ptr->drawHeldObject(holdingType, holdingID, mouse_x_window, mouse_y_window);
+
+		SDL_RenderPresent(window_ptr->screen_renderer);
 
 		break;
 	}

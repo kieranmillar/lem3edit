@@ -19,7 +19,7 @@
 */
 
 /*
-This file includes code to manage drawing in the editor, and the properties fo the part of the screen
+This file includes code to manage drawing in the editor, and the properties of the part of the screen
 where the level is displayed
 */
 
@@ -114,7 +114,7 @@ void Canvas::draw()
 
 	SDL_SetRenderTarget(window_ptr->screen_renderer, NULL);
 	SDL_RenderCopy(window_ptr->screen_renderer, window_ptr->screen_texture, NULL, NULL);
-	SDL_RenderPresent(window_ptr->screen_renderer);
+	
 
 
 }
@@ -132,6 +132,25 @@ void Canvas::draw_selection_box(int x, int y, int width, int height)
 	SDL_RenderFillRect(window_ptr->screen_renderer, &r);
 	SDL_SetRenderDrawColor(window_ptr->screen_renderer, 255, 0, 255, 255);
 	SDL_RenderDrawRect(window_ptr->screen_renderer, &r);
+}
+
+void Canvas::drawHeldObject(int holdingType, int holdingID, int x, int y)
+{
+	int scrollOffsetX, scrollOffsetY, drawX, drawY;
+	if (y < height)
+	{
+		scrollOffsetX = (scroll_x % 8) * zoom;
+		scrollOffsetY = (scroll_y % 2) * zoom;
+		drawX = x - ((x + scrollOffsetX) % (8 * zoom));
+		drawY = y - ((y + scrollOffsetY) % (2 * zoom));
+	}
+	else
+	{
+		drawX = x;
+		drawY = y;
+	}
+	int drawID = style_ptr->object_by_id(holdingType, holdingID);
+	style_ptr->draw_object_texture(window_ptr, drawX, drawY, holdingType, drawID, zoom, NULL);
 }
 
 void Canvas::draw_dashed_level_border(borderType type, int pos, int offset)
@@ -155,7 +174,7 @@ void Canvas::draw_dashed_level_border(borderType type, int pos, int offset)
 	}
 	if (type == vertical)
 	{
-		end = window_ptr->height;
+		end = height;
 		x1 = pos;
 		x2 = pos;
 		y1 = 0 - initialOffset;

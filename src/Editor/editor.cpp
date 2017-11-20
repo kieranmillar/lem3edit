@@ -130,7 +130,7 @@ bool Editor::paste( void )
 	selection.clear(); // maybe delete selection instead?
 	
 	for (Clipboard::const_iterator i = clipboard.begin(); i != clipboard.end(); ++i)
-	{
+	{		
 		const Level::Object::Index &index = i->first;
 		
 		level.object[index.type].push_back(i->second);
@@ -139,6 +139,18 @@ bool Editor::paste( void )
 	}
 	
 	return canvas.redraw = !clipboard.empty();
+}
+
+bool Editor::addObject(int idToAdd, int typeToAdd, int xToAdd, int yToAdd)
+{
+	Level::Object o;
+
+	o.id = idToAdd;
+	o.x = xToAdd;
+	o.y = yToAdd;
+	level.object[typeToAdd].push_back(o);
+
+	return canvas.redraw = true;
 }
 
 bool Editor::decrease_obj_id( void )
