@@ -81,6 +81,19 @@ void Bar::updateBarScrollPos(int xPos)
 	barScrollRect.x += BAR_HEIGHT + 18;
 }
 
+void Bar::moveScrollBar(int moveLocationInWindow)
+{
+	int x = moveLocationInWindow - BAR_HEIGHT - 18;
+	int xMax = window_ptr->width - BAR_HEIGHT - 33;
+	if (x < 0)
+		x = 0;
+	if (x > xMax - barScrollRect.w)
+		x = xMax - barScrollRect.w;
+	int factor = x * 1000 / xMax;
+	barScrollX = (barMax * factor) / 1000;
+	scroll(0);
+}
+
 void Bar::changeType(int t)
 {
 	if (type == t)

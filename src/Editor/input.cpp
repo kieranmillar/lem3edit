@@ -48,6 +48,8 @@ void Editor_input::load(void)
 	dragging = false;
 	leftScrollButtonHolding = false;
 	rightScrollButtonHolding = false;
+	scrollBarHolding = false;
+	scrollBarHoldingOffset = 0;
 	holdingID = -1;
 	holdingType = -1;
 }
@@ -86,6 +88,8 @@ void Editor_input::handleEvents(SDL_Event event)
 
 		if (e.state & SDL_BUTTON(SDL_BUTTON_LEFT) && dragging)
 			editor_ptr->move_selected(mouse_x_window - mouse_prev_x, mouse_y_window - mouse_prev_y);
+		if (e.state & SDL_BUTTON(SDL_BUTTON_LEFT) && scrollBarHolding)
+			bar_ptr->moveScrollBar(mouse_x_window - scrollBarHoldingOffset);
 
 		mouse_prev_x = mouse_x_window;
 		mouse_prev_y = mouse_y_window;
@@ -157,10 +161,11 @@ void Editor_input::handleEvents(SDL_Event event)
 			else if (mouse_x_window > bar_ptr->barScrollRect.x && mouse_x_window < (bar_ptr->barScrollRect.x + bar_ptr->barScrollRect.w))
 				// piece browser scroll bar bar
 			{
-
+				scrollBarHolding = true;
+				scrollBarHoldingOffset = mouse_x_window - bar_ptr->barScrollRect.x;
 			}
 			else
-				// // piece browser scroll bar area
+				// piece browser scroll bar area
 			{
 
 			}
@@ -177,6 +182,7 @@ void Editor_input::handleEvents(SDL_Event event)
 			dragging = false;
 			leftScrollButtonHolding = false;
 			rightScrollButtonHolding = false;
+			scrollBarHolding = false;
 		}
 		break;
 	}

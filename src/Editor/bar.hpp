@@ -55,6 +55,7 @@ public:
 	void resizeBarScrollRect(int windowWidth, int windowHeight);
 	void scroll(signed int moveAmount);
 	void updateBarScrollPos(int xPos);
+	void moveScrollBar(int moveLocationInWindow);
 
 	void changeType( int t);
 
