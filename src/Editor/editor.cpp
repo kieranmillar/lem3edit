@@ -72,13 +72,19 @@ bool Editor::select( signed int x, signed int y, bool modify_selection )
 	else
 	{
 		bool already_selected = selection.find(temp) != selection.end();
-		
-		if (!modify_selection && !already_selected)
-			selection.clear();
-		if (modify_selection && already_selected)
-			selection.erase(temp);
+		if (already_selected)
+		{
+			editor_input.dragging = true;
+		}
 		else
-			selection.insert(temp);
+		{
+			if (!modify_selection)
+				selection.clear();
+			if (modify_selection)
+				selection.erase(temp);
+			else
+				selection.insert(temp);
+		}
 	}
 	
 	return canvas.redraw = true;

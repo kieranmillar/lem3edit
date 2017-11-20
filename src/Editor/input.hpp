@@ -41,11 +41,10 @@ public:
 	Style * style_ptr;
 	Level * level_ptr;
 
-	int height;
-
 	bool redraw;
 
 	Sint32 mouse_prev_x, mouse_prev_y;
+	bool dragging, leftScrollButtonHolding, rightScrollButtonHolding;
 
 	void setReferences(Window * w, Editor * e, Bar * b, Canvas * c, Style * s, Level * l);
 	void load(void);

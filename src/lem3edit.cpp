@@ -75,7 +75,8 @@ int main( int argc, char *argv[] )
 	SDL_Event event;
 	while (SDL_WaitEvent(&event) && event.type != SDL_QUIT)
 	{
-		editor.editor_input.handleEvents(event);
+		if (g_currentMode == EDITORMODE)
+			editor.editor_input.handleEvents(event);
 	}
 
 	window.destroy();
