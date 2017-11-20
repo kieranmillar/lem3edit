@@ -39,7 +39,7 @@
 using namespace std;
 
 const char *prog_name = "lem3edit";
-const char *prog_ver = "0.5";
+const char *prog_ver = "0.5.1";
 const char *prog_date = "20/11/2017";
 
 void version(void);
