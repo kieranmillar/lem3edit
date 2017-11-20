@@ -23,6 +23,7 @@
 
 #include "bar.hpp"
 #include "canvas.hpp"
+#include "input.hpp"
 #include "../del.hpp"
 #include "../level.hpp"
 #include "../tribe.hpp"
@@ -39,6 +40,7 @@ public:
 
 	Bar bar;
 	Canvas canvas;
+	Editor_input editor_input;
 	
 	Del font;
 	

@@ -30,6 +30,8 @@
 class Level
 {
 public:
+	int level_id;
+	
 	Uint16 tribe;
 	Uint16 cave_map, cave_raw;
 	Uint16 temp, perm;

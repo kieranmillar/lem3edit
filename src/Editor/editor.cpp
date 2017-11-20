@@ -19,7 +19,7 @@
  */
 
 /*
-This file includes all the primary functionality of the level editor
+This file is the top level object of the editor and handles some general purpose functionality
 */
 #include "editor.hpp"
 
@@ -43,11 +43,13 @@ bool Editor::load( int n, Window * w )
 	window_ptr = w;
 	bar.setReferences(window_ptr, this, &canvas, &style);
 	canvas.setReferences(window_ptr, this, &bar, &style, &level);
+	editor_input.setReferences(window_ptr, this, &bar, &canvas, &style, &level);
 	level.load(n);
 	tribe.load(level.tribe);
 	style.load(level.style, window_ptr, tribe.palette);
 	bar.load();
 	canvas.load();
+	editor_input.load();
 	
 	return canvas.redraw = true;
 }

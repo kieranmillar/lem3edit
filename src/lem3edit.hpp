@@ -30,8 +30,12 @@
 
 static const int PERM = 0, TEMP = 1;
 
+enum programMode { EDITORMODE };
+
 std::string l3_filename( const std::string &path, const std::string &name, const std::string &ext );
 std::string l3_filename( const std::string &path, const std::string &name, int n, const std::string &ext);
+
+void die(void);
 
 void printDebugNumber(int n);
 

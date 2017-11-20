@@ -108,6 +108,8 @@ bool Level::load( unsigned int n )
 	const string path = "LEVELS/";
 	const string level = "LEVEL";
 	const string perm = "PERM", temp = "TEMP";
+
+	level_id - n;
 	
 	return load_level(path, level, n) &&
 	       load_objects(PERM, path, perm, n) &&
