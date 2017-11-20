@@ -28,8 +28,6 @@ This file includes all the primary functionality of the level editor
 using namespace std;
 
 Editor::Editor(void)
-	: scroll_x(0), scroll_y(0), zoom(2), backgroundOnly(false),
-	mouse_remainder_x(0), mouse_remainder_y(0)
 {
 	font.load("FONT");
 }
@@ -44,26 +42,26 @@ bool Editor::load( int n, Window * w )
 {
 	window_ptr = w;
 	bar.setReferences(window_ptr, this, &canvas, &style);
-	canvas.setReferences(window_ptr, this, &bar, &style);
+	canvas.setReferences(window_ptr, this, &bar, &style, &level);
 	level.load(n);
 	tribe.load(level.tribe);
 	style.load(level.style, window_ptr, tribe.palette);
 	bar.load();
 	canvas.load();
 	
-	return redraw = true;
+	return canvas.redraw = true;
 }
 
 bool Editor::save(int n)
 {
 	level.save(n);
 
-	return redraw = true;
+	return canvas.redraw = true;
 }
 
 bool Editor::select( signed int x, signed int y, bool modify_selection )
 {
-	Level::Object::Index temp = level.get_object_by_position(x, y, style, backgroundOnly);
+	Level::Object::Index temp = level.get_object_by_position(x, y, style, canvas.backgroundOnly);
 	
 	if (temp.i == -1)  // selected nothing
 	{
@@ -81,7 +79,7 @@ bool Editor::select( signed int x, signed int y, bool modify_selection )
 			selection.insert(temp);
 	}
 	
-	return redraw = true;
+	return canvas.redraw = true;
 }
 
 bool Editor::select_none( void )
@@ -91,7 +89,7 @@ bool Editor::select_none( void )
 	
 	selection.clear();
 	
-	return redraw = true;
+	return canvas.redraw = true;
 }
 
 bool Editor::select_all( void )
@@ -104,7 +102,7 @@ bool Editor::select_all( void )
 		}
 	}
 	
-	return redraw = !selection.empty();
+	return canvas.redraw = !selection.empty();
 }
 
 bool Editor::copy_selected( void )
@@ -132,7 +130,7 @@ bool Editor::paste( void )
 		selection.insert(Level::Object::Index(index.type, level.object[index.type].size() - 1));
 	}
 	
-	return redraw = !clipboard.empty();
+	return canvas.redraw = !clipboard.empty();
 }
 
 bool Editor::decrease_obj_id( void )
@@ -143,7 +141,7 @@ bool Editor::decrease_obj_id( void )
 		o.id = style.object_prev_id(i->type, o.id);
 	}
 
-	return redraw = true;
+	return canvas.redraw = true;
 }
 
 bool Editor::increase_obj_id( void )
@@ -154,7 +152,7 @@ bool Editor::increase_obj_id( void )
 		o.id = style.object_next_id(i->type, o.id);
 	}
 
-	return redraw = true;
+	return canvas.redraw = true;
 }
 
 bool Editor::delete_selected( void )
@@ -167,7 +165,7 @@ bool Editor::delete_selected( void )
 	
 	selection.clear();
 	
-	return redraw = true;
+	return canvas.redraw = true;
 }
 
 //This function takes in how much the mouse has moved in the last frame
@@ -176,13 +174,13 @@ bool Editor::delete_selected( void )
 //and snapping them to the grid
 bool Editor::move_selected( signed int delta_x, signed int delta_y )
 {
-	delta_x += mouse_remainder_x;
-	delta_y += mouse_remainder_y;
-	mouse_remainder_x = delta_x % (8*zoom);
-	mouse_remainder_y = delta_y % (2*zoom);
+	delta_x += canvas.mouse_remainder_x;
+	delta_y += canvas.mouse_remainder_y;
+	canvas.mouse_remainder_x = delta_x % (8 * canvas.zoom);
+	canvas.mouse_remainder_y = delta_y % (2 * canvas.zoom);
 
-	delta_x /= (8*zoom);
-	delta_y /= (2*zoom);
+	delta_x /= (8 * canvas.zoom);
+	delta_y /= (2 * canvas.zoom);
 	
 	if (selection.empty() || (delta_x == 0 && delta_y == 0))
 		return false;
@@ -194,7 +192,7 @@ bool Editor::move_selected( signed int delta_x, signed int delta_y )
 		o.y += delta_y*2;
 	}
 	
-	return redraw = true;
+	return canvas.redraw = true;
 }
 
 bool Editor::move_selected_z( signed int delta_z )
@@ -208,90 +206,28 @@ bool Editor::move_selected_z( signed int delta_z )
 		(void)delta_z;
 	}
 	
-	return redraw = true;
+	return canvas.redraw = true;
 }
 
 bool Editor::scroll( signed int delta_x, signed int delta_y, bool drag )
 {
-	signed int old_scroll_x = scroll_x, old_scroll_y = scroll_y;
+	signed int old_scroll_x = canvas.scroll_x, old_scroll_y = canvas.scroll_y;
 	
-	scroll_x = BETWEEN(-200, scroll_x + delta_x, level.width);
-	delta_x = scroll_x - old_scroll_x;
+	canvas.scroll_x = BETWEEN(-200, canvas.scroll_x + delta_x, level.width);
+	delta_x = canvas.scroll_x - old_scroll_x;
 	
-	scroll_y = BETWEEN(-200, scroll_y + delta_y, level.height);
-	delta_y = scroll_y - old_scroll_y;
+	canvas.scroll_y = BETWEEN(-200, canvas.scroll_y + delta_y, level.height);
+	delta_y = canvas.scroll_y - old_scroll_y;
 	
 	if (delta_x != 0 || delta_y != 0)
 	{
 		if (drag)
-			move_selected(delta_x*zoom, delta_y*zoom);
+			move_selected(delta_x*canvas.zoom, delta_y*canvas.zoom);
 		
-		return redraw = true;
+		return canvas.redraw = true;
 	}
 	
 	return false;
-}
-
-void Editor::draw()
-{
-
-	SDL_Rect level_area;
-	level_area.x = 0 - scroll_x * zoom;
-	level_area.y = 0 - scroll_y * zoom;
-	level_area.w = level.width*zoom;
-	level_area.h = level.height*zoom;
-
-	if (redraw)
-	{
-		SDL_SetRenderDrawBlendMode(window_ptr->screen_renderer, SDL_BLENDMODE_BLEND);
-		SDL_SetRenderTarget(window_ptr->screen_renderer, window_ptr->screen_texture);
-		SDL_SetRenderDrawColor(window_ptr->screen_renderer, 100, 100, 100, 255);
-		SDL_RenderFillRect(window_ptr->screen_renderer, NULL);
-
-		SDL_SetRenderDrawColor(window_ptr->screen_renderer, 0, 0, 0, 255);
-		SDL_RenderFillRect(window_ptr->screen_renderer, &level_area);
-
-		level.draw(window_ptr, scroll_x, scroll_y, style, backgroundOnly, zoom);
-
-		for (Selection::const_iterator i = selection.begin(); i != selection.end(); ++i)
-		{
-			Level::Object &o = level.object[i->type][i->i];
-			int so = style.object_by_id(i->type, o.id);
-			draw_selection_box((o.x - scroll_x)*zoom, (o.y - scroll_y)*zoom, style.object[i->type][so].width * 8 * zoom, style.object[i->type][so].height * 2 * zoom);
-		}
-
-		SDL_SetRenderDrawColor(window_ptr->screen_renderer, 0, 0, 0, 255);
-
-		//Draw dotted lines on the level border
-		if (scroll_x < 0 && (scroll_x * zoom) + window_ptr->width > 0)
-		{
-			draw_dashed_level_border(vertical, ((0 - scroll_x) * zoom) - 1, scroll_y * zoom);
-		}
-		if (scroll_x < level.width && scroll_x + (window_ptr->width / zoom) > level.width)
-		{
-			draw_dashed_level_border(vertical, ((level.width - scroll_x) * zoom), scroll_y * zoom);
-		}
-		if (scroll_y < 0 && (scroll_y * zoom) + window_ptr->height > 0)
-		{
-			draw_dashed_level_border(horizontal, ((0 - scroll_y) * zoom) - 1, scroll_x * zoom);
-		}
-		if (scroll_y < level.height && scroll_y + (window_ptr->height / zoom) > level.height)
-		{
-			draw_dashed_level_border(horizontal, ((level.height - scroll_y) * zoom), scroll_x * zoom);
-		}
-
-		SDL_SetRenderTarget(window_ptr->screen_renderer, NULL);
-
-		redraw = false;
-
-	}
-
-	bar.draw();
-
-	SDL_SetRenderTarget(window_ptr->screen_renderer, NULL);
-	SDL_RenderCopy(window_ptr->screen_renderer, window_ptr->screen_texture, NULL, NULL);
-	SDL_RenderPresent(window_ptr->screen_renderer);
-
 }
 
 void Editor::draw_selection_box(int x, int y, int width, int height)

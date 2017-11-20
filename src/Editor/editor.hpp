@@ -39,21 +39,12 @@ public:
 
 	Bar bar;
 	Canvas canvas;
-
-	bool redraw;
-	
-	void draw();
 	
 	Del font;
 	
 	Level level;
 	Tribe tribe;
 	Style style;
-	
-	signed int scroll_x, scroll_y;
-	signed int zoom;
-	Sint32 mouse_remainder_x, mouse_remainder_y;
-	bool backgroundOnly;
 	
 	typedef std::set<Level::Object::Index> Selection;
 	Selection selection;

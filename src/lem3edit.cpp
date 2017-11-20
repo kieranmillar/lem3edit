@@ -84,8 +84,8 @@ int main( int argc, char *argv[] )
 		// So we need to create our own variables instead
 		// These ones give the true x co-ordinate of the level, ignoring zoom and scroll
 		Sint32 mouse_x, mouse_y;
-		mouse_x = (mouse_x_window / editor.zoom) + editor.scroll_x;
-		mouse_y = (mouse_y_window / editor.zoom) + editor.scroll_y;
+		mouse_x = (mouse_x_window / editor.canvas.zoom) + editor.canvas.scroll_x;
+		mouse_y = (mouse_y_window / editor.canvas.zoom) + editor.canvas.scroll_y;
 
 		switch (event.type)
 		{
@@ -99,7 +99,7 @@ int main( int argc, char *argv[] )
 					window.height = e.data2;
 					window.resize();
 					editor.resize(e.data1, e.data2);
-					editor.redraw = true;
+					editor.canvas.redraw = true;
 				}
 			}
 			case SDL_MOUSEMOTION:
@@ -121,8 +121,8 @@ int main( int argc, char *argv[] )
 
 				if (e.button == SDL_BUTTON_LEFT)
 				{
-					editor.mouse_remainder_x = 0;
-					editor.mouse_remainder_y = 0;
+					editor.canvas.mouse_remainder_x = 0;
+					editor.canvas.mouse_remainder_y = 0;
 				}
 
 				if (e.button == SDL_BUTTON_LEFT || e.button == SDL_BUTTON_RIGHT)
@@ -135,7 +135,7 @@ int main( int argc, char *argv[] )
 				SDL_MouseButtonEvent &e = event.button;
 
 				if (e.button == SDL_BUTTON_LEFT)
-					editor.mouse_remainder_x = editor.mouse_remainder_y = 0;
+					editor.canvas.mouse_remainder_x = editor.canvas.mouse_remainder_y = 0;
 
 				break;
 			}
@@ -146,15 +146,15 @@ int main( int argc, char *argv[] )
 				{
 					if (e.y == 1)
 					{
-						if (editor.zoom != 16)
-							editor.zoom *= 2;
-						editor.redraw = true;
+						if (editor.canvas.zoom != 16)
+							editor.canvas.zoom *= 2;
+						editor.canvas.redraw = true;
 					}
 					if (e.y == -1)
 					{
-						if (editor.zoom != 1)
-							editor.zoom /= 2;
-						editor.redraw = true;
+						if (editor.canvas.zoom != 1)
+							editor.canvas.zoom /= 2;
+						editor.canvas.redraw = true;
 					}
 				}
 				break;
@@ -205,12 +205,12 @@ int main( int argc, char *argv[] )
 					case SDLK_UP:
 					case SDLK_DOWN:
 						if (!mouse_state & SDL_BUTTON(SDL_BUTTON_LEFT))
-							editor.move_selected(0, (e.keysym.sym == SDLK_UP ? -1 : e.keysym.sym == SDLK_DOWN ? 1 : 0) * delta_multiplier * editor.zoom);
+							editor.move_selected(0, (e.keysym.sym == SDLK_UP ? -1 : e.keysym.sym == SDLK_DOWN ? 1 : 0) * delta_multiplier * editor.canvas.zoom);
 						break;
 					case SDLK_LEFT:
 					case SDLK_RIGHT:
 						if (!mouse_state & SDL_BUTTON(SDL_BUTTON_LEFT))
-							editor.move_selected((e.keysym.sym == SDLK_LEFT ? -4 : e.keysym.sym == SDLK_RIGHT ? 4 : 0) * delta_multiplier * editor.zoom, 0);
+							editor.move_selected((e.keysym.sym == SDLK_LEFT ? -4 : e.keysym.sym == SDLK_RIGHT ? 4 : 0) * delta_multiplier * editor.canvas.zoom, 0);
 						break;
 					case SDLK_DELETE:
 						editor.delete_selected();
@@ -219,16 +219,16 @@ int main( int argc, char *argv[] )
 						die();
 						break;
 					case SDLK_b:
-						if (editor.backgroundOnly)
+						if (editor.canvas.backgroundOnly)
 						{
-							editor.backgroundOnly = false;
+							editor.canvas.backgroundOnly = false;
 						}
 						else
 						{
-							editor.backgroundOnly = true;
+							editor.canvas.backgroundOnly = true;
 						}
 							
-						editor.redraw = true;
+						editor.canvas.redraw = true;
 						break;
 					default:
 						break;
@@ -257,7 +257,7 @@ int main( int argc, char *argv[] )
 
 				}
 
-				editor.draw();
+				editor.canvas.draw();
 							
 				break;
 			}

@@ -27,6 +27,7 @@ class Window;
 class Editor;
 class Bar;
 class Style;
+class Level;
 
 class Canvas
 {
@@ -36,10 +37,18 @@ public:
 	Editor * editor_ptr;
 	Bar * bar_ptr;
 	Style * style_ptr;
+	Level * level_ptr;
 
 	int height;
 
-	void setReferences(Window * w, Editor * e, Bar * b, Style * s);
+	bool redraw;
+
+	signed int scroll_x, scroll_y;
+	signed int zoom;
+	Sint32 mouse_remainder_x, mouse_remainder_y;
+	bool backgroundOnly;
+
+	void setReferences(Window * w, Editor * e, Bar * b, Style * s, Level * l);
 	void load(void);
 	void resize(int h);
 
