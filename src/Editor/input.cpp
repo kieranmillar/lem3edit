@@ -50,6 +50,7 @@ void Editor_input::load(void)
 	rightScrollButtonHolding = false;
 	scrollBarHolding = false;
 	scrollBarHoldingOffset = 0;
+	scrollBarShifting = false;
 	holdingID = -1;
 	holdingType = -1;
 }
@@ -167,7 +168,7 @@ void Editor_input::handleEvents(SDL_Event event)
 			else
 				// piece browser scroll bar area
 			{
-
+				scrollBarShifting = true;
 			}
 		}
 		break;
@@ -183,6 +184,7 @@ void Editor_input::handleEvents(SDL_Event event)
 			leftScrollButtonHolding = false;
 			rightScrollButtonHolding = false;
 			scrollBarHolding = false;
+			scrollBarShifting = false;
 		}
 		break;
 	}
@@ -304,18 +306,32 @@ void Editor_input::handleEvents(SDL_Event event)
 
 			if (mouse_state & SDL_BUTTON(SDL_BUTTON_LEFT))
 			{
-				if (leftScrollButtonHolding
-					&& mouse_x_window > BAR_HEIGHT
-					&& mouse_x_window < BAR_HEIGHT + 16
-					&& mouse_y_window > window_ptr->height - 16)
+				if (mouse_y_window > window_ptr->height - 16) // scroll bar area
 				{
-					bar_ptr->scroll(-50);
-				}
-				if (rightScrollButtonHolding
-					&& mouse_x_window > window_ptr->width - 16
-					&& mouse_y_window > window_ptr->height - 16)
-				{
-					bar_ptr->scroll(50);
+					if (leftScrollButtonHolding
+						&& mouse_x_window > BAR_HEIGHT
+						&& mouse_x_window < BAR_HEIGHT + 16)
+					{
+						bar_ptr->scroll(-50);
+					}
+					if (rightScrollButtonHolding
+						&& mouse_x_window > window_ptr->width - 16)
+					{
+						bar_ptr->scroll(50);
+					}
+					if (scrollBarShifting
+						&& mouse_x_window < window_ptr->width - 16
+						&& mouse_x_window > BAR_HEIGHT + 16)
+					{
+						if (bar_ptr->barScrollRect.x > mouse_x_window)
+						{
+							bar_ptr->moveScrollBar(bar_ptr->barScrollRect.x - (bar_ptr->barScrollRect.w / 2));
+						}
+						else if (bar_ptr->barScrollRect.x + bar_ptr->barScrollRect.w < mouse_x_window)
+						{
+							bar_ptr->moveScrollBar(bar_ptr->barScrollRect.x + (bar_ptr->barScrollRect.w / 2));
+						}
+					}
 				}
 			}		
 		}
@@ -325,6 +341,8 @@ void Editor_input::handleEvents(SDL_Event event)
 			canvas_ptr->drawHeldObject(holdingType, holdingID, mouse_x_window, mouse_y_window);
 
 		SDL_RenderPresent(window_ptr->screen_renderer);
+
+		editor_ptr->gameFrameCount++;
 
 		break;
 	}

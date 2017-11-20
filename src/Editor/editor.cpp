@@ -50,6 +50,7 @@ bool Editor::load( int n, Window * w )
 	bar.load();
 	canvas.load();
 	editor_input.load();
+	gameFrameCount = 0;
 	
 	return canvas.redraw = true;
 }

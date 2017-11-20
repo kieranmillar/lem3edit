@@ -53,6 +53,8 @@ public:
 	
 	typedef std::vector< std::pair<Level::Object::Index, Level::Object> > Clipboard;
 	Clipboard clipboard;
+
+	Uint32 gameFrameCount;
 	
 	void resize(int w, int h);
 

@@ -44,7 +44,8 @@ public:
 	bool redraw;
 
 	Sint32 mouse_prev_x, mouse_prev_y;
-	bool dragging, leftScrollButtonHolding, rightScrollButtonHolding, scrollBarHolding;
+	bool dragging, leftScrollButtonHolding, rightScrollButtonHolding;
+	bool scrollBarHolding, scrollBarShifting;
 	int scrollBarHoldingOffset;
 
 	int holdingID, holdingType;
