@@ -72,11 +72,6 @@ public:
 	
 	bool load(int n, Window * w);
 	bool save(int n);
-
-	void draw_selection_box(int x, int y, int width, int height);
-
-	enum borderType { horizontal, vertical };
-	void draw_dashed_level_border(borderType type, int pos, int offset);
 	
 	Editor( void );
 	~Editor( void ) { /* nothing to do */ }

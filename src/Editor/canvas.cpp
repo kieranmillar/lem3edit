@@ -81,7 +81,7 @@ void Canvas::draw()
 		{
 			Level::Object &o = level_ptr->object[i->type][i->i];
 			int so = style_ptr->object_by_id(i->type, o.id);
-			editor_ptr->draw_selection_box((o.x - scroll_x)*zoom, (o.y - scroll_y)*zoom, style_ptr->object[i->type][so].width * 8 * zoom, style_ptr->object[i->type][so].height * 2 * zoom);
+			draw_selection_box((o.x - scroll_x)*zoom, (o.y - scroll_y)*zoom, style_ptr->object[i->type][so].width * 8 * zoom, style_ptr->object[i->type][so].height * 2 * zoom);
 		}
 
 		SDL_SetRenderDrawColor(window_ptr->screen_renderer, 0, 0, 0, 255);
@@ -89,19 +89,19 @@ void Canvas::draw()
 		//Draw dotted lines on the level border
 		if (scroll_x < 0 && (scroll_x * zoom) + window_ptr->width > 0)
 		{
-			editor_ptr->draw_dashed_level_border(Editor::vertical, ((0 - scroll_x) * zoom) - 1, scroll_y * zoom);
+			draw_dashed_level_border(vertical, ((0 - scroll_x) * zoom) - 1, scroll_y * zoom);
 		}
 		if (scroll_x < level_ptr->width && scroll_x + (window_ptr->width / zoom) > level_ptr->width)
 		{
-			editor_ptr->draw_dashed_level_border(Editor::vertical, ((level_ptr->width - scroll_x) * zoom), scroll_y * zoom);
+			draw_dashed_level_border(vertical, ((level_ptr->width - scroll_x) * zoom), scroll_y * zoom);
 		}
 		if (scroll_y < 0 && (scroll_y * zoom) + window_ptr->height > 0)
 		{
-			editor_ptr->draw_dashed_level_border(Editor::horizontal, ((0 - scroll_y) * zoom) - 1, scroll_x * zoom);
+			draw_dashed_level_border(horizontal, ((0 - scroll_y) * zoom) - 1, scroll_x * zoom);
 		}
 		if (scroll_y < level_ptr->height && scroll_y + (window_ptr->height / zoom) > level_ptr->height)
 		{
-			editor_ptr->draw_dashed_level_border(Editor::horizontal, ((level_ptr->height - scroll_y) * zoom), scroll_x * zoom);
+			draw_dashed_level_border(horizontal, ((level_ptr->height - scroll_y) * zoom), scroll_x * zoom);
 		}
 
 		SDL_SetRenderTarget(window_ptr->screen_renderer, NULL);
@@ -117,4 +117,53 @@ void Canvas::draw()
 	SDL_RenderPresent(window_ptr->screen_renderer);
 
 
+}
+
+void Canvas::draw_selection_box(int x, int y, int width, int height)
+{
+	if (x > window_ptr->width || y > (window_ptr->height - BAR_HEIGHT) || (x + width) < 0 || (x + height) < 0)
+		return;
+	SDL_SetRenderDrawColor(window_ptr->screen_renderer, 255, 0, 255, 255 / 8);
+	SDL_Rect r;
+	r.x = x - 1;
+	r.y = y - 1;
+	r.w = width + 1;
+	r.h = height + 1;
+	SDL_RenderFillRect(window_ptr->screen_renderer, &r);
+	SDL_SetRenderDrawColor(window_ptr->screen_renderer, 255, 0, 255, 255);
+	SDL_RenderDrawRect(window_ptr->screen_renderer, &r);
+}
+
+void Canvas::draw_dashed_level_border(borderType type, int pos, int offset)
+{
+	//We have an offset so the lines don't scroll out of synch with the view when scrolling
+	int initialOffset = offset % 20;
+	SDL_SetRenderDrawColor(window_ptr->screen_renderer, 200, 200, 200, 255);
+	int end, x1, y1, x2, y2;
+	if (type == horizontal)
+	{
+		end = window_ptr->width;
+		x1 = 0 - initialOffset;
+		x2 = 10 - initialOffset;
+		y1 = pos;
+		y2 = pos;
+		for (x1; x1 < end; x1 += 20)
+		{
+			SDL_RenderDrawLine(window_ptr->screen_renderer, x1, y1, x2, y2);
+			x2 += 20;
+		}
+	}
+	if (type == vertical)
+	{
+		end = window_ptr->height;
+		x1 = pos;
+		x2 = pos;
+		y1 = 0 - initialOffset;
+		y2 = 10 - initialOffset;
+		for (y1; y1 < end; y1 += 20)
+		{
+			SDL_RenderDrawLine(window_ptr->screen_renderer, x1, y1, x2, y2);
+			y2 += 20;
+		}
+	}
 }

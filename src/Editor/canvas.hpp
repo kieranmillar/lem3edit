@@ -54,6 +54,11 @@ public:
 
 	void draw(void);
 
+	void draw_selection_box(int x, int y, int width, int height);
+
+	enum borderType { horizontal, vertical };
+	void draw_dashed_level_border(borderType type, int pos, int offset);
+
 	Canvas(void) { /* nothing to do */ }
 
 };
