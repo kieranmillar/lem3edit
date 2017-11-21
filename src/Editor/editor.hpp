@@ -72,8 +72,6 @@ public:
 	bool move_selected( signed int delta_x, signed int delta_y );
 	bool move_selected_z( signed int delta_z );
 	
-	bool scroll( signed int delta_x, signed int delta_y, bool drag );
-	
 	bool load(int n, Window * w);
 	bool save(int n);
 	

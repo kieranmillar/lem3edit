@@ -302,7 +302,7 @@ void Editor_input::handleEvents(SDL_Event event)
 			signed int delta_y = (-up + down) * delta_multiplier;
 
 
-			editor_ptr->scroll(delta_x, delta_y, mouse_state & SDL_BUTTON(SDL_BUTTON_LEFT));
+			canvas_ptr->scroll(delta_x, delta_y, mouse_state & SDL_BUTTON(SDL_BUTTON_LEFT));
 
 			if (mouse_state & SDL_BUTTON(SDL_BUTTON_LEFT))
 			{

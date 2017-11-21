@@ -229,24 +229,3 @@ bool Editor::move_selected_z( signed int delta_z )
 	
 	return canvas.redraw = true;
 }
-
-bool Editor::scroll( signed int delta_x, signed int delta_y, bool drag )
-{
-	signed int old_scroll_x = canvas.scroll_x, old_scroll_y = canvas.scroll_y;
-	
-	canvas.scroll_x = BETWEEN(-200, canvas.scroll_x + delta_x, level.width);
-	delta_x = canvas.scroll_x - old_scroll_x;
-	
-	canvas.scroll_y = BETWEEN(-200, canvas.scroll_y + delta_y, level.height);
-	delta_y = canvas.scroll_y - old_scroll_y;
-	
-	if (delta_x != 0 || delta_y != 0)
-	{
-		if (drag)
-			move_selected(delta_x*canvas.zoom, delta_y*canvas.zoom);
-		
-		return canvas.redraw = true;
-	}
-	
-	return false;
-}

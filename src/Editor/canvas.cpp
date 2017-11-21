@@ -56,6 +56,27 @@ void Canvas::resize(int h)
 	height = h - BAR_HEIGHT;
 }
 
+bool Canvas::scroll(signed int delta_x, signed int delta_y, bool drag)
+{
+	signed int old_scroll_x = scroll_x, old_scroll_y = scroll_y;
+
+	scroll_x = BETWEEN(-200, scroll_x + delta_x, level_ptr->width);
+	delta_x = scroll_x - old_scroll_x;
+
+	scroll_y = BETWEEN(-200, scroll_y + delta_y, level_ptr->height);
+	delta_y = scroll_y - old_scroll_y;
+
+	if (delta_x != 0 || delta_y != 0)
+	{
+		if (drag)
+			editor_ptr->move_selected(delta_x*zoom, delta_y*zoom);
+
+		return redraw = true;
+	}
+
+	return true;
+}
+
 void Canvas::draw()
 {
 

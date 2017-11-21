@@ -52,6 +52,8 @@ public:
 	void load(void);
 	void resize(int h);
 
+	bool scroll(signed int delta_x, signed int delta_y, bool drag);
+
 	void draw(void);
 
 	void draw_selection_box(int x, int y, int width, int height);
