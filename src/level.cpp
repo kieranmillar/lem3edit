@@ -26,17 +26,17 @@
 #include <iostream>
 using namespace std;
 
-void Level::draw( Window * window, signed int x, signed int y, const Style &style, bool backgroundOnly, int zoom ) const
+void Level::draw(Window * window, signed int x, signed int xOffset, signed int y, signed int yOffset, const Style &style, bool backgroundOnly, int zoom) const
 {
-	draw_objects(window, x, y, PERM, 0, 4999, style, zoom);
+	draw_objects(window, x, xOffset, y, yOffset, PERM, 0, 4999, style, zoom);
 	if (backgroundOnly == false)
 	{
-		draw_objects(window, x, y, TEMP, 0, 10999, style, zoom);
-		draw_objects(window, x, y, PERM, 5000, 10999, style, zoom);
+		draw_objects(window, x, xOffset, y, yOffset, TEMP, 0, 10999, style, zoom);
+		draw_objects(window, x, xOffset, y, yOffset, PERM, 5000, 10999, style, zoom);
 	}
 }
 
-void Level::draw_objects(Window * window, signed int x, signed int y, int type, unsigned int id_min, unsigned int id_max, const Style &style, int zoom) const
+void Level::draw_objects(Window * window, signed int x, signed int xOffset, signed int y, signed int yOffset, int type, unsigned int id_min, unsigned int id_max, const Style &style, int zoom) const
 {
 	assert((unsigned)type < COUNTOF(this->object));
 	
@@ -50,9 +50,9 @@ void Level::draw_objects(Window * window, signed int x, signed int y, int type, 
 		if (so == -1)
 			continue;
 
-		int onScreenX = (o.x - x)*zoom;
-		int onScreenY = (o.y - y)*zoom;
-		if (onScreenY < window->height - BAR_HEIGHT)
+		int onScreenX = (o.x - x)*zoom - xOffset;
+		int onScreenY = (o.y - y)*zoom - yOffset;
+		if (onScreenY < window->height - BAR_HEIGHT + zoom)
 			style.draw_object_texture(window, onScreenX, onScreenY, type, so, zoom, NULL);
 	}
 }

@@ -190,7 +190,7 @@ bool Editor::delete_selected( void )
 }
 
 //This function takes in how much the mouse has moved in the last frame
-//Input is independent of zoom, so provide true pixel values
+//Input is dependent of zoom, so provide screen pixel values
 //So to ensure smooth scrolling, it maintains a remainder after relocating the moved objects
 //and snapping them to the grid
 bool Editor::move_selected( signed int delta_x, signed int delta_y )

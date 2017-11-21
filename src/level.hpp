@@ -64,8 +64,8 @@ public:
 	
 	std::vector<Object> object[2];
 	
-	void draw(Window * window, signed int x, signed int y, const Style &style, bool backgroundOnly, int zoom) const;
-	void draw_objects(Window * window, signed int x, signed int y, int type, unsigned int id_min, unsigned int id_max, const Style &style, int zoom) const;
+	void draw(Window * window, signed int x, signed int xOffset, signed int y, signed int yOffset, const Style &style, bool backgroundOnly, int zoom) const;
+	void draw_objects(Window * window, signed int x, signed int xOffset, signed int y, signed int yOffset, int type, unsigned int id_min, unsigned int id_max, const Style &style, int zoom) const;
 	
 	Object::Index get_object_by_position( signed int x, signed int y, const Style &style, bool backgroundOnly ) const;
 	signed int get_object_by_position(signed int x, signed int y, int type, unsigned int id_min, unsigned int id_max, const Style &style) const;

@@ -70,240 +70,238 @@ void Editor_input::handleEvents(SDL_Event event)
 
 	switch (event.type)
 	{
-	case SDL_WINDOWEVENT:
-	{
-		SDL_WindowEvent &e = event.window;
-
-		if (e.event == SDL_WINDOWEVENT_RESIZED)
+		case SDL_WINDOWEVENT:
 		{
-			window_ptr->width = e.data1;
-			window_ptr->height = e.data2;
-			window_ptr->resize();
-			editor_ptr->resize(e.data1, e.data2);
-			canvas_ptr->redraw = true;
+			SDL_WindowEvent &e = event.window;
+
+			if (e.event == SDL_WINDOWEVENT_RESIZED)
+			{
+				window_ptr->width = e.data1;
+				window_ptr->height = e.data2;
+				window_ptr->resize();
+				editor_ptr->resize(e.data1, e.data2);
+				canvas_ptr->redraw = true;
+			}
 		}
-	}
-	case SDL_MOUSEMOTION:
-	{
-		SDL_MouseMotionEvent &e = event.motion;
-
-		if (e.state & SDL_BUTTON(SDL_BUTTON_LEFT) && dragging)
-			editor_ptr->move_selected(mouse_x_window - mouse_prev_x, mouse_y_window - mouse_prev_y);
-		if (e.state & SDL_BUTTON(SDL_BUTTON_LEFT) && scrollBarHolding)
-			bar_ptr->moveScrollBar(mouse_x_window - scrollBarHoldingOffset);
-
-		mouse_prev_x = mouse_x_window;
-		mouse_prev_y = mouse_y_window;
-
-		break;
-	}
-	case SDL_MOUSEBUTTONDOWN://when initially pressed
-	{
-		SDL_MouseButtonEvent &e = event.button;
-		bool ctrl_down = SDL_GetModState() & KMOD_CTRL;
-
-		if (e.button == SDL_BUTTON_LEFT)
+		case SDL_MOUSEMOTION:
 		{
-			canvas_ptr->mouse_remainder_x = 0;
-			canvas_ptr->mouse_remainder_y = 0;
-			if (mouse_y_window < canvas_ptr->height)
-				// canvas
-			{
-				if (holdingType != -1 && holdingID != -1)
-				{
-					editor_ptr->addObject(holdingID, holdingType, mouse_x - (mouse_x % 8), mouse_y - (mouse_y % 2));
-					
-					Level::Object::Index o(holdingType, level_ptr->object[holdingType].size() - 1);
-					editor_ptr->selection.insert(o);
+			SDL_MouseMotionEvent &e = event.motion;
 
-					holdingType = -1;
-					holdingID = -1;
-				}
-				else
-				{
-					editor_ptr->select(mouse_x, mouse_y, ctrl_down);
-				}
-			}
-			else if (mouse_x_window < BAR_HEIGHT)
-				// options panel
+			if (e.state & SDL_BUTTON(SDL_BUTTON_LEFT) && dragging)
+				editor_ptr->move_selected(mouse_x_window - mouse_prev_x, mouse_y_window - mouse_prev_y);
+			if (e.state & SDL_BUTTON(SDL_BUTTON_LEFT) && scrollBarHolding)
+				bar_ptr->moveScrollBar(mouse_x_window - scrollBarHoldingOffset);
+
+			mouse_prev_x = mouse_x_window;
+			mouse_prev_y = mouse_y_window;
+
+			break;
+		}
+		case SDL_MOUSEBUTTONDOWN://when initially pressed
+		{
+			SDL_MouseButtonEvent &e = event.button;
+			bool ctrl_down = SDL_GetModState() & KMOD_CTRL;
+
+			if (e.button == SDL_BUTTON_LEFT)
 			{
-				holdingType = -1;
-				holdingID = -1;
-			}
-			else if (mouse_y_window < window_ptr->height - 16)
-				// piece browser
-			{
-				if (holdingType == -1 && holdingID == -1)
+				canvas_ptr->mouse_remainder_x = 0;
+				canvas_ptr->mouse_remainder_y = 0;
+				if (mouse_y_window < canvas_ptr->height)
+					// canvas
 				{
-					int pieceSelected = bar_ptr->getPieceIDByScreenPos(mouse_x_window);
-					if (pieceSelected != -1)
+					if (holdingType != -1 && holdingID != -1)
 					{
-						holdingType = bar_ptr->type;
-						holdingID = pieceSelected;
-						editor_ptr->select_none();
+						editor_ptr->addObject(holdingID, holdingType, mouse_x - (mouse_x % 8), mouse_y - (mouse_y % 2));
+
+						Level::Object::Index o(holdingType, level_ptr->object[holdingType].size() - 1);
+						editor_ptr->selection.insert(o);
+
+						holdingType = -1;
+						holdingID = -1;
+					}
+					else
+					{
+						editor_ptr->select(mouse_x, mouse_y, ctrl_down);
 					}
 				}
-				else
+				else if (mouse_x_window < BAR_HEIGHT)
+					// options panel
 				{
 					holdingType = -1;
 					holdingID = -1;
 				}
+				else if (mouse_y_window < window_ptr->height - 16)
+					// piece browser
+				{
+					if (holdingType == -1 && holdingID == -1)
+					{
+						int pieceSelected = bar_ptr->getPieceIDByScreenPos(mouse_x_window);
+						if (pieceSelected != -1)
+						{
+							holdingType = bar_ptr->type;
+							holdingID = pieceSelected;
+							editor_ptr->select_none();
+						}
+					}
+					else
+					{
+						holdingType = -1;
+						holdingID = -1;
+					}
+				}
+				else if (mouse_x_window < BAR_HEIGHT + 16)
+					// piece browser scroll bar left button
+				{
+					leftScrollButtonHolding = true;
+				}
+				else if (mouse_x_window > window_ptr->width - 16)
+					// piece browser scroll bar right button
+				{
+					rightScrollButtonHolding = true;
+				}
+				else if (mouse_x_window > bar_ptr->barScrollRect.x && mouse_x_window < (bar_ptr->barScrollRect.x + bar_ptr->barScrollRect.w))
+					// piece browser scroll bar bar
+				{
+					scrollBarHolding = true;
+					scrollBarHoldingOffset = mouse_x_window - bar_ptr->barScrollRect.x;
+				}
+				else
+					// piece browser scroll bar area
+				{
+					scrollBarShifting = true;
+				}
 			}
-			else if (mouse_x_window < BAR_HEIGHT + 16)
-				// piece browser scroll bar left button
-			{
-				leftScrollButtonHolding = true;
-			}
-			else if (mouse_x_window > window_ptr->width - 16)
-				// piece browser scroll bar right button
-			{
-				rightScrollButtonHolding = true;
-			}
-			else if (mouse_x_window > bar_ptr->barScrollRect.x && mouse_x_window < (bar_ptr->barScrollRect.x + bar_ptr->barScrollRect.w))
-				// piece browser scroll bar bar
-			{
-				scrollBarHolding = true;
-				scrollBarHoldingOffset = mouse_x_window - bar_ptr->barScrollRect.x;
-			}
-			else
-				// piece browser scroll bar area
-			{
-				scrollBarShifting = true;
-			}
+			break;
 		}
-		break;
-	}
-	case SDL_MOUSEBUTTONUP://when released
-	{
-		SDL_MouseButtonEvent &e = event.button;
+		case SDL_MOUSEBUTTONUP://when released
+		{
+			SDL_MouseButtonEvent &e = event.button;
 
-		if (e.button == SDL_BUTTON_LEFT)
-		{
-			canvas_ptr->mouse_remainder_x = canvas_ptr->mouse_remainder_y = 0;
-			dragging = false;
-			leftScrollButtonHolding = false;
-			rightScrollButtonHolding = false;
-			scrollBarHolding = false;
-			scrollBarShifting = false;
-		}
-		break;
-	}
-	case SDL_MOUSEWHEEL:
-	{
-		SDL_MouseWheelEvent &e = event.wheel;
-		if (!mouse_state & SDL_BUTTON(SDL_BUTTON_LEFT))
-		{
-			if (e.y == 1)
+			if (e.button == SDL_BUTTON_LEFT)
 			{
-				if (canvas_ptr->zoom != 16)
-					canvas_ptr->zoom *= 2;
-				canvas_ptr->redraw = true;
+				canvas_ptr->mouse_remainder_x = canvas_ptr->mouse_remainder_y = 0;
+				dragging = false;
+				leftScrollButtonHolding = false;
+				rightScrollButtonHolding = false;
+				scrollBarHolding = false;
+				scrollBarShifting = false;
 			}
-			if (e.y == -1)
-			{
-				if (canvas_ptr->zoom != 1)
-					canvas_ptr->zoom /= 2;
-				canvas_ptr->redraw = true;
-			}
+			break;
 		}
-		break;
-	}
-	case SDL_KEYDOWN:
-	{
-		SDL_KeyboardEvent &e = event.key;
-		bool alt_down = e.keysym.mod & KMOD_ALT;
-		bool ctrl_down = e.keysym.mod & KMOD_CTRL;
-
-		Uint8 mouse_state = SDL_GetMouseState(NULL, NULL);
-
-		switch (e.keysym.sym)
+		case SDL_MOUSEWHEEL:
 		{
-		case SDLK_1:
-			bar_ptr->changeType(PERM);
-			break;
-		case SDLK_2:
-			bar_ptr->changeType(TEMP);
-			break;
-		case SDLK_s:
-			editor_ptr->save(level_ptr->level_id);
-			break;
-		case SDLK_ESCAPE:
-			editor_ptr->select_none();
-			break;
-		case SDLK_a:
-			editor_ptr->select_all();
-			break;
-		case SDLK_c:
-			if (ctrl_down) {
-				editor_ptr->copy_selected();
-			}
-			break;
-		case SDLK_v:
-			if (ctrl_down) {
-				editor_ptr->paste();
-			}
-			break;
-		case SDLK_z:
-			//editor.decrease_obj_id();
-			bar_ptr->scroll(-50 * delta_multiplier);
-			break;
-		case SDLK_x:
-			//editor.increase_obj_id();
-			bar_ptr->scroll(50 * delta_multiplier);
-			break;
-		case SDLK_UP:
-		case SDLK_DOWN:
+			SDL_MouseWheelEvent &e = event.wheel;
 			if (!mouse_state & SDL_BUTTON(SDL_BUTTON_LEFT))
-				editor_ptr->move_selected(0, (e.keysym.sym == SDLK_UP ? -2 : e.keysym.sym == SDLK_DOWN ? 2 : 0) * delta_multiplier * canvas_ptr->zoom);
-			break;
-		case SDLK_LEFT:
-		case SDLK_RIGHT:
-			if (!mouse_state & SDL_BUTTON(SDL_BUTTON_LEFT))
-				editor_ptr->move_selected((e.keysym.sym == SDLK_LEFT ? -8 : e.keysym.sym == SDLK_RIGHT ? 8 : 0) * delta_multiplier * canvas_ptr->zoom, 0);
-			break;
-		case SDLK_DELETE:
-			editor_ptr->delete_selected();
-			break;
-		case SDLK_q:
-			die();
-			break;
-		case SDLK_b:
-			if (canvas_ptr->backgroundOnly)
 			{
-				canvas_ptr->backgroundOnly = false;
+				if (e.y == 1)
+				{
+					if (canvas_ptr->zoom != 16)
+						canvas_ptr->zoom *= 2;
+					canvas_ptr->redraw = true;
+				}
+				if (e.y == -1)
+				{
+					if (canvas_ptr->zoom != 1)
+						canvas_ptr->zoom /= 2;
+					canvas_ptr->redraw = true;
+				}
 			}
-			else
-			{
-				canvas_ptr->backgroundOnly = true;
-			}
-
-			canvas_ptr->redraw = true;
-			break;
-		default:
 			break;
 		}
+		case SDL_KEYDOWN:
+		{
+			SDL_KeyboardEvent &e = event.key;
+			bool alt_down = e.keysym.mod & KMOD_ALT;
+			bool ctrl_down = e.keysym.mod & KMOD_CTRL;
 
-		break;
-	}
-	case SDL_USEREVENT:// stuff here happens every frame
-	{
+			Uint8 mouse_state = SDL_GetMouseState(NULL, NULL);
 
-		const Uint8 *key_state = SDL_GetKeyboardState(NULL);
+			switch (e.keysym.sym)
+			{
+			case SDLK_1:
+				bar_ptr->changeType(PERM);
+				break;
+			case SDLK_2:
+				bar_ptr->changeType(TEMP);
+				break;
+			case SDLK_s:
+				editor_ptr->save(level_ptr->level_id);
+				break;
+			case SDLK_ESCAPE:
+				editor_ptr->select_none();
+				break;
+			case SDLK_a:
+				editor_ptr->select_all();
+				break;
+			case SDLK_c:
+				if (ctrl_down) {
+					editor_ptr->copy_selected();
+				}
+				break;
+			case SDLK_v:
+				if (ctrl_down) {
+					editor_ptr->paste();
+				}
+				break;
+			case SDLK_UP:
+			case SDLK_DOWN:
+				if (!mouse_state & SDL_BUTTON(SDL_BUTTON_LEFT))
+					editor_ptr->move_selected(0, (e.keysym.sym == SDLK_UP ? -2 : e.keysym.sym == SDLK_DOWN ? 2 : 0) * delta_multiplier * canvas_ptr->zoom);
+				break;
+			case SDLK_LEFT:
+			case SDLK_RIGHT:
+				if (!mouse_state & SDL_BUTTON(SDL_BUTTON_LEFT))
+					editor_ptr->move_selected((e.keysym.sym == SDLK_LEFT ? -8 : e.keysym.sym == SDLK_RIGHT ? 8 : 0) * delta_multiplier * canvas_ptr->zoom, 0);
+				break;
+			case SDLK_DELETE:
+				editor_ptr->delete_selected();
+				break;
+			case SDLK_q:
+				die();
+				break;
+			case SDLK_b:
+				if (canvas_ptr->backgroundOnly)
+				{
+					canvas_ptr->backgroundOnly = false;
+				}
+				else
+				{
+					canvas_ptr->backgroundOnly = true;
+				}
 
-		{ // scroll if ijkl or mouse at border
-			const int mouse_scroll_trigger = std::min(window_ptr->width, window_ptr->height) / 32;
+				canvas_ptr->redraw = true;
+				break;
+			default:
+				break;
+			}
 
-			const signed int left = (mouse_x_window < mouse_scroll_trigger) ? /*4*/0 : 0 + key_state[SDL_GetScancodeFromKey(SDLK_j)] ? 4 : 0;
-			const signed int right = (mouse_x_window >= (signed)window_ptr->width - mouse_scroll_trigger) ? /*4*/0 : 0 + key_state[SDL_GetScancodeFromKey(SDLK_l)] ? 4 : 0;
-			signed int delta_x = (-left + right) * delta_multiplier;
+			break;
+		}
+		case SDL_USEREVENT:// stuff here happens every frame
+		{
 
-			const signed int up = (mouse_y_window < mouse_scroll_trigger) ? /*4*/0 : 0 + key_state[SDL_GetScancodeFromKey(SDLK_i)] ? 4 : 0;
-			const signed int down = (mouse_y_window >= (signed)window_ptr->height - mouse_scroll_trigger) ? /*4*/0 : 0 + key_state[SDL_GetScancodeFromKey(SDLK_k)] ? 4 : 0;
-			signed int delta_y = (-up + down) * delta_multiplier;
+			const Uint8 *key_state = SDL_GetKeyboardState(NULL);
 
+			{ // canvas scroll
 
-			canvas_ptr->scroll(delta_x, delta_y, mouse_state & SDL_BUTTON(SDL_BUTTON_LEFT));
+				const signed int left = key_state[SDL_GetScancodeFromKey(SDLK_j)] ? 8 : 0;
+				const signed int right = key_state[SDL_GetScancodeFromKey(SDLK_l)] ? 8 : 0;
+				signed int delta_x = (-left + right) * delta_multiplier;
 
+				const signed int up = key_state[SDL_GetScancodeFromKey(SDLK_i)] ? 8 : 0;
+				const signed int down = key_state[SDL_GetScancodeFromKey(SDLK_k)] ? 8 : 0;
+				signed int delta_y = (-up + down) * delta_multiplier;
+
+				canvas_ptr->scroll(delta_x, delta_y, mouse_state & SDL_BUTTON(SDL_BUTTON_LEFT));
+			}
+			{ // bar scroll
+
+				const signed int left = key_state[SDL_GetScancodeFromKey(SDLK_z)] ? 20 : 0;
+				const signed int right = key_state[SDL_GetScancodeFromKey(SDLK_x)] ? 20 : 0;
+				signed int delta_x = (-left + right) * delta_multiplier;
+
+				bar_ptr->scroll(delta_x);
+			}
 			if (mouse_state & SDL_BUTTON(SDL_BUTTON_LEFT))
 			{
 				if (mouse_y_window > window_ptr->height - 16) // scroll bar area
@@ -333,20 +331,26 @@ void Editor_input::handleEvents(SDL_Event event)
 						}
 					}
 				}
-			}		
+			}
+
+			canvas_ptr->draw();
+			bar_ptr->draw();
+
+			SDL_SetRenderTarget(window_ptr->screen_renderer, NULL);
+			SDL_RenderCopy(window_ptr->screen_renderer, window_ptr->screen_texture, NULL, NULL);
+
+			if (holdingType != -1 && holdingID != -1)
+				canvas_ptr->drawHeldObject(holdingType, holdingID, mouse_x_window, mouse_y_window);
+
+			SDL_RenderPresent(window_ptr->screen_renderer);
+
+			editor_ptr->gameFrameCount++;
+
+			break;
 		}
-
-		canvas_ptr->draw();
-		if (holdingType != -1 && holdingID != -1)
-			canvas_ptr->drawHeldObject(holdingType, holdingID, mouse_x_window, mouse_y_window);
-
-		SDL_RenderPresent(window_ptr->screen_renderer);
-
-		editor_ptr->gameFrameCount++;
-
-		break;
-	}
-	default:
-		break;
+		default:
+		{
+			break;
+		}
 	}
 }

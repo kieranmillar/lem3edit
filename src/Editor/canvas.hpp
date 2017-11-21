@@ -44,6 +44,7 @@ public:
 	bool redraw;
 
 	signed int scroll_x, scroll_y;
+	signed int scrollOffset_x, scrollOffset_y;
 	signed int zoom;
 	Sint32 mouse_remainder_x, mouse_remainder_y;
 	bool backgroundOnly;
