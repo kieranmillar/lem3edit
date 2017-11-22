@@ -51,6 +51,7 @@ void Editor_input::load(void)
 	scrollBarHolding = false;
 	scrollBarHoldingOffset = 0;
 	scrollBarShifting = false;
+	movingView = false;
 	holdingID = -1;
 	holdingType = -1;
 }
@@ -88,9 +89,17 @@ void Editor_input::handleEvents(SDL_Event event)
 			SDL_MouseMotionEvent &e = event.motion;
 
 			if (e.state & SDL_BUTTON(SDL_BUTTON_LEFT) && dragging)
+			{
 				editor_ptr->move_selected(mouse_x_window - mouse_prev_x, mouse_y_window - mouse_prev_y);
+			}
 			if (e.state & SDL_BUTTON(SDL_BUTTON_LEFT) && scrollBarHolding)
+			{
 				bar_ptr->moveScrollBar(mouse_x_window - scrollBarHoldingOffset);
+			}
+			if (e.state & SDL_BUTTON(SDL_BUTTON_RIGHT) && movingView)
+			{
+				canvas_ptr->scroll(mouse_prev_x - mouse_x_window, mouse_prev_y - mouse_y_window, false);
+			}
 
 			mouse_prev_x = mouse_x_window;
 			mouse_prev_y = mouse_y_window;
@@ -171,6 +180,14 @@ void Editor_input::handleEvents(SDL_Event event)
 					scrollBarShifting = true;
 				}
 			}
+			if (e.button == SDL_BUTTON_RIGHT)
+			{
+				if (mouse_y_window < canvas_ptr->height)
+					// canvas
+				{
+					movingView = true;
+				}
+			}
 			break;
 		}
 		case SDL_MOUSEBUTTONUP://when released
@@ -185,6 +202,10 @@ void Editor_input::handleEvents(SDL_Event event)
 				rightScrollButtonHolding = false;
 				scrollBarHolding = false;
 				scrollBarShifting = false;
+			}
+			if (e.button == SDL_BUTTON_RIGHT)
+			{
+				movingView = false;
 			}
 			break;
 		}

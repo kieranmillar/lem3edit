@@ -47,6 +47,7 @@ public:
 	bool dragging, leftScrollButtonHolding, rightScrollButtonHolding;
 	bool scrollBarHolding, scrollBarShifting;
 	int scrollBarHoldingOffset;
+	bool movingView;
 
 	int holdingID, holdingType;
 
