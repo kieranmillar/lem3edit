@@ -83,6 +83,8 @@ public:
 	bool save_level(const std::string &filename);
 	bool save_objects(int type, const std::string &path, const std::string &name, unsigned int n);
 	bool save_objects(int type, const std::string &filename);
+
+	void resizeLevel(int delta_x, int delta_y, bool shiftLevel);
 	
 	Level( void ) { /* nothing to do */ }
 	

@@ -45,15 +45,23 @@ void Editor_input::setReferences(Window * w, Editor * e, Bar * b, Canvas * c, St
 void Editor_input::load(void)
 {
 	mouse_prev_x = mouse_prev_y = 0;
+
 	dragging = false;
+
 	leftScrollButtonHolding = false;
 	rightScrollButtonHolding = false;
 	scrollBarHolding = false;
 	scrollBarHoldingOffset = 0;
 	scrollBarShifting = false;
-	movingView = false;
+
 	holdingID = -1;
 	holdingType = -1;
+
+	movingView = false;
+	
+	resizingLevel = false;
+	resizingNewPos = 0;
+	resizingWhich = none;
 }
 
 void Editor_input::handleEvents(SDL_Event event)
@@ -65,7 +73,6 @@ void Editor_input::handleEvents(SDL_Event event)
 	// Due to zooming we can't rely on the mouse's position in the window to map correctly
 	// So we need to create our own variables instead
 	// These ones give the real x co-ordinate of the level, ignoring zoom and scroll
-	Sint32 mouse_x, mouse_y;
 	mouse_x = (mouse_x_window / canvas_ptr->zoom) + canvas_ptr->scroll_x;
 	mouse_y = (mouse_y_window / canvas_ptr->zoom) + canvas_ptr->scroll_y;
 
@@ -100,6 +107,48 @@ void Editor_input::handleEvents(SDL_Event event)
 			{
 				canvas_ptr->scroll(mouse_prev_x - mouse_x_window, mouse_prev_y - mouse_y_window, false);
 			}
+			if (e.state & SDL_BUTTON(SDL_BUTTON_LEFT) && resizingLevel)
+			{
+				switch (resizingWhich)
+				{
+					case (top) :
+					{
+						resizingNewPos = mouse_y - (mouse_y % 4);
+						if (level_ptr->height - resizingNewPos > 400)
+							resizingNewPos = level_ptr->height - 400;
+						if (level_ptr->height - resizingNewPos < 160)
+							resizingNewPos = level_ptr->height - 160;
+						break;
+					}
+					case (bottom) :
+					{
+						resizingNewPos = mouse_y - (mouse_y % 4);
+						if (resizingNewPos > 400)
+							resizingNewPos = 400;
+						if (resizingNewPos < 160)
+							resizingNewPos = 160;
+						break;
+					}
+					case (left) :
+					{
+						resizingNewPos = mouse_x - (mouse_x % 8);
+						if (level_ptr->width - resizingNewPos > 2048)
+							resizingNewPos = level_ptr->width - 2048;
+						if (level_ptr->width - resizingNewPos < 320)
+							resizingNewPos = level_ptr->width - 320;
+						break;
+					}
+					case (right) :
+					{
+						resizingNewPos = mouse_x - (mouse_x % 8);
+						if (resizingNewPos > 2048)
+							resizingNewPos = 2048;
+						if (resizingNewPos < 320)
+							resizingNewPos = 320;
+						break;
+					}
+				}
+			}
 
 			mouse_prev_x = mouse_x_window;
 			mouse_prev_y = mouse_y_window;
@@ -130,7 +179,35 @@ void Editor_input::handleEvents(SDL_Event event)
 					}
 					else
 					{
-						editor_ptr->select(mouse_x, mouse_y, ctrl_down);
+						bool selectedSomething = editor_ptr->select(mouse_x, mouse_y, ctrl_down);
+						if (!selectedSomething)
+						{
+							// grab level borders
+							if (mouse_x <= 8 && mouse_x >= -8)
+							{
+								resizingLevel = true;
+								resizingNewPos = 0;
+								resizingWhich = left;
+							}
+							else if (mouse_x >= level_ptr->width - 8 && mouse_x <= level_ptr->width + 8)
+							{
+								resizingLevel = true;
+								resizingNewPos = level_ptr->width;
+								resizingWhich = right;
+							}
+							else if (mouse_y <= 8 && mouse_y >= -8)
+							{
+								resizingLevel = true;
+								resizingNewPos = 0;
+								resizingWhich = top;
+							}
+							else if (mouse_y >= level_ptr->height - 8 && mouse_y <= level_ptr->height + 8)
+							{
+								resizingLevel = true;
+								resizingNewPos = level_ptr->height;
+								resizingWhich = bottom;
+							}
+						}
 					}
 				}
 				else if (mouse_x_window < BAR_HEIGHT)
@@ -202,6 +279,38 @@ void Editor_input::handleEvents(SDL_Event event)
 				rightScrollButtonHolding = false;
 				scrollBarHolding = false;
 				scrollBarShifting = false;
+				if (resizingLevel)
+				{
+					switch (resizingWhich)
+					{
+						case (top) :
+						{
+							level_ptr->resizeLevel(0, -resizingNewPos, true);
+							canvas_ptr->scroll(0, -resizingNewPos * canvas_ptr->zoom, false);
+							break;
+						}
+						case (bottom) :
+						{
+							level_ptr->resizeLevel(0, resizingNewPos - level_ptr->height, false);
+							break;
+						}
+						case (left) :
+						{
+							level_ptr->resizeLevel(-resizingNewPos, 0, true);
+							canvas_ptr->scroll(-resizingNewPos * canvas_ptr->zoom, 0, false);
+							break;
+						}
+						case (right) :
+						{
+							level_ptr->resizeLevel(resizingNewPos - level_ptr->width, 0, false);
+							break;
+						}
+					}
+					resizingLevel = false;
+					resizingWhich = none;
+					resizingNewPos = 0;
+					canvas_ptr->redraw = true;
+				}
 			}
 			if (e.button == SDL_BUTTON_RIGHT)
 			{

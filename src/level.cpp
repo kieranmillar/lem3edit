@@ -277,3 +277,24 @@ bool Level::save_objects(int type, const string &filename)
 	f.close();
 	return true;
 }
+
+void Level::resizeLevel(int delta_x, int delta_y, bool shiftLevel)
+{
+	width += delta_x;
+	height += delta_y;
+	if (shiftLevel)
+	{
+		for (vector<Object>::iterator i = object[PERM].begin(); i != object[PERM].end(); ++i)
+		{
+			Object &o = *i;
+			o.x += delta_x;
+			o.y += delta_y;
+		}
+		for (vector<Object>::iterator i = object[TEMP].begin(); i != object[TEMP].end(); ++i)
+		{
+			Object &o = *i;
+			o.x += delta_x;
+			o.y += delta_y;
+		}
+	}
+}

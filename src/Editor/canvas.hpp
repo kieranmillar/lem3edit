@@ -25,6 +25,7 @@
 
 class Window;
 class Editor;
+class Editor_input;
 class Bar;
 class Style;
 class Level;
@@ -35,6 +36,7 @@ public:
 
 	Window * window_ptr;
 	Editor * editor_ptr;
+	Editor_input * input_ptr;
 	Bar * bar_ptr;
 	Style * style_ptr;
 	Level * level_ptr;
@@ -49,7 +51,7 @@ public:
 	Sint32 mouse_remainder_x, mouse_remainder_y;
 	bool backgroundOnly;
 
-	void setReferences(Window * w, Editor * e, Bar * b, Style * s, Level * l);
+	void setReferences(Window * w, Editor * e, Editor_input * i, Bar * b, Style * s, Level * l);
 	void load(void);
 	void resize(int h);
 
@@ -65,7 +67,7 @@ public:
 	void drawHeldObject(int holdingType, int holdingID, int x, int y);
 
 	enum borderType { horizontal, vertical };
-	void draw_dashed_level_border(borderType type, int pos, int offset);
+	void draw_dashed_level_border(borderType type, int pos, int offset, bool highlight);
 
 	Canvas(void) { /* nothing to do */ }
 

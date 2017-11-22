@@ -27,14 +27,16 @@ where the level is displayed
 
 #include "bar.hpp"
 #include "editor.hpp"
+#include "input.hpp"
 #include "../level.hpp"
 #include "../style.hpp"
 #include "../window.hpp"
 
-void Canvas::setReferences(Window * w, Editor * e, Bar * b, Style * s, Level * l)
+void Canvas::setReferences(Window * w, Editor * e, Editor_input * i, Bar * b, Style * s, Level * l)
 {
 	window_ptr = w;
 	editor_ptr = e;
+	input_ptr = i;
 	bar_ptr = b;
 	style_ptr = s;
 	level_ptr = l;
@@ -181,23 +183,78 @@ void Canvas::draw()
 
 		SDL_SetRenderDrawColor(window_ptr->screen_renderer, 0, 0, 0, 255);
 
-		//Draw dotted lines on the level border
+		//START - Draw dotted lines on the level border
+		enum whichBorder { none, top, bottom, left, right };
+		whichBorder hoverBorder = none;
+		if (input_ptr->resizingLevel == false) // only highlight borders on hover if not resizing
+		{
+			if (input_ptr->mouse_x <= 8 && input_ptr->mouse_x >= -8)
+			{
+				hoverBorder = left;
+			}
+			else if (input_ptr->mouse_x >= level_ptr->width - 8 && input_ptr->mouse_x <= level_ptr->width + 8)
+			{
+				hoverBorder = right;
+			}
+			else if (input_ptr->mouse_y <= 8 && input_ptr->mouse_y >= -8)
+			{
+				hoverBorder = top;
+			}
+			else if (input_ptr->mouse_y >= level_ptr->height - 8 && input_ptr->mouse_y <= level_ptr->height + 8)
+			{
+				hoverBorder = bottom;
+			}
+		}
+		bool highlight = false;
 		if (scroll_x <= 0 && (scroll_x * zoom) + window_ptr->width - 1 >= 0)
 		{
-			draw_dashed_level_border(vertical, ((0 - scroll_x) * zoom) - scrollOffset_x - 1, scroll_y * zoom + scrollOffset_y);
+			if (input_ptr->resizingLevel == false || input_ptr->resizingWhich != Editor_input::whichBorder::left)
+			{
+				if (hoverBorder == left)
+					highlight = true;
+				draw_dashed_level_border(vertical, ((0 - scroll_x) * zoom) - scrollOffset_x - 1, scroll_y * zoom + scrollOffset_y, highlight);
+				highlight = false;
+			}
 		}
 		if (scroll_x <= level_ptr->width && scroll_x + (window_ptr->width / zoom) - 1 >= level_ptr->width)
 		{
-			draw_dashed_level_border(vertical, ((level_ptr->width - scroll_x) * zoom) - scrollOffset_x, scroll_y * zoom + scrollOffset_y);
+			if (input_ptr->resizingLevel == false || input_ptr->resizingWhich != Editor_input::whichBorder::right)
+			{
+				if (hoverBorder == right)
+					highlight = true;
+				draw_dashed_level_border(vertical, ((level_ptr->width - scroll_x) * zoom) - scrollOffset_x, scroll_y * zoom + scrollOffset_y, highlight);
+				highlight = false;
+			}
 		}
 		if (scroll_y <= 0 && (scroll_y * zoom) + window_ptr->height - 1 >= 0)
 		{
-			draw_dashed_level_border(horizontal, ((0 - scroll_y) * zoom) - 1 - scrollOffset_y, scroll_x * zoom + scrollOffset_x);
+			if (input_ptr->resizingLevel == false || input_ptr->resizingWhich != Editor_input::whichBorder::top)
+			{
+				if (hoverBorder == top)
+					highlight = true;
+				draw_dashed_level_border(horizontal, ((0 - scroll_y) * zoom) - 1 - scrollOffset_y, scroll_x * zoom + scrollOffset_x, highlight);
+				highlight = false;
+			}
 		}
 		if (scroll_y <= level_ptr->height && scroll_y + (window_ptr->height / zoom) - 1 >= level_ptr->height)
 		{
-			draw_dashed_level_border(horizontal, ((level_ptr->height - scroll_y) * zoom) - scrollOffset_y, scroll_x * zoom + scrollOffset_x);
+			if (input_ptr->resizingLevel == false || input_ptr->resizingWhich != Editor_input::whichBorder::bottom)
+			{
+				if (hoverBorder == bottom)
+					highlight = true;
+				draw_dashed_level_border(horizontal, ((level_ptr->height - scroll_y) * zoom) - scrollOffset_y, scroll_x * zoom + scrollOffset_x, highlight);
+				highlight = false;
+			}
 		}
+		if (input_ptr->resizingLevel) // draw the one border we are currently resizing
+		{
+			if (input_ptr->resizingWhich == Editor_input::whichBorder::left || input_ptr->resizingWhich == Editor_input::whichBorder::right)
+				draw_dashed_level_border(vertical, (input_ptr->resizingNewPos - scroll_x) * zoom - scrollOffset_x, scroll_y * zoom + scrollOffset_y, true);
+			if (input_ptr->resizingWhich == Editor_input::whichBorder::top || input_ptr->resizingWhich == Editor_input::whichBorder::bottom)
+				draw_dashed_level_border(horizontal, (input_ptr->resizingNewPos - scroll_y) * zoom - scrollOffset_y, scroll_x * zoom + scrollOffset_x, true);
+		}
+
+		//END - Draw dotted lines on the level border
 
 		SDL_SetRenderTarget(window_ptr->screen_renderer, NULL);
 
@@ -241,11 +298,14 @@ void Canvas::drawHeldObject(int holdingType, int holdingID, int x, int y)
 	style_ptr->draw_object_texture(window_ptr, drawX, drawY, holdingType, drawID, zoom, NULL);
 }
 
-void Canvas::draw_dashed_level_border(borderType type, int pos, int offset)
+void Canvas::draw_dashed_level_border(borderType type, int pos, int offset, bool highlight)
 {
 	//We have an offset so the lines don't scroll out of synch with the view when scrolling
 	int initialOffset = offset % 20;
-	SDL_SetRenderDrawColor(window_ptr->screen_renderer, 200, 200, 200, 255);
+	int rendColour = 200;
+	if (highlight)
+		rendColour = 250;
+	SDL_SetRenderDrawColor(window_ptr->screen_renderer, rendColour, rendColour, rendColour, 255);
 	int end, x1, y1, x2, y2;
 	if (type == horizontal)
 	{

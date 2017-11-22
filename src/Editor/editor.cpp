@@ -42,7 +42,7 @@ bool Editor::load( int n, Window * w )
 {
 	window_ptr = w;
 	bar.setReferences(window_ptr, this, &canvas, &style);
-	canvas.setReferences(window_ptr, this, &bar, &style, &level);
+	canvas.setReferences(window_ptr, this, &editor_input, &bar, &style, &level);
 	editor_input.setReferences(window_ptr, this, &bar, &canvas, &style, &level);
 	level.load(n);
 	tribe.load(level.tribe);
@@ -69,6 +69,8 @@ bool Editor::select( signed int x, signed int y, bool modify_selection )
 	if (temp.i == -1)  // selected nothing
 	{
 		selection.clear();
+		canvas.redraw = true;
+		return false;
 	}
 	else
 	{
@@ -86,9 +88,9 @@ bool Editor::select( signed int x, signed int y, bool modify_selection )
 			else
 				selection.insert(temp);
 		}
+		canvas.redraw = true;
+		return true;
 	}
-	
-	return canvas.redraw = true;
 }
 
 bool Editor::select_none( void )

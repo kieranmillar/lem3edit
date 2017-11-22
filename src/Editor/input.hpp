@@ -43,13 +43,23 @@ public:
 
 	bool redraw;
 
+	int mouse_x, mouse_y;
 	Sint32 mouse_prev_x, mouse_prev_y;
-	bool dragging, leftScrollButtonHolding, rightScrollButtonHolding;
+
+	bool dragging;
+
+	bool leftScrollButtonHolding, rightScrollButtonHolding;
 	bool scrollBarHolding, scrollBarShifting;
 	int scrollBarHoldingOffset;
-	bool movingView;
 
 	int holdingID, holdingType;
+
+	bool movingView;
+
+	enum whichBorder {none, top, bottom, left, right};
+	bool resizingLevel;
+	int resizingNewPos;
+	whichBorder resizingWhich;
 
 	void setReferences(Window * w, Editor * e, Bar * b, Canvas * c, Style * s, Level * l);
 	void load(void);
