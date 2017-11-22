@@ -55,6 +55,9 @@ public:
 
 	bool scroll(signed int delta_x, signed int delta_y, bool drag);
 
+	enum zoomType { zoomIn, zoomOut };
+	void zoomCanvas(signed int zoomFocusX, signed int zoomFocusY, zoomType zoomDir);
+
 	void draw(void);
 
 	void draw_selection_box(int x, int y, int width, int height);

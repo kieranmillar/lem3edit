@@ -60,33 +60,95 @@ void Canvas::resize(int h)
 // Measured in screen pixels (so zoom dependent)
 bool Canvas::scroll(signed int delta_x, signed int delta_y, bool drag)
 {
+
+	bool up = false;
+	bool down = false;
+	bool left = false;
+	bool right = false;
+
+	if (delta_x < 0)
+		left = true;
+	if (delta_x > 0)
+		right = true;
+	if (delta_y < 0)
+		up = true;
+	if (delta_y > 0)
+		down = true;
 	scrollOffset_x += delta_x;
 	scrollOffset_y += delta_y;
 
 	signed int unzoomedMove_x = floor(scrollOffset_x / zoom);
 	signed int unzoomedMove_y = floor(scrollOffset_y / zoom);
 
-	/*if (scrollOffset_x < 0)
-		unzoomedMove_x -= 1;
-	if (scrollOffset_y < 0)
-		unzoomedMove_y -= 1;*/
-
 	scrollOffset_x %= zoom;
 	scrollOffset_y %= zoom;
 
-	scroll_x = BETWEEN(-200, scroll_x + unzoomedMove_x, level_ptr->width);
+	scroll_x += unzoomedMove_x;
+	scroll_y += unzoomedMove_y;
 
-	scroll_y = BETWEEN(-200, scroll_y + unzoomedMove_y, level_ptr->height);
+	if (scroll_x <= 0 - window_ptr->width && left)
+	{
+		scroll_x = 0 - window_ptr->width;
+		scrollOffset_x = 0;
+		delta_x = 0;
+	}
+	if (scroll_x >= level_ptr->width + ((window_ptr->width / zoom) * (zoom - 1)) && right)
+	{
+		scroll_x = level_ptr->width + ((window_ptr->width / zoom) * (zoom - 1));
+		scrollOffset_x = 0;
+		delta_x = 0;
+	}
+	if (scroll_y <= 0 - height && up)
+	{
+		scroll_y = 0 - height;
+		scrollOffset_y = 0;
+		delta_y = 0;
+	}
+	if (scroll_y >= level_ptr->height + ((height / zoom) * (zoom - 1)) && down)
+	{
+		scroll_y = level_ptr->height + ((height / zoom) * (zoom - 1));
+		scrollOffset_y = 0;
+		delta_y = 0;
+	}
 
 	if (delta_x != 0 || delta_y != 0)
 	{
 		if (drag)
 			editor_ptr->move_selected(delta_x, delta_y);
-
-		return redraw = true;
 	}
 
-	return true;
+	return redraw = true;
+}
+
+// x and y values are real values (so zoom independent)
+void Canvas::zoomCanvas(signed int zoomFocusX, signed int zoomFocusY, zoomType zoomDir)
+{
+	int moveDiff_x = zoomFocusX - scroll_x;
+	int moveDiff_y = zoomFocusY - scroll_y;
+
+	if (zoomDir == zoomIn)
+	{
+		if (zoom == 16)
+			return;
+		zoom *= 2;
+		scrollOffset_x *= 2;
+		scrollOffset_y *= 2;
+		moveDiff_x /= 2;
+		moveDiff_y /= 2;
+	}
+	if (zoomDir == zoomOut)
+	{
+		if (zoom == 1)
+			return;
+		zoom /= 2;
+		scrollOffset_x /= 2;
+		scrollOffset_y /= 2;
+		moveDiff_x = -moveDiff_x;
+		moveDiff_y = -moveDiff_y;
+	}
+
+	scroll(moveDiff_x * zoom, moveDiff_y * zoom, false);
+	redraw = true;
 }
 
 void Canvas::draw()

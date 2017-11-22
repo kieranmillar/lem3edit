@@ -63,7 +63,7 @@ void Editor_input::handleEvents(SDL_Event event)
 	Uint8 mouse_state = SDL_GetMouseState(&mouse_x_window, &mouse_y_window);
 	// Due to zooming we can't rely on the mouse's position in the window to map correctly
 	// So we need to create our own variables instead
-	// These ones give the true x co-ordinate of the level, ignoring zoom and scroll
+	// These ones give the real x co-ordinate of the level, ignoring zoom and scroll
 	Sint32 mouse_x, mouse_y;
 	mouse_x = (mouse_x_window / canvas_ptr->zoom) + canvas_ptr->scroll_x;
 	mouse_y = (mouse_y_window / canvas_ptr->zoom) + canvas_ptr->scroll_y;
@@ -191,19 +191,15 @@ void Editor_input::handleEvents(SDL_Event event)
 		case SDL_MOUSEWHEEL:
 		{
 			SDL_MouseWheelEvent &e = event.wheel;
-			if (!mouse_state & SDL_BUTTON(SDL_BUTTON_LEFT))
+			if (!mouse_state & SDL_BUTTON(SDL_BUTTON_LEFT) && mouse_y_window < canvas_ptr->height)
 			{
 				if (e.y == 1)
 				{
-					if (canvas_ptr->zoom != 16)
-						canvas_ptr->zoom *= 2;
-					canvas_ptr->redraw = true;
+					canvas_ptr->zoomCanvas(mouse_x, mouse_y, canvas_ptr->zoomIn);
 				}
 				if (e.y == -1)
 				{
-					if (canvas_ptr->zoom != 1)
-						canvas_ptr->zoom /= 2;
-					canvas_ptr->redraw = true;
+					canvas_ptr->zoomCanvas(mouse_x, mouse_y, canvas_ptr->zoomOut);
 				}
 			}
 			break;
@@ -292,7 +288,7 @@ void Editor_input::handleEvents(SDL_Event event)
 				const signed int down = key_state[SDL_GetScancodeFromKey(SDLK_k)] ? 8 : 0;
 				signed int delta_y = (-up + down) * delta_multiplier;
 
-				canvas_ptr->scroll(delta_x, delta_y, mouse_state & SDL_BUTTON(SDL_BUTTON_LEFT));
+				canvas_ptr->scroll(delta_x, delta_y, dragging);
 			}
 			{ // bar scroll
 
