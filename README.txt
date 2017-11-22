@@ -30,3 +30,6 @@ b             -- toggle background-only mode
 ijkl          -- scroll
 arrow pad     -- fine-tune object location
 shift         -- ... faster
+
+[             -- cycle object id down
+]             -- cycle object id up

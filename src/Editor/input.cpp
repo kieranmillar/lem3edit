@@ -252,6 +252,12 @@ void Editor_input::handleEvents(SDL_Event event)
 			case SDLK_DELETE:
 				editor_ptr->delete_selected();
 				break;
+			case SDLK_LEFTBRACKET:
+				editor_ptr->decrease_obj_id();
+				break;
+			case SDLK_RIGHTBRACKET:
+				editor_ptr->increase_obj_id();
+				break;
 			case SDLK_q:
 				die();
 				break;
