@@ -202,9 +202,12 @@ bool Level::save(unsigned int n)
 	const string level = "LEVEL";
 	const string perm = "PERM", temp = "TEMP";
 
-	return save_level(path, level, n) &&
-		save_objects(PERM, path, perm, n) &&
-		save_objects(TEMP, path, temp, n);
+	enemies = 0;
+	extra_lemmings = 0;
+
+	return save_objects(PERM, path, perm, n) &&
+		save_objects(TEMP, path, temp, n) &&
+		save_level(path, level, n);
 }
 
 bool Level::save_level(const std::string &path, const std::string &name, unsigned int n)
@@ -271,6 +274,10 @@ bool Level::save_objects(int type, const string &filename)
 		f.write((char *)&o.id, sizeof(o.id));
 		f.write((char *)&o.x, sizeof(o.x));
 		f.write((char *)&o.y, sizeof(o.y));
+		if (o.id == 10006 || o.id == 10007)
+			extra_lemmings++;
+		if (o.id >= 10010 && o.id <= 10017)
+			enemies++;
 	}
 
 	cout << "wrote " << object[type].size() << " objects to '" << filename << "'" << endl;
