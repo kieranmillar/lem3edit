@@ -77,16 +77,24 @@ bool Editor::select( signed int x, signed int y, bool modify_selection )
 		bool already_selected = selection.find(temp) != selection.end();
 		if (already_selected)
 		{
-			editor_input.dragging = true;
-		}
-		else
-		{
-			if (!modify_selection)
-				selection.clear();
 			if (modify_selection)
 				selection.erase(temp);
 			else
+			{
+				editor_input.dragging = true;
+				editor_input.startDragTime = gameFrameCount;
+			}
+		}
+		else
+		{
+			if (modify_selection)
 				selection.insert(temp);
+			else
+			{
+				selection.clear();
+				selection.insert(temp);
+				editor_input.dragging = true;
+			}
 		}
 		canvas.redraw = true;
 		return true;
@@ -152,6 +160,56 @@ bool Editor::addObject(int idToAdd, int typeToAdd, int xToAdd, int yToAdd)
 	o.x = xToAdd;
 	o.y = yToAdd;
 	level.object[typeToAdd].push_back(o);
+
+	return canvas.redraw = true;
+}
+
+bool Editor::moveToFront(void)
+{
+/*	int selectionSize = selection.size();
+	std::vector<Level::Object> copiedObjects[2] {level.object[0], level.object[1]};
+
+	int count = 0;
+	for (Selection::const_iterator i = selection.begin(); i != selection.end(); ++i)
+	{
+		Level::Object &o = level.object[i->type][i->i];
+		Level::Object newObj = o;
+
+		copiedObjects[i->type].erase(copiedObjects[i->type].begin() + i->i + count);
+		copiedObjects[i->type].push_back(newObj);
+
+		level.object[0] = copiedObjects[0];
+		level.object[1] = copiedObjects[1];
+
+		count--;
+	}
+
+	selection.clear();*/
+
+	return canvas.redraw = true;
+}
+
+bool Editor::moveToBack(void)
+{
+/*	int selectionSize = selection.size();
+	std::vector<Level::Object> copiedObjects[2] {level.object[0], level.object[1]};
+
+	int count = 0;
+	for (Selection::const_iterator i = selection.begin(); i != selection.end(); ++i)
+	{
+		Level::Object &o = level.object[i->type][i->i];
+		Level::Object newObj = o;
+
+		copiedObjects[i->type].erase(copiedObjects[i->type].begin() + i->i + count);
+		copiedObjects[i->type].insert(copiedObjects[i->type].begin(), newObj);
+
+		level.object[0] = copiedObjects[0];
+		level.object[1] = copiedObjects[1];
+
+		count++;
+	}
+
+	selection.clear();*/
 
 	return canvas.redraw = true;
 }

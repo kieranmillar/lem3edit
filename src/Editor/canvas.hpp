@@ -62,7 +62,7 @@ public:
 
 	void draw(void);
 
-	void draw_selection_box(int x, int y, int width, int height);
+	void draw_selection_box(int x, int y, int w, int h);
 
 	void drawHeldObject(int holdingType, int holdingID, int x, int y);
 

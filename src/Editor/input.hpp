@@ -47,6 +47,7 @@ public:
 	Sint32 mouse_prev_x, mouse_prev_y;
 
 	bool dragging;
+	Uint32 startDragTime;
 
 	bool leftScrollButtonHolding, rightScrollButtonHolding;
 	bool scrollBarHolding, scrollBarShifting;

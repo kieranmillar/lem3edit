@@ -61,11 +61,15 @@ public:
 	bool select( signed int x, signed int y, bool modify );
 	bool select_none( void );
 	bool select_all( void );
+
+	bool copy_selected(void);
+	bool paste(void);
 	
 	bool addObject(int idToAdd, int typeToAdd, int xToAdd, int yToAdd);
 
-	bool copy_selected( void );
-	bool paste( void );
+	bool moveToFront(void);
+	bool moveToBack(void);
+
 	bool decrease_obj_id(void);
 	bool increase_obj_id(void);
 	bool delete_selected( void );

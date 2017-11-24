@@ -79,14 +79,11 @@ bool Canvas::scroll(signed int delta_x, signed int delta_y, bool drag)
 	scrollOffset_x += delta_x;
 	scrollOffset_y += delta_y;
 
-	signed int unzoomedMove_x = floor(scrollOffset_x / zoom);
-	signed int unzoomedMove_y = floor(scrollOffset_y / zoom);
+	scroll_x += scrollOffset_x / zoom;
+	scroll_y += scrollOffset_y / zoom;
 
 	scrollOffset_x %= zoom;
 	scrollOffset_y %= zoom;
-
-	scroll_x += unzoomedMove_x;
-	scroll_y += unzoomedMove_y;
 
 	if (scroll_x <= 0 - window_ptr->width && left)
 	{
@@ -155,7 +152,6 @@ void Canvas::zoomCanvas(signed int zoomFocusX, signed int zoomFocusY, zoomType z
 
 void Canvas::draw()
 {
-
 	SDL_Rect level_area;
 	level_area.x = 0 - (scroll_x * zoom) - scrollOffset_x;
 	level_area.y = 0 - (scroll_y * zoom) - scrollOffset_y;
@@ -259,21 +255,20 @@ void Canvas::draw()
 		SDL_SetRenderTarget(window_ptr->screen_renderer, NULL);
 
 		redraw = false;
-
 	}
 
 }
 
-void Canvas::draw_selection_box(int x, int y, int width, int height)
+void Canvas::draw_selection_box(int x, int y, int w, int h)
 {
-	if (x > window_ptr->width || y > (window_ptr->height - BAR_HEIGHT) || (x + width) < 0 || (x + height) < 0)
+	if (x > window_ptr->width || y > height || (x + w) < 0 || (y + h) < 0)
 		return;
 	SDL_SetRenderDrawColor(window_ptr->screen_renderer, 255, 0, 255, 255 / 8);
 	SDL_Rect r;
 	r.x = x - 1;
 	r.y = y - 1;
-	r.w = width + 1;
-	r.h = height + 1;
+	r.w = w + 1;
+	r.h = h + 1;
 	SDL_RenderFillRect(window_ptr->screen_renderer, &r);
 	SDL_SetRenderDrawColor(window_ptr->screen_renderer, 255, 0, 255, 255);
 	SDL_RenderDrawRect(window_ptr->screen_renderer, &r);

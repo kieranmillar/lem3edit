@@ -47,6 +47,7 @@ void Editor_input::load(void)
 	mouse_prev_x = mouse_prev_y = 0;
 
 	dragging = false;
+	startDragTime = 0;
 
 	leftScrollButtonHolding = false;
 	rightScrollButtonHolding = false;
@@ -274,11 +275,22 @@ void Editor_input::handleEvents(SDL_Event event)
 			if (e.button == SDL_BUTTON_LEFT)
 			{
 				canvas_ptr->mouse_remainder_x = canvas_ptr->mouse_remainder_y = 0;
-				dragging = false;
 				leftScrollButtonHolding = false;
 				rightScrollButtonHolding = false;
 				scrollBarHolding = false;
 				scrollBarShifting = false;
+				if (dragging)
+				{
+					if (startDragTime >= editor_ptr->gameFrameCount - 5) //single-clicked instead of dragging
+					{
+						editor_ptr->selection.clear();
+						Level::Object::Index temp = level_ptr->get_object_by_position(mouse_x, mouse_y, *style_ptr, canvas_ptr->backgroundOnly);
+						if (temp.i != -1)
+							editor_ptr->selection.insert(temp);
+					}
+					dragging = false;
+					startDragTime = 0;
+				}
 				if (resizingLevel)
 				{
 					switch (resizingWhich)
@@ -381,6 +393,12 @@ void Editor_input::handleEvents(SDL_Event event)
 				break;
 			case SDLK_DELETE:
 				editor_ptr->delete_selected();
+				break;
+			case SDLK_COMMA:
+				editor_ptr->moveToBack();
+				break;
+			case SDLK_PERIOD:
+				editor_ptr->moveToFront();
 				break;
 			case SDLK_LEFTBRACKET:
 				editor_ptr->decrease_obj_id();
