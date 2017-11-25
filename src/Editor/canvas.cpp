@@ -254,6 +254,7 @@ void Canvas::draw()
 
 		SDL_SetRenderTarget(window_ptr->screen_renderer, NULL);
 
+
 		redraw = false;
 	}
 

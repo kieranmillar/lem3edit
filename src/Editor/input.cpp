@@ -427,7 +427,7 @@ void Editor_input::handleEvents(SDL_Event event)
 
 			break;
 		}
-		case SDL_USEREVENT:// stuff here happens every frame
+		case SDL_USEREVENT:// stuff here happens every frame. Watch out, timer produces events on a separate thread to rest of program!
 		{
 
 			const Uint8 *key_state = SDL_GetKeyboardState(NULL);
@@ -484,7 +484,7 @@ void Editor_input::handleEvents(SDL_Event event)
 			}
 
 			//Only draw if time between this frame and last didn't take too long
-			if (SDL_GetTicks() - editor_ptr->gameFrameTick <= 40)
+			if (SDL_GetTicks() - editor_ptr->gameFrameTick <= 35)
 			{
 				editor_ptr->gameFrameTick = SDL_GetTicks();
 				canvas_ptr->draw();

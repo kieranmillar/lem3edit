@@ -34,14 +34,16 @@ void Level::draw(Window * window, signed int x, signed int xOffset, signed int y
 		draw_objects(window, x, xOffset, y, yOffset, TEMP, 0, 10999, style, zoom);
 		draw_objects(window, x, xOffset, y, yOffset, PERM, 5000, 10999, style, zoom);
 	}
+
 }
 
 void Level::draw_objects(Window * window, signed int x, signed int xOffset, signed int y, signed int yOffset, int type, unsigned int id_min, unsigned int id_max, const Style &style, int zoom) const
 {
 	assert((unsigned)type < COUNTOF(this->object));
-	
+
 	for (vector<Object>::const_iterator i = object[type].begin(); i != object[type].end(); ++i)
 	{
+
 		const Object &o = *i;
 		if (o.id < id_min || o.id > id_max)
 			continue;
@@ -52,8 +54,10 @@ void Level::draw_objects(Window * window, signed int x, signed int xOffset, sign
 
 		int onScreenX = (o.x - x)*zoom - xOffset;
 		int onScreenY = (o.y - y)*zoom - yOffset;
-		if (onScreenY < window->height - BAR_HEIGHT + zoom)
+		if (onScreenY < window->height - BAR_HEIGHT)
+		{
 			style.draw_object_texture(window, onScreenX, onScreenY, type, so, zoom, NULL);
+		}
 	}
 }
 

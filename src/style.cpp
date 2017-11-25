@@ -103,13 +103,12 @@ int Style::object_by_id( int type, unsigned int id ) const
 {
 	assert((unsigned)type < COUNTOF(this->object));
 	
-	for (vector<Object>::const_iterator i = object[type].begin(); i != object[type].end(); ++i)
-	{
-		if (i->id == id)
-			return i - object[type].begin(); // index
-	}
-	
-	return -1;
+	vector<Object>::const_iterator i = std::find_if(object[type].begin(), object[type].end(), [&id](const Object& obj) {return obj.id == id; });
+
+	if (i != object[type].end())
+		return i - object[type].begin(); // index
+	else
+		return -1;
 }
 
 int Style::object_next_id(int type, unsigned int id) const
