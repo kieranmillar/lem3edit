@@ -39,8 +39,8 @@
 using namespace std;
 
 const char *prog_name = "lem3edit";
-const char *prog_ver = "0.6";
-const char *prog_date = "22/11/2017";
+const char *prog_ver = "0.6.1";
+const char *prog_date = "25/11/2017";
 
 void version(void);
 
