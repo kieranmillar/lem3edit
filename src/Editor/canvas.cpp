@@ -277,13 +277,15 @@ void Canvas::draw_selection_box(int x, int y, int w, int h)
 
 void Canvas::drawHeldObject(int holdingType, int holdingID, int x, int y)
 {
-	int scrollOffsetX, scrollOffsetY, drawX, drawY;
+	int drawX, drawY;
 	if (y < height)
 	{
-		scrollOffsetX = (scroll_x % 8) * zoom;
-		scrollOffsetY = (scroll_y % 2) * zoom;
-		drawX = x - ((x + scrollOffsetX) % (8 * zoom));
-		drawY = y - ((y + scrollOffsetY) % (2 * zoom));
+		drawX = input_ptr->mouse_x - (input_ptr->mouse_x % 8) - scroll_x;
+		drawX *= zoom;
+		drawX -= scrollOffset_x;
+		drawY = input_ptr->mouse_y - (input_ptr->mouse_y % 2) - scroll_y;
+		drawY *= zoom;
+		drawY -= scrollOffset_y;
 	}
 	else
 	{
