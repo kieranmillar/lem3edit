@@ -483,8 +483,9 @@ void Editor_input::handleEvents(SDL_Event event)
 				}
 			}
 
-			//Only draw if time between this frame and last didn't take too long
-			if (SDL_GetTicks() - editor_ptr->gameFrameTick <= 35)
+			//Only draw if time between this frame and last was neither too long nor too short
+			Uint32 ticksSinceLastFrame = SDL_GetTicks() - editor_ptr->gameFrameTick;
+			if (ticksSinceLastFrame <= 35 && ticksSinceLastFrame >= 3)
 			{
 				editor_ptr->gameFrameTick = SDL_GetTicks();
 				canvas_ptr->draw();
