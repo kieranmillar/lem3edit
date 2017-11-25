@@ -211,7 +211,7 @@ void Editor_input::handleEvents(SDL_Event event)
 						}
 					}
 				}
-				else if (mouse_x_window < BAR_HEIGHT)
+				else if (mouse_x_window < PANEL_WIDTH)
 					// options panel
 				{
 					holdingType = -1;
@@ -236,7 +236,7 @@ void Editor_input::handleEvents(SDL_Event event)
 						holdingID = -1;
 					}
 				}
-				else if (mouse_x_window < BAR_HEIGHT + 16)
+				else if (mouse_x_window < PANEL_WIDTH + 16)
 					// piece browser scroll bar left button
 				{
 					leftScrollButtonHolding = true;
@@ -457,8 +457,8 @@ void Editor_input::handleEvents(SDL_Event event)
 				if (mouse_y_window > window_ptr->height - 16) // scroll bar area
 				{
 					if (leftScrollButtonHolding
-						&& mouse_x_window > BAR_HEIGHT
-						&& mouse_x_window < BAR_HEIGHT + 16)
+						&& mouse_x_window > PANEL_WIDTH
+						&& mouse_x_window < PANEL_WIDTH + 16)
 					{
 						bar_ptr->scroll(-50);
 					}
@@ -469,7 +469,7 @@ void Editor_input::handleEvents(SDL_Event event)
 					}
 					if (scrollBarShifting
 						&& mouse_x_window < window_ptr->width - 16
-						&& mouse_x_window > BAR_HEIGHT + 16)
+						&& mouse_x_window > PANEL_WIDTH + 16)
 					{
 						if (bar_ptr->barScrollRect.x > mouse_x_window)
 						{

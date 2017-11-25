@@ -22,6 +22,7 @@
 #define BAR_HPP
 
 #define BAR_HEIGHT 150
+#define PANEL_WIDTH 150
 #define PIECESIZE 132
 
 #include "SDL.h"
