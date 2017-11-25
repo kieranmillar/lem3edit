@@ -388,7 +388,7 @@ bool Style::load_objects( int type, const string &obj_filename, const string &fr
 
 	}
 	
-	cout << "loaded " << object[type].size() << " objects from '" << obj_filename << "'" << endl;
+	SDL_Log("Loaded %d objects from '%s'\n", object[type].size(), obj_filename.c_str());
 	return true;
 }
 
@@ -410,7 +410,7 @@ bool Style::load_blocks( int type, const string &blk_filename )
 	ifstream blk_f(blk_filename.c_str(), ios::binary);
 	if (!blk_f)
 	{
-		cerr << "failed to open '" << blk_filename << "'" << endl;
+		SDL_Log("Failed to open '%s'\n", blk_filename.c_str());
 		return false;
 	}
 	
@@ -428,7 +428,7 @@ bool Style::load_blocks( int type, const string &blk_filename )
 		block[type].push_back(b);
 	}
 	
-	cout << "loaded " << block[type].size() << " blocks from '" << blk_filename << "'" << endl;
+	SDL_Log("Loaded %d blocks from '%s'\n", object[type].size(), blk_filename.c_str());
 	return true;
 }
 

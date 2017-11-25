@@ -151,6 +151,6 @@ bool Del::load( const string &din_filename, const string &del_filename )
 		frame.push_back(f);
 	}
 	
-	cout << "loaded " << frame.size() << " images from '" << del_filename << "'" << endl;
+	SDL_Log("Loaded %d images from '%s'\n", frame.size(), del_filename.c_str());
 	return true;
 }

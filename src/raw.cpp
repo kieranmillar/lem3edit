@@ -91,7 +91,7 @@ bool Raw::load_raw( string raw_filename )
 	
 	delete[] temp;
 	
-	cout << "loaded " << frame.size() << " images from '" << raw_filename << "'" << endl;
+	SDL_Log("Loaded %d images from '%s'\n", frame.size(), raw_filename.c_str());
 	return true;
 }
 

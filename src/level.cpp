@@ -132,7 +132,7 @@ bool Level::load_level( const string &filename )
 	ifstream f(filename.c_str(), ios::binary);
 	if (!f)
 	{
-		cerr << "failed to open '" << filename << "'" << endl;
+		SDL_Log("Failed to open '%s'\n", filename.c_str());
 		return false;
 	}
 	
@@ -153,7 +153,7 @@ bool Level::load_level( const string &filename )
 	f.read((char *)&release_delay,  sizeof(release_delay));
 	f.read((char *)&enemies,        sizeof(enemies));
 	
-	cout << "loaded level from '" << filename << "'" << endl;
+	SDL_Log("Loaded level from  '%s'\n", filename.c_str());
 
 	f.close();
 	return true;
@@ -177,7 +177,7 @@ bool Level::load_objects( int type, const string &filename )
 	ifstream f(filename.c_str(), ios::binary);
 	if (!f)
 	{
-		cerr << "failed to open '" << filename << "'" << endl;
+		SDL_Log("Failed to open '%s'\n", filename.c_str());
 		return false;
 	}
 	
@@ -195,7 +195,7 @@ bool Level::load_objects( int type, const string &filename )
 		object[type].push_back(o);
 	}
 	
-	cout << "loaded " << object[type].size() << " objects from '" << filename << "'" << endl;
+	SDL_Log("Loaded %d objects from '%s'\n", object[type].size(), filename.c_str());
 	f.close();
 	return true;
 }
@@ -226,7 +226,7 @@ bool Level::save_level(const string &filename)
 	ofstream f(filename.c_str(), ios::binary | ios::trunc);
 	if (!f)
 	{
-		cerr << "failed to open '" << filename << "'" << endl;
+		SDL_Log("Failed to open '%s'\n", filename.c_str());
 		return false;
 	}
 
@@ -247,7 +247,7 @@ bool Level::save_level(const string &filename)
 	f.write((char *)&release_delay, sizeof(release_delay));
 	f.write((char *)&enemies, sizeof(enemies));
 
-	cout << "wrote level to '" << filename << "'" << endl;
+	SDL_Log("Wrote level to '%s'\n", filename.c_str());
 	f.close();
 	return true;
 }
@@ -268,7 +268,7 @@ bool Level::save_objects(int type, const string &filename)
 	ofstream f(filename.c_str(), ios::binary | ios::trunc);
 	if (!f)
 	{
-		cerr << "failed to open '" << filename << "'" << endl;
+		SDL_Log("Failed to open '%s'\n", filename.c_str());
 		return false;
 	}
 
@@ -284,7 +284,7 @@ bool Level::save_objects(int type, const string &filename)
 			enemies++;
 	}
 
-	cout << "wrote " << object[type].size() << " objects to '" << filename << "'" << endl;
+	SDL_Log("Wrote %d objects to '%s'\n", object[type].size(), filename.c_str());
 	f.close();
 	return true;
 }

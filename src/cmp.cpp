@@ -211,6 +211,6 @@ bool Cmp::load( const string &ind_filename, const string &cmp_filename )
 		animation.push_back(a);
 	}
 	
-	cout << "loaded " << animation.size() << " animations from '" << cmp_filename << "'" << endl;
+	SDL_Log("Loaded %d animations from '%s'\n", animation.size(), cmp_filename.c_str());
 	return true;
 }
