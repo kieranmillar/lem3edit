@@ -51,6 +51,7 @@ bool Editor::load( int n, Window * w )
 	canvas.load();
 	editor_input.load();
 	gameFrameCount = 0;
+	gameFrameTick = SDL_GetTicks();
 	
 	return canvas.redraw = true;
 }

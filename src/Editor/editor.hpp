@@ -55,6 +55,7 @@ public:
 	Clipboard clipboard;
 
 	Uint32 gameFrameCount;
+	Uint32 gameFrameTick;
 	
 	void resize(int w, int h);
 

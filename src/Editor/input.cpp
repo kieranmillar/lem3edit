@@ -483,8 +483,17 @@ void Editor_input::handleEvents(SDL_Event event)
 				}
 			}
 
-			canvas_ptr->draw();
-			bar_ptr->draw();
+			//Only draw if time between this frame and last didn't take too long
+			if (SDL_GetTicks() - editor_ptr->gameFrameTick <= 40)
+			{
+				editor_ptr->gameFrameTick = SDL_GetTicks();
+				canvas_ptr->draw();
+				bar_ptr->draw();
+			}
+			else
+			{
+				editor_ptr->gameFrameTick = SDL_GetTicks();
+			}
 
 			SDL_SetRenderTarget(window_ptr->screen_renderer, NULL);
 			SDL_RenderCopy(window_ptr->screen_renderer, window_ptr->screen_texture, NULL, NULL);
