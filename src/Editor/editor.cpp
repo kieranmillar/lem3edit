@@ -195,25 +195,28 @@ bool Editor::moveToFront(void)
 
 bool Editor::moveToBack(void)
 {
-/*	int selectionSize = selection.size();
-	std::vector<Level::Object> copiedObjects[2] {level.object[0], level.object[1]};
+	std::vector<int> indexes[COUNTOF(level.object)];
 
-	int count = 0;
 	for (Selection::const_iterator i = selection.begin(); i != selection.end(); ++i)
 	{
-		Level::Object &o = level.object[i->type][i->i];
-		Level::Object newObj = o;
-
-		copiedObjects[i->type].erase(copiedObjects[i->type].begin() + i->i + count);
-		copiedObjects[i->type].insert(copiedObjects[i->type].begin(), newObj);
-
-		level.object[0] = copiedObjects[0];
-		level.object[1] = copiedObjects[1];
-
-		count++;
+		indexes[i->type].push_back(i->i);
 	}
+	selection.clear();
 
-	selection.clear();*/
+	for (unsigned int type = 0; type < COUNTOF(level.object); ++type)
+	{
+		std::sort(indexes[type].begin(), indexes[type].end());
+		std::reverse(indexes[type].begin(), indexes[type].end());
+
+		for (unsigned int i = 0; i < indexes[type].size(); i++)
+		{
+			int j = indexes[type][i] + i;
+			level.object[type].insert(level.object[type].begin(), level.object[type][j]);
+			level.object[type].erase(level.object[type].begin() + j + 1);
+
+			selection.insert(Level::Object::Index(type, i));
+		}
+	}
 
 	return canvas.redraw = true;
 }
