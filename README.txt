@@ -9,6 +9,8 @@ on case-sensitive filesystems, all the data files must have upper case filenames
 Use the left mouse button to select and place objects from the object bar.
 Click on objects in the level to select them, and then drag selected objects to move them.
 
+Drag with the right mouse button to scroll the view
+
 == Keys ========================================================================
 s             -- save level
 q             -- quit
@@ -16,9 +18,9 @@ q             -- quit
 1             -- switch object bar to background pieces
 2             -- switch object bar to terrain pieces
 3             -- switch object bar to tool and creature pieces
-Ctrl + 1      -- toggle visibility of background layer
-Ctrl + 2      -- toggle visibility of terrain layer
-Ctrl + 3      -- toggle visibility of tool and creature layer
+ctrl + 1      -- toggle visibility of background layer
+ctrl + 2      -- toggle visibility of terrain layer
+ctrl + 3      -- toggle visibility of tool and creature layer
 z             -- scroll object bar left
 x             -- scroll object bar right
 
