@@ -211,9 +211,18 @@ bool Level::save(unsigned int n)
 	enemies = 0;
 	extra_lemmings = 0;
 
-	return save_objects(PERM, path, perm, n) &&
+	if (save_objects(PERM, path, perm, n) &&
 		save_objects(TEMP, path, temp, n) &&
-		save_level(path, level, n);
+		save_level(path, level, n) == true)
+	{
+		SDL_ShowSimpleMessageBox(0, "Save Complete", "Level saved!", NULL);
+		return true;
+	}
+	else
+	{
+		SDL_ShowSimpleMessageBox(0, "Oh no!", "Failed to save :(", NULL);
+		return false;
+	}
 }
 
 bool Level::save_level(const std::string &path, const std::string &name, unsigned int n)
