@@ -42,12 +42,9 @@ public:
 	Style * style_ptr;
 
 	int barScrollX;
-	int barPERMCount;
-	int barMaxPERM;
-	int barTEMPCount;
-	int barMaxTEMP;
+	int barTypeCount[3];
+	int barTypeMax[3];
 	int type;
-	int barMax;
 	SDL_Rect barScrollRect;
 
 	void setReferences(Window * w, Editor * e, Canvas * c, Style * s);

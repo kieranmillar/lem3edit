@@ -41,13 +41,13 @@ void Bar::setReferences(Window * w, Editor * e, Canvas * c, Style * s)
 
 void Bar::load( void )
 {
-	barPERMCount = style_ptr->object[PERM].size();
-	barMaxPERM = barPERMCount * PIECESIZE;
-	barTEMPCount = style_ptr->object[TEMP].size();
-	barMaxTEMP = barTEMPCount * PIECESIZE;
+	for (int i = 0; i < 3; i++)
+	{
+		barTypeCount[i] = style_ptr->object[i].size();
+		barTypeMax[i] = barTypeCount[i] * PIECESIZE;
+	}
 	barScrollX = 0;
 	type = PERM;
-	barMax = barMaxPERM;
 
 	resizeBarScrollRect(window_ptr->width, window_ptr->height);
 	barScrollRect.h = 13;
@@ -56,7 +56,7 @@ void Bar::load( void )
 void Bar::resizeBarScrollRect(int windowWidth, int windowHeight)
 {
 	barScrollRect.y = windowHeight - 14;
-	barScrollRect.w = (window_ptr->width - PANEL_WIDTH - 33) * 1000 / barMax;
+	barScrollRect.w = (window_ptr->width - PANEL_WIDTH - 33) * 1000 / barTypeMax[type];
 	barScrollRect.w *= (window_ptr->width - PANEL_WIDTH - 33);
 	barScrollRect.w /= 1000;
 	barScrollRect.w += 1;
@@ -68,14 +68,14 @@ void Bar::scroll(signed int moveAmount)
 	barScrollX += moveAmount;
 	if (barScrollX < 0)
 		barScrollX = 0;
-	if (barScrollX > barMax - (window_ptr->width - PANEL_WIDTH))
-		barScrollX = barMax - (window_ptr->width - PANEL_WIDTH);
+	if (barScrollX > barTypeMax[type] - (window_ptr->width - PANEL_WIDTH))
+		barScrollX = barTypeMax[type] - (window_ptr->width - PANEL_WIDTH);
 	updateBarScrollPos(barScrollX);
 }
 
 void Bar::updateBarScrollPos(int xPos)
 {
-	barScrollRect.x = (xPos * 1000) / barMax;
+	barScrollRect.x = (xPos * 1000) / barTypeMax[type];
 	barScrollRect.x *= (window_ptr->width - PANEL_WIDTH - 33);
 	barScrollRect.x /= 1000;
 	barScrollRect.x += PANEL_WIDTH + 18;
@@ -90,7 +90,7 @@ void Bar::moveScrollBar(int moveLocationInWindow)
 	if (x > xMax - barScrollRect.w)
 		x = xMax - barScrollRect.w;
 	int factor = x * 1000 / xMax;
-	barScrollX = (barMax * factor) / 1000;
+	barScrollX = (barTypeMax[type] * factor) / 1000;
 	scroll(0);
 }
 
@@ -100,10 +100,6 @@ void Bar::changeType(int t)
 		return;
 	type = t;
 	barScrollX = 0;
-	if (t == PERM)
-		barMax = barMaxPERM;
-	if (t == TEMP)
-		barMax = barMaxTEMP;
 	resizeBarScrollRect(window_ptr->width, window_ptr->height);
 }
 

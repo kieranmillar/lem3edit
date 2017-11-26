@@ -362,6 +362,9 @@ void Editor_input::handleEvents(SDL_Event event)
 			case SDLK_2:
 				bar_ptr->changeType(TEMP);
 				break;
+			case SDLK_3:
+				bar_ptr->changeType(TOOL);
+				break;
 			case SDLK_s:
 				editor_ptr->save(level_ptr->level_id);
 				break;

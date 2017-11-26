@@ -28,7 +28,7 @@
 
 #define COUNTOF( x ) (sizeof(x) / sizeof(*(x)))
 
-static const int PERM = 0, TEMP = 1;
+static const int PERM = 0, TEMP = 1, TOOL = 2;
 
 enum programMode { EDITORMODE };
 

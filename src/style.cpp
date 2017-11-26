@@ -150,6 +150,14 @@ void Style::blit_object( SDL_Surface *surface, signed int x, signed int y, int t
 {
 	assert((unsigned)type < COUNTOF(this->object));
 	
+	// There are 3 object arrays, but they were loaded from two files
+	// We split up the PERM objects to separate out the tools and creatures
+	// But the blocks that hold the grpahics info are all still in a single PERM list
+	// So we need to redirect TOOL objects back to the PERM block list
+	int blockType = type;
+	if (type == TOOL)
+		blockType = PERM;
+
 	if (object >= this->object[type].size())
 		return assert(false);
 	if (frame >= this->object[type][object].frame.size())
@@ -163,7 +171,7 @@ void Style::blit_object( SDL_Surface *surface, signed int x, signed int y, int t
 		{
 			int b = this->object[type][object].frame[frame][i++];
 			if (b != (Uint16)-1)
-				block[type][b].blit(surface, x + bx * 8, y + by * 2);
+				block[blockType][b].blit(surface, x + bx * 8, y + by * 2);
 		}
 	}
 }
@@ -232,7 +240,8 @@ bool Style::load(unsigned int n, Window * window, SDL_Color *pal2)
 	       load_blocks(TEMP, path, temp, n) &&
 	       skill.load(path, objec, n) &&
 		   create_object_textures (PERM, window, pal2) &&
-		   create_object_textures(TEMP, window, pal2);
+		   create_object_textures(TEMP, window, pal2) &&
+		   create_object_textures(TOOL, window, pal2);
 }
 
 bool Style::load_palette( string path, string name, unsigned int n )
@@ -284,6 +293,8 @@ bool Style::load_objects( int type, const string &obj_filename, const string &fr
 	assert((unsigned)type < COUNTOF(this->object));
 	
 	object[type].clear();
+	if (type == PERM)
+		object[TOOL].clear();
 	
 	ifstream obj_f(obj_filename.c_str(), ios::binary);
 	if (!obj_f)
@@ -337,7 +348,7 @@ bool Style::load_objects( int type, const string &obj_filename, const string &fr
 			frl_f.read((char *)&type, sizeof(type));
 			frl_f.read((char *)&blocks, sizeof(blocks));
 			
-			if (type == 0)
+			if (type == PERM)
 			{
 				frl_f.read((char *)&seek, sizeof(seek));
 				frl_f.seekg(seek, ios::beg);
@@ -352,14 +363,14 @@ bool Style::load_objects( int type, const string &obj_filename, const string &fr
 				
 				switch (type)
 				{
-				case 0:
+				case PERM:
 					Uint8 x, y;
 					frl_f.read((char *)&x, sizeof(x));
 					frl_f.read((char *)&y, sizeof(y));
 					
 					b = x + y * o.width;
 					break;
-				case 1:
+				case TEMP:
 					b = k;
 					break;
 				default:
@@ -384,11 +395,21 @@ bool Style::load_objects( int type, const string &obj_filename, const string &fr
 		o.texX = NULL;
 		o.texY = NULL;
 
-		object[type].push_back(o);
+		if (o.id < 5000)
+		{
+			object[type].push_back(o);
+		}
+		else
+		{
+			object[TOOL].push_back(o);
+		}
+		
 
 	}
-	
-	SDL_Log("Loaded %d objects from '%s'\n", object[type].size(), obj_filename.c_str());
+	if (type == PERM)
+		SDL_Log("Loaded %d + %d objects from '%s'\n", object[type].size(), object[TOOL].size(), obj_filename.c_str());
+	if (type == TEMP)
+		SDL_Log("Loaded %d objects from '%s'\n", object[type].size(), obj_filename.c_str());
 	return true;
 }
 
@@ -414,6 +435,7 @@ bool Style::load_blocks( int type, const string &blk_filename )
 		return false;
 	}
 	
+	int count = 0;
 	while (true)
 	{
 		Uint8 temp[16];
@@ -426,9 +448,9 @@ bool Style::load_blocks( int type, const string &blk_filename )
 		Block b(temp);
 		
 		block[type].push_back(b);
+		
 	}
-	
-	SDL_Log("Loaded %d blocks from '%s'\n", object[type].size(), blk_filename.c_str());
+	SDL_Log("Loaded %d blocks from '%s'\n", block[type].size(), blk_filename.c_str());
 	return true;
 }
 

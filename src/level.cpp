@@ -32,7 +32,7 @@ void Level::draw(Window * window, signed int x, signed int xOffset, signed int y
 	if (backgroundOnly == false)
 	{
 		draw_objects(window, x, xOffset, y, yOffset, TEMP, 0, 10999, style, zoom);
-		draw_objects(window, x, xOffset, y, yOffset, PERM, 5000, 10999, style, zoom);
+		draw_objects(window, x, xOffset, y, yOffset, TOOL, 5000, 10999, style, zoom);
 	}
 
 }
@@ -67,31 +67,29 @@ Level::Object::Index Level::get_object_by_position( signed int x, signed int y, 
 
 	if (backgroundOnly == false)
 	{
-		i = get_object_by_position(x, y, PERM, 5000, 10999, style);
+		i = get_object_by_position(x, y, TOOL, style);
 		if (i != -1)
-			return Object::Index(PERM, i);
+			return Object::Index(TOOL, i);
 	
-		i = get_object_by_position(x, y, TEMP, 0, 10999, style);
+		i = get_object_by_position(x, y, TEMP, style);
 		if (i != -1)
 			return Object::Index(TEMP, i);
 	}
 		
-	i = get_object_by_position(x, y, PERM, 0, 4999, style);
+	i = get_object_by_position(x, y, PERM, style);
 	if (i != -1)
 		return Object::Index(PERM, i);
 	
 	return Object::Index(0, -1);
 }
 
-signed int Level::get_object_by_position(signed int x, signed int y, int type, unsigned int id_min, unsigned int id_max, const Style &style) const
+signed int Level::get_object_by_position(signed int x, signed int y, int type, const Style &style) const
 {
 	assert((unsigned)type < COUNTOF(this->object));
 	
 	for (vector<Object>::const_reverse_iterator i = object[type].rbegin(); i != object[type].rend(); ++i)
 	{
 		const Object &o = *i;
-		if (o.id < id_min || o.id > id_max)
-			continue;
 		
 		if (x < o.x || y < o.y)
 			continue;
@@ -173,6 +171,8 @@ bool Level::load_objects( int type, const string &filename )
 	assert((unsigned)type < COUNTOF(this->object));
 	
 	object[type].clear();
+	if (type == PERM)
+		object[TOOL].clear();
 	
 	ifstream f(filename.c_str(), ios::binary);
 	if (!f)
@@ -191,11 +191,21 @@ bool Level::load_objects( int type, const string &filename )
 		
 		if (!f)
 			break;
-		
-		object[type].push_back(o);
+
+		if (o.id < 5000)
+		{
+			object[type].push_back(o);
+		}
+		else
+		{
+			object[TOOL].push_back(o);
+		}
 	}
 	
-	SDL_Log("Loaded %d objects from '%s'\n", object[type].size(), filename.c_str());
+	if (type == PERM)
+		SDL_Log("Loaded %d + %d objects from '%s'\n", object[type].size(), object[TOOL].size(), filename.c_str());
+	if (type == TEMP)
+		SDL_Log("Loaded %d objects from '%s'\n", object[type].size(), filename.c_str());
 	f.close();
 	return true;
 }
@@ -272,19 +282,30 @@ bool Level::save_objects(int type, const string &filename)
 		return false;
 	}
 
-	for (vector<Object>::const_iterator i = object[type].begin(); i != object[type].end(); ++i)
+	int numTypesToSave = 1;
+	int savingType = type;
+	if (type == PERM)
+		numTypesToSave = 2;
+	for (int j = 0; j < numTypesToSave; j++)
 	{
-		const Object &o = *i;
-		f.write((char *)&o.id, sizeof(o.id));
-		f.write((char *)&o.x, sizeof(o.x));
-		f.write((char *)&o.y, sizeof(o.y));
-		if (o.id == 10006 || o.id == 10007)
-			extra_lemmings++;
-		if (o.id >= 10010 && o.id <= 10017)
-			enemies++;
+		for (vector<Object>::const_iterator i = object[savingType].begin(); i != object[savingType].end(); ++i)
+		{
+			const Object &o = *i;
+			f.write((char *)&o.id, sizeof(o.id));
+			f.write((char *)&o.x, sizeof(o.x));
+			f.write((char *)&o.y, sizeof(o.y));
+			if (o.id == 10006 || o.id == 10007)
+				extra_lemmings++;
+			if (o.id >= 10010 && o.id <= 10017)
+				enemies++;
+		}
+		savingType = TOOL;
 	}
-
-	SDL_Log("Wrote %d objects to '%s'\n", object[type].size(), filename.c_str());
+	
+	if (type == PERM)
+		SDL_Log("Wrote %d + %d objects to '%s'\n", object[type].size(), object[TOOL].size(), filename.c_str());
+	if (type == TEMP)
+		SDL_Log("Wrote %d objects to '%s'\n", object[type].size(), filename.c_str());
 	f.close();
 	return true;
 }

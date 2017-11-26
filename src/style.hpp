@@ -65,7 +65,7 @@ public:
 		static void decode( Uint8 *dest, const Uint8 *src, unsigned int size );
 	};
 	
-	std::vector<Object> object[2];
+	std::vector<Object> object[3];
 	
 	std::vector<Block> block[2];
 	

@@ -84,6 +84,7 @@ int main( int argc, char *argv[] )
 
 	editor.style.destroy_all_objects(PERM);
 	editor.style.destroy_all_objects(TEMP);
+	editor.style.destroy_all_objects(TOOL);
 	
 	return EXIT_SUCCESS;
 }
