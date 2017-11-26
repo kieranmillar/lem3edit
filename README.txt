@@ -13,20 +13,25 @@ Click on objects in the level to select them, and then drag selected objects to 
 s             -- save level
 q             -- quit
 
-a             -- select all
+1             -- switch object bar to background pieces
+2             -- switch object bar to terrain pieces
+3             -- switch object bar to tool and creature pieces
+Ctrl + 1      -- toggle visibility of background layer
+Ctrl + 2      -- toggle visibility of terrain layer
+Ctrl + 3      -- toggle visibility of tool and creature layer
+z             -- scroll object bar left
+x             -- scroll object bar right
+
+a             -- select all on visible layers
 ctrl          -- select multiple
 escape        -- select none
 delete        -- delete selected objects
 ctrl + c      -- copy
 ctrl + v      -- paste
-
-1             -- switch object bar to background and object pieces
-2             -- switch object bar to terrain pieces
-z             -- scroll object bar left
-x             -- scroll object bar right
+,             -- move selected objects behind others on the same layer
+.             -- move selected objects infront of others on the same layer
 
 scroll-wheel  -- zoom in and out
-b             -- toggle background-only mode
 ijkl          -- scroll
 arrow pad     -- fine-tune object location
 shift         -- ... faster
