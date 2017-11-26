@@ -18,6 +18,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 #include "Editor/bar.hpp"
+#include "Editor/canvas.hpp"
 #include "lem3edit.hpp"
 #include "level.hpp"
 
@@ -26,18 +27,16 @@
 #include <iostream>
 using namespace std;
 
-void Level::draw(Window * window, signed int x, signed int xOffset, signed int y, signed int yOffset, const Style &style, bool backgroundOnly, int zoom) const
+void Level::draw(Window * window, signed int x, signed int xOffset, signed int y, signed int yOffset, const Style &style, const Canvas &canvas, int zoom) const
 {
-	draw_objects(window, x, xOffset, y, yOffset, PERM, 0, 4999, style, zoom);
-	if (backgroundOnly == false)
+	for (int i = 0; i < 3; i++)
 	{
-		draw_objects(window, x, xOffset, y, yOffset, TEMP, 0, 10999, style, zoom);
-		draw_objects(window, x, xOffset, y, yOffset, TOOL, 5000, 10999, style, zoom);
+		if (canvas.layerVisible[i])
+			draw_objects(window, x, xOffset, y, yOffset, i, style, zoom);
 	}
-
 }
 
-void Level::draw_objects(Window * window, signed int x, signed int xOffset, signed int y, signed int yOffset, int type, unsigned int id_min, unsigned int id_max, const Style &style, int zoom) const
+void Level::draw_objects(Window * window, signed int x, signed int xOffset, signed int y, signed int yOffset, int type, const Style &style, int zoom) const
 {
 	assert((unsigned)type < COUNTOF(this->object));
 
@@ -45,8 +44,6 @@ void Level::draw_objects(Window * window, signed int x, signed int xOffset, sign
 	{
 
 		const Object &o = *i;
-		if (o.id < id_min || o.id > id_max)
-			continue;
 			
 		unsigned int so = style.object_by_id(type, o.id);
 		if (so == -1)
@@ -61,24 +58,19 @@ void Level::draw_objects(Window * window, signed int x, signed int xOffset, sign
 	}
 }
 
-Level::Object::Index Level::get_object_by_position( signed int x, signed int y, const Style &style, bool backgroundOnly ) const
+Level::Object::Index Level::get_object_by_position(signed int x, signed int y, const Style &style, const Canvas &canvas) const
 {
 	signed int i;
 
-	if (backgroundOnly == false)
+	for (int j = 2; j >= 0; j--)
 	{
-		i = get_object_by_position(x, y, TOOL, style);
-		if (i != -1)
-			return Object::Index(TOOL, i);
-	
-		i = get_object_by_position(x, y, TEMP, style);
-		if (i != -1)
-			return Object::Index(TEMP, i);
+		if (canvas.layerVisible[j])
+		{
+			i = get_object_by_position(x, y, j, style);
+			if (i != -1)
+				return Object::Index(j, i);
+		}
 	}
-		
-	i = get_object_by_position(x, y, PERM, style);
-	if (i != -1)
-		return Object::Index(PERM, i);
 	
 	return Object::Index(0, -1);
 }

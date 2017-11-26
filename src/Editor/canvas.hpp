@@ -49,7 +49,7 @@ public:
 	signed int scrollOffset_x, scrollOffset_y;
 	signed int zoom;
 	Sint32 mouse_remainder_x, mouse_remainder_y;
-	bool backgroundOnly;
+	bool layerVisible[3];
 
 	void setReferences(Window * w, Editor * e, Editor_input * i, Bar * b, Style * s, Level * l);
 	void load(void);

@@ -19,6 +19,7 @@
 #ifndef LEVEL_HPP
 #define LEVEL_HPP
 
+#include "editor/canvas.hpp"
 #include "style.hpp"
 #include "window.hpp"
 
@@ -64,10 +65,10 @@ public:
 	
 	std::vector<Object> object[3];
 	
-	void draw(Window * window, signed int x, signed int xOffset, signed int y, signed int yOffset, const Style &style, bool backgroundOnly, int zoom) const;
-	void draw_objects(Window * window, signed int x, signed int xOffset, signed int y, signed int yOffset, int type, unsigned int id_min, unsigned int id_max, const Style &style, int zoom) const;
+	void draw(Window * window, signed int x, signed int xOffset, signed int y, signed int yOffset, const Style &style, const Canvas &canvas, int zoom) const;
+	void draw_objects(Window * window, signed int x, signed int xOffset, signed int y, signed int yOffset, int type, const Style &style, int zoom) const;
 	
-	Object::Index get_object_by_position( signed int x, signed int y, const Style &style, bool backgroundOnly ) const;
+	Object::Index get_object_by_position(signed int x, signed int y, const Style &style, const Canvas &canvas) const;
 	signed int get_object_by_position(signed int x, signed int y, int type, const Style &style) const;
 	
 	bool load( unsigned int n );

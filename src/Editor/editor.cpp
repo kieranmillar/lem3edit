@@ -66,7 +66,7 @@ bool Editor::save(int n)
 
 bool Editor::select( signed int x, signed int y, bool modify_selection )
 {
-	Level::Object::Index temp = level.get_object_by_position(x, y, style, canvas.backgroundOnly);
+	Level::Object::Index temp = level.get_object_by_position(x, y, style, canvas);
 	
 	if (temp.i == -1)  // selected nothing
 	{
@@ -117,9 +117,12 @@ bool Editor::select_all( void )
 {
 	for (unsigned int type = 0; type < COUNTOF(level.object); ++type)
 	{
-		for (unsigned int i = 0; i < level.object[type].size(); ++i)
+		if (canvas.layerVisible[type])
 		{
-			selection.insert(Level::Object::Index(type, i));
+			for (unsigned int i = 0; i < level.object[type].size(); ++i)
+			{
+				selection.insert(Level::Object::Index(type, i));
+			}
 		}
 	}
 	

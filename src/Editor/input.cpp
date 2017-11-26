@@ -284,7 +284,7 @@ void Editor_input::handleEvents(SDL_Event event)
 					if (startDragTime >= editor_ptr->gameFrameCount - 5) //single-clicked instead of dragging
 					{
 						editor_ptr->selection.clear();
-						Level::Object::Index temp = level_ptr->get_object_by_position(mouse_x, mouse_y, *style_ptr, canvas_ptr->backgroundOnly);
+						Level::Object::Index temp = level_ptr->get_object_by_position(mouse_x, mouse_y, *style_ptr, *canvas_ptr);
 						if (temp.i != -1)
 							editor_ptr->selection.insert(temp);
 					}
@@ -357,13 +357,61 @@ void Editor_input::handleEvents(SDL_Event event)
 			switch (e.keysym.sym)
 			{
 			case SDLK_1:
-				bar_ptr->changeType(PERM);
+				if (ctrl_down)
+				{
+					if (canvas_ptr->layerVisible[PERM])
+					{
+						canvas_ptr->layerVisible[PERM] = false;
+					}
+					else
+					{
+						canvas_ptr->layerVisible[PERM] = true;
+					}
+				}
+				else
+				{
+					bar_ptr->changeType(PERM);
+					canvas_ptr->layerVisible[PERM] = true;
+				}
+				canvas_ptr->redraw = true;
 				break;
 			case SDLK_2:
-				bar_ptr->changeType(TEMP);
+				if (ctrl_down)
+				{
+					if (canvas_ptr->layerVisible[TEMP])
+					{
+						canvas_ptr->layerVisible[TEMP] = false;
+					}
+					else
+					{
+						canvas_ptr->layerVisible[TEMP] = true;
+					}
+				}
+				else
+				{
+					bar_ptr->changeType(TEMP);
+					canvas_ptr->layerVisible[TEMP] = true;
+				}
+				canvas_ptr->redraw = true;
 				break;
 			case SDLK_3:
-				bar_ptr->changeType(TOOL);
+				if (ctrl_down)
+				{
+					if (canvas_ptr->layerVisible[TOOL])
+					{
+						canvas_ptr->layerVisible[TOOL] = false;
+					}
+					else
+					{
+						canvas_ptr->layerVisible[TOOL] = true;
+					}
+				}
+				else
+				{
+					bar_ptr->changeType(TOOL);
+					canvas_ptr->layerVisible[TOOL] = true;
+				}
+				canvas_ptr->redraw = true;
 				break;
 			case SDLK_s:
 				editor_ptr->save(level_ptr->level_id);
@@ -411,18 +459,6 @@ void Editor_input::handleEvents(SDL_Event event)
 				break;
 			case SDLK_q:
 				die();
-				break;
-			case SDLK_b:
-				if (canvas_ptr->backgroundOnly)
-				{
-					canvas_ptr->backgroundOnly = false;
-				}
-				else
-				{
-					canvas_ptr->backgroundOnly = true;
-				}
-
-				canvas_ptr->redraw = true;
 				break;
 			default:
 				break;
