@@ -23,6 +23,7 @@ This file is the top level object of the editor and handles some general purpose
 */
 #include "editor.hpp"
 
+#include <algorithm>
 #include <cassert>
 #include <iostream>
 using namespace std;
@@ -167,25 +168,27 @@ bool Editor::addObject(int idToAdd, int typeToAdd, int xToAdd, int yToAdd)
 
 bool Editor::moveToFront(void)
 {
-/*	int selectionSize = selection.size();
-	std::vector<Level::Object> copiedObjects[2] {level.object[0], level.object[1]};
+	std::vector<int> indexes[COUNTOF(level.object)];
 
-	int count = 0;
 	for (Selection::const_iterator i = selection.begin(); i != selection.end(); ++i)
 	{
-		Level::Object &o = level.object[i->type][i->i];
-		Level::Object newObj = o;
-
-		copiedObjects[i->type].erase(copiedObjects[i->type].begin() + i->i + count);
-		copiedObjects[i->type].push_back(newObj);
-
-		level.object[0] = copiedObjects[0];
-		level.object[1] = copiedObjects[1];
-
-		count--;
+		indexes[i->type].push_back(i->i);
 	}
+	selection.clear();
+	
+	for (unsigned int type = 0; type < COUNTOF(level.object); ++type)
+	{
+		std::sort(indexes[type].begin(), indexes[type].end());
 
-	selection.clear();*/
+		for (unsigned int i = 0; i < indexes[type].size(); i++)
+		{
+			int j = indexes[type][i] - i;
+			level.object[type].push_back(level.object[type][j]);
+			level.object[type].erase(level.object[type].begin() + j);
+
+			selection.insert(Level::Object::Index(type, level.object[type].size() - i - 1));
+		}
+	}
 
 	return canvas.redraw = true;
 }
@@ -272,20 +275,6 @@ bool Editor::move_selected( signed int delta_x, signed int delta_y )
 		Level::Object &o = level.object[i->type][i->i];
 		o.x += delta_x*8;
 		o.y += delta_y*2;
-	}
-	
-	return canvas.redraw = true;
-}
-
-bool Editor::move_selected_z( signed int delta_z )
-{
-	if (selection.empty())
-		return false;
-	
-	for (Selection::const_iterator i = selection.begin(); i != selection.end(); ++i)
-	{
-		assert(false); // TODO
-		(void)delta_z;
 	}
 	
 	return canvas.redraw = true;
