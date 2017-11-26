@@ -335,3 +335,13 @@ void Canvas::draw_dashed_level_border(borderType type, int pos, int offset, bool
 		}
 	}
 }
+
+bool Canvas::toggleLayerVisibility(int type)
+{
+	if (layerVisible[type])
+		layerVisible[type] = false;
+	else
+		layerVisible[type] = true;
+	redraw = true;
+	return true;
+}

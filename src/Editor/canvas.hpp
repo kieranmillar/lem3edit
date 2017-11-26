@@ -69,6 +69,8 @@ public:
 	enum borderType { horizontal, vertical };
 	void draw_dashed_level_border(borderType type, int pos, int offset, bool highlight);
 
+	bool toggleLayerVisibility(int type);
+
 	Canvas(void) { /* nothing to do */ }
 
 };

@@ -216,6 +216,46 @@ void Editor_input::handleEvents(SDL_Event event)
 				{
 					holdingType = -1;
 					holdingID = -1;
+					if (mouse_y_window > window_ptr->height - BAR_HEIGHT + 3 && mouse_y_window < window_ptr->height - BAR_HEIGHT + 35)
+						//first row of buttons
+					{
+						if (mouse_x_window > 3 && mouse_x_window < 35)
+						{
+							bar_ptr->changeType(PERM);
+						}
+						if (mouse_x_window > 39 && mouse_x_window < 71)
+						{
+							bar_ptr->changeType(TEMP);
+						}
+						if (mouse_x_window > 75 && mouse_x_window < 107)
+						{
+							bar_ptr->changeType(TOOL);
+						}
+						if (mouse_x_window > 111 && mouse_x_window < 143)
+						{
+							editor_ptr->save(level_ptr->level_id);
+						}
+					}
+					if (mouse_y_window > window_ptr->height - BAR_HEIGHT + 39 && mouse_y_window < window_ptr->height - BAR_HEIGHT + 71)
+						//second row of buttons
+					{
+						if (mouse_x_window > 3 && mouse_x_window < 35)
+						{
+							canvas_ptr->toggleLayerVisibility(PERM);
+						}
+						if (mouse_x_window > 39 && mouse_x_window < 71)
+						{
+							canvas_ptr->toggleLayerVisibility(TEMP);
+						}
+						if (mouse_x_window > 75 && mouse_x_window < 107)
+						{
+							canvas_ptr->toggleLayerVisibility(TOOL);
+						}
+						/*if (mouse_x_window > 111 && mouse_x_window < 143)
+						{
+							editor_ptr->save(level_ptr->level_id);
+						}*/
+					}
 				}
 				else if (mouse_y_window < window_ptr->height - 16)
 					// piece browser
@@ -358,60 +398,21 @@ void Editor_input::handleEvents(SDL_Event event)
 			{
 			case SDLK_1:
 				if (ctrl_down)
-				{
-					if (canvas_ptr->layerVisible[PERM])
-					{
-						canvas_ptr->layerVisible[PERM] = false;
-					}
-					else
-					{
-						canvas_ptr->layerVisible[PERM] = true;
-					}
-				}
+					canvas_ptr->toggleLayerVisibility(PERM);
 				else
-				{
 					bar_ptr->changeType(PERM);
-					canvas_ptr->layerVisible[PERM] = true;
-				}
-				canvas_ptr->redraw = true;
 				break;
 			case SDLK_2:
 				if (ctrl_down)
-				{
-					if (canvas_ptr->layerVisible[TEMP])
-					{
-						canvas_ptr->layerVisible[TEMP] = false;
-					}
-					else
-					{
-						canvas_ptr->layerVisible[TEMP] = true;
-					}
-				}
+					canvas_ptr->toggleLayerVisibility(TEMP);
 				else
-				{
 					bar_ptr->changeType(TEMP);
-					canvas_ptr->layerVisible[TEMP] = true;
-				}
-				canvas_ptr->redraw = true;
 				break;
 			case SDLK_3:
 				if (ctrl_down)
-				{
-					if (canvas_ptr->layerVisible[TOOL])
-					{
-						canvas_ptr->layerVisible[TOOL] = false;
-					}
-					else
-					{
-						canvas_ptr->layerVisible[TOOL] = true;
-					}
-				}
+					canvas_ptr->toggleLayerVisibility(TOOL);
 				else
-				{
 					bar_ptr->changeType(TOOL);
-					canvas_ptr->layerVisible[TOOL] = true;
-				}
-				canvas_ptr->redraw = true;
 				break;
 			case SDLK_s:
 				editor_ptr->save(level_ptr->level_id);

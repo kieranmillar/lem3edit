@@ -140,6 +140,8 @@ void Bar::moveScrollBar(int moveLocationInWindow)
 
 void Bar::changeType(int t)
 {
+	canvas_ptr->layerVisible[t] = true;
+	canvas_ptr->redraw = true;
 	if (type == t)
 		return;
 	type = t;
