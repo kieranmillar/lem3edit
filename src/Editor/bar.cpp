@@ -27,6 +27,8 @@ This file includes code to deal with the object bar at the bottom of the editor 
 #include "../style.hpp"
 #include "../window.hpp"
 
+#include "SDL.h"
+
 #include <cassert>
 #include <stdlib.h>
 #include <string>
@@ -51,6 +53,48 @@ void Bar::load( void )
 
 	resizeBarScrollRect(window_ptr->width, window_ptr->height);
 	barScrollRect.h = 13;
+
+	button_layerBackground_off = NULL;
+	button_layerBackground_on = NULL;
+	button_layerTerrain_off = NULL;
+	button_layerTerrain_on = NULL;
+	button_layerTool_off = NULL;
+	button_layerTool_on = NULL;
+	button_layerVisible_off = NULL;
+	button_layerVisible_on = NULL;
+	button_save_down = NULL;
+	button_save_up = NULL;
+
+	loadButtonGraphic(button_layerBackground_off, "./gfx/layerBackground_off.bmp");
+	loadButtonGraphic(button_layerBackground_on, "./gfx/layerBackground_on.bmp");
+	loadButtonGraphic(button_layerTerrain_off, "./gfx/layerTerrain_off.bmp");
+	loadButtonGraphic(button_layerTerrain_on, "./gfx/layerTerrain_on.bmp");
+	loadButtonGraphic(button_layerTool_off, "./gfx/layerTool_off.bmp");
+	loadButtonGraphic(button_layerTool_on, "./gfx/layerTool_on.bmp");
+	loadButtonGraphic(button_layerVisible_off, "./gfx/layerVisible_off.bmp");
+	loadButtonGraphic(button_layerVisible_on, "./gfx/layerVisible_on.bmp");
+	loadButtonGraphic(button_save_down, "./gfx/save_down.bmp");
+	loadButtonGraphic(button_save_up, "./gfx/save_up.bmp");
+
+}
+
+bool Bar::loadButtonGraphic(SDL_Texture *& texture, const char * filePath)
+{
+	SDL_Surface* graphic = NULL;
+	SDL_ConvertSurfaceFormat(graphic, SDL_PIXELFORMAT_RGB888, 0);
+	graphic = SDL_LoadBMP(filePath);
+	if (graphic == NULL)
+	{ 
+		SDL_Log("Unable to load image '%s'! SDL Error: %s\n", filePath, SDL_GetError());
+		return false;
+	}
+
+	texture = SDL_CreateTextureFromSurface(window_ptr->screen_renderer, graphic);
+
+	SDL_FreeSurface(graphic);
+	graphic = NULL;
+
+	return true;
 }
 
 void Bar::resizeBarScrollRect(int windowWidth, int windowHeight)
@@ -105,7 +149,7 @@ void Bar::changeType(int t)
 
 int Bar::getPieceIDByScreenPos(int mousePos)
 {
-	int piece = mousePos + barScrollX - PANEL_WIDTH;
+	unsigned int piece = mousePos + barScrollX - PANEL_WIDTH;
 	piece /= PIECESIZE;
 
 	if (piece > style_ptr->object[type].size())
@@ -203,7 +247,69 @@ void Bar::draw( void )
 		SDL_SetRenderDrawColor(window_ptr->screen_renderer, 0, 0, 0, 255);
 		SDL_RenderDrawLine(window_ptr->screen_renderer, 0, canvas_ptr->height, window_ptr->width, canvas_ptr->height);
 		SDL_RenderDrawLine(window_ptr->screen_renderer, PANEL_WIDTH, canvas_ptr->height, PANEL_WIDTH, window_ptr->height);
+
+		{
+			if (type == PERM)
+				drawButton(button_layerBackground_on, 3, canvas_ptr->height + 3);
+			else
+				drawButton(button_layerBackground_off, 3, canvas_ptr->height + 3);
+			if (canvas_ptr->layerVisible[PERM])
+				drawButton(button_layerVisible_on, 3, canvas_ptr->height + 39);
+			else
+				drawButton(button_layerVisible_off, 3, canvas_ptr->height + 39);
+			SDL_Rect rect;
+			rect.x = 1;
+			rect.y = canvas_ptr->height + 1;
+			rect.w = 36;
+			rect.h = 72;
+			SDL_RenderDrawRect(window_ptr->screen_renderer, &rect);
+		}
+		{
+			if (type == TEMP)
+				drawButton(button_layerTerrain_on, 39, canvas_ptr->height + 3);
+			else
+				drawButton(button_layerTerrain_off, 39, canvas_ptr->height + 3);
+			if (canvas_ptr->layerVisible[TEMP])
+				drawButton(button_layerVisible_on, 39, canvas_ptr->height + 39);
+			else
+				drawButton(button_layerVisible_off, 39, canvas_ptr->height + 39);
+			SDL_Rect rect;
+			rect.x = 37;
+			rect.y = canvas_ptr->height + 1;
+			rect.w = 36;
+			rect.h = 72;
+			SDL_RenderDrawRect(window_ptr->screen_renderer, &rect);
+		}
+		{
+			if (type == TOOL)
+				drawButton(button_layerTool_on, 75, canvas_ptr->height + 3);
+			else
+				drawButton(button_layerTool_off, 75, canvas_ptr->height + 3);
+			if (canvas_ptr->layerVisible[TOOL])
+				drawButton(button_layerVisible_on, 75, canvas_ptr->height + 39);
+			else
+				drawButton(button_layerVisible_off, 75, canvas_ptr->height + 39);
+			SDL_Rect rect;
+			rect.x = 73;
+			rect.y = canvas_ptr->height + 1;
+			rect.w = 36;
+			rect.h = 72;
+			SDL_RenderDrawRect(window_ptr->screen_renderer, &rect);
+		}
+
+		drawButton(button_save_up, 111, canvas_ptr->height + 3);
 	}
 
 	SDL_SetRenderTarget(window_ptr->screen_renderer, NULL);
+}
+
+void Bar::drawButton(SDL_Texture * texture, int x, int y)
+{
+	SDL_Rect rect;
+	rect.x = x;
+	rect.y = y;
+	rect.w = 32;
+	rect.h = 32;
+
+	SDL_RenderCopy(window_ptr->screen_renderer, texture, NULL, &rect);
 }

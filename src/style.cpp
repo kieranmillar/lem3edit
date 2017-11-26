@@ -475,7 +475,7 @@ bool Style::create_object_textures (int type, Window * window, SDL_Color *pal2)
 		//tempSurface now contains image in 8 bit colour depth format, and magenta for transparency
 
 		SDL_Surface *tempSurface2;
-		tempSurface2 = SDL_ConvertSurfaceFormat(tempSurface, SDL_PIXELFORMAT_RGB888, 0);//We need a surface format with higgher colour depth that can handle transparency
+		tempSurface2 = SDL_ConvertSurfaceFormat(tempSurface, SDL_PIXELFORMAT_RGB888, 0);//We need a surface format with higher colour depth that can handle transparency
 		SDL_SetColorKey(tempSurface2, SDL_TRUE, SDL_MapRGB(tempSurface2->format, 255, 0, 255));//Convert dummy magenta into transparency
 		
 		SDL_Texture *tempTexture;//Need to turn surface into a texture so can draw it with transparency onto our megatexture

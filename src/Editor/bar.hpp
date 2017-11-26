@@ -47,8 +47,20 @@ public:
 	int type;
 	SDL_Rect barScrollRect;
 
+	SDL_Texture * button_layerBackground_off;
+	SDL_Texture * button_layerBackground_on;
+	SDL_Texture * button_layerTerrain_off;
+	SDL_Texture * button_layerTerrain_on;
+	SDL_Texture * button_layerTool_off;
+	SDL_Texture * button_layerTool_on;
+	SDL_Texture * button_layerVisible_off;
+	SDL_Texture * button_layerVisible_on;
+	SDL_Texture * button_save_down;
+	SDL_Texture * button_save_up;
+
 	void setReferences(Window * w, Editor * e, Canvas * c, Style * s);
 	void load(void);
+	bool loadButtonGraphic(SDL_Texture *& texture, const char * filePath);
 
 	void resizeBarScrollRect(int windowWidth, int windowHeight);
 	void scroll(signed int moveAmount);
@@ -60,6 +72,8 @@ public:
 	int getPieceIDByScreenPos ( int mousePos );
 
 	void draw( void );
+
+	void drawButton( SDL_Texture * texture, int x, int y);
 
 	Bar(void) { /* nothing to do */ };
 
