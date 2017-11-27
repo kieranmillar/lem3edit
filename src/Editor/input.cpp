@@ -253,7 +253,27 @@ void Editor_input::handleEvents(SDL_Event event)
 						}
 						/*if (mouse_x_window > 111 && mouse_x_window < 143)
 						{
-							editor_ptr->save(level_ptr->level_id);
+							
+						}*/
+					}
+					if (mouse_y_window > window_ptr->height - BAR_HEIGHT + 75 && mouse_y_window < window_ptr->height - BAR_HEIGHT + 107)
+						//third row of buttons
+					{
+						if (mouse_x_window > 3 && mouse_x_window < 35)
+						{
+							editor_ptr->moveToBack();
+						}
+						if (mouse_x_window > 39 && mouse_x_window < 71)
+						{
+							editor_ptr->moveToFront();
+						}
+						/*if (mouse_x_window > 75 && mouse_x_window < 107)
+						{
+							
+						}
+						if (mouse_x_window > 111 && mouse_x_window < 143)
+						{
+						
 						}*/
 					}
 				}

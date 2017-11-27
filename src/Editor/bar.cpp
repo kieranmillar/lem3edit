@@ -54,45 +54,77 @@ void Bar::load( void )
 	resizeBarScrollRect(window_ptr->width, window_ptr->height);
 	barScrollRect.h = 13;
 
-	button_layerBackground_off = NULL;
-	button_layerBackground_on = NULL;
-	button_layerTerrain_off = NULL;
-	button_layerTerrain_on = NULL;
-	button_layerTool_off = NULL;
-	button_layerTool_on = NULL;
-	button_layerVisible_off = NULL;
-	button_layerVisible_on = NULL;
-	button_save_down = NULL;
-	button_save_up = NULL;
+	buttonTexture = SDL_CreateTexture(window_ptr->screen_renderer, SDL_PIXELFORMAT_RGB888, SDL_TEXTUREACCESS_TARGET, 512, 32);
+	SDL_SetTextureBlendMode(buttonTexture, SDL_BLENDMODE_BLEND);
+	SDL_SetTextureAlphaMod(buttonTexture, 255);
 
-	loadButtonGraphic(button_layerBackground_off, "./gfx/layerBackground_off.bmp");
-	loadButtonGraphic(button_layerBackground_on, "./gfx/layerBackground_on.bmp");
-	loadButtonGraphic(button_layerTerrain_off, "./gfx/layerTerrain_off.bmp");
-	loadButtonGraphic(button_layerTerrain_on, "./gfx/layerTerrain_on.bmp");
-	loadButtonGraphic(button_layerTool_off, "./gfx/layerTool_off.bmp");
-	loadButtonGraphic(button_layerTool_on, "./gfx/layerTool_on.bmp");
-	loadButtonGraphic(button_layerVisible_off, "./gfx/layerVisible_off.bmp");
-	loadButtonGraphic(button_layerVisible_on, "./gfx/layerVisible_on.bmp");
-	loadButtonGraphic(button_save_down, "./gfx/save_down.bmp");
-	loadButtonGraphic(button_save_up, "./gfx/save_up.bmp");
+	currentButtonTextureX = 0;
 
+	loadButtonGraphic(button_layerBackground, "./gfx/layerBackground_off.bmp", "./gfx/layerBackground_on.bmp");
+	loadButtonGraphic(button_layerTerrain, "./gfx/layerTerrain_off.bmp", "./gfx/layerTerrain_on.bmp");
+	loadButtonGraphic(button_layerTool, "./gfx/layerTool_off.bmp", "./gfx/layerTool_on.bmp");
+	loadButtonGraphic(button_layerVisible, "./gfx/layerVisible_off.bmp", "./gfx/layerVisible_on.bmp");
+	loadButtonGraphic(button_save, "./gfx/save_up.bmp", "./gfx/save_down.bmp");
+	loadButtonGraphic(button_moveToBack, "./gfx/moveToBack_up.bmp", "./gfx/moveToBack_down.bmp");
+	loadButtonGraphic(button_moveToFront, "./gfx/moveToFront_up.bmp", "./gfx/moveToFront_down.bmp");
 }
 
-bool Bar::loadButtonGraphic(SDL_Texture *& texture, const char * filePath)
+bool Bar::loadButtonGraphic(buttonInfo & button, const char * filePathUp, const char * filePathDown)
 {
+
+	SDL_SetRenderDrawColor(window_ptr->screen_renderer, 255, 255, 255, 255);
 	SDL_Surface* graphic = NULL;
-	SDL_ConvertSurfaceFormat(graphic, SDL_PIXELFORMAT_RGB888, 0);
-	graphic = SDL_LoadBMP(filePath);
+	//first load the botton's up graphic
+	graphic = SDL_LoadBMP(filePathUp);
 	if (graphic == NULL)
 	{ 
-		SDL_Log("Unable to load image '%s'! SDL Error: %s\n", filePath, SDL_GetError());
+		SDL_Log("Unable to load image '%s'! SDL Error: %s\n", filePathUp, SDL_GetError());
+		return false;
+	}
+	SDL_ConvertSurfaceFormat(graphic, SDL_PIXELFORMAT_RGB888, 0);
+
+	SDL_Texture * texture = SDL_CreateTextureFromSurface(window_ptr->screen_renderer, graphic);
+	SDL_Rect rect;
+	rect.x = currentButtonTextureX;
+	rect.y = 0;
+	rect.w = 32;
+	rect.h = 32;
+
+	SDL_SetRenderTarget(window_ptr->screen_renderer, buttonTexture);
+	SDL_RenderCopy(window_ptr->screen_renderer, texture, NULL, &rect);
+
+	SDL_FreeSurface(graphic);
+	graphic = NULL;
+	SDL_DestroyTexture(texture);
+	texture = NULL;
+	button.texOffX = rect.x;
+	button.texOffY = rect.y;
+
+	currentButtonTextureX += rect.w;
+
+	//then the down graphic
+	graphic = SDL_LoadBMP(filePathDown);
+	if (graphic == NULL)
+	{
+		SDL_Log("Unable to load image '%s'! SDL Error: %s\n", filePathDown, SDL_GetError());
 		return false;
 	}
 
 	texture = SDL_CreateTextureFromSurface(window_ptr->screen_renderer, graphic);
+	rect.x = currentButtonTextureX;
+
+	SDL_SetRenderTarget(window_ptr->screen_renderer, buttonTexture);
+	SDL_RenderCopy(window_ptr->screen_renderer, texture, NULL, &rect);
 
 	SDL_FreeSurface(graphic);
 	graphic = NULL;
+	SDL_DestroyTexture(texture);
+	texture = NULL;
+
+	button.texOnX = rect.x;
+	button.texOnY = rect.y;
+
+	currentButtonTextureX += rect.w;
 
 	return true;
 }
@@ -251,14 +283,15 @@ void Bar::draw( void )
 		SDL_RenderDrawLine(window_ptr->screen_renderer, PANEL_WIDTH, canvas_ptr->height, PANEL_WIDTH, window_ptr->height);
 
 		{
+			//draw background layer buttons
 			if (type == PERM)
-				drawButton(button_layerBackground_on, 3, canvas_ptr->height + 3);
+				drawButton(button_layerBackground, on, 3, canvas_ptr->height + 3);
 			else
-				drawButton(button_layerBackground_off, 3, canvas_ptr->height + 3);
+				drawButton(button_layerBackground, off, 3, canvas_ptr->height + 3);
 			if (canvas_ptr->layerVisible[PERM])
-				drawButton(button_layerVisible_on, 3, canvas_ptr->height + 39);
+				drawButton(button_layerVisible, on, 3, canvas_ptr->height + 39);
 			else
-				drawButton(button_layerVisible_off, 3, canvas_ptr->height + 39);
+				drawButton(button_layerVisible, off, 3, canvas_ptr->height + 39);
 			SDL_Rect rect;
 			rect.x = 1;
 			rect.y = canvas_ptr->height + 1;
@@ -267,14 +300,15 @@ void Bar::draw( void )
 			SDL_RenderDrawRect(window_ptr->screen_renderer, &rect);
 		}
 		{
+			//draw terrain layer buttons
 			if (type == TEMP)
-				drawButton(button_layerTerrain_on, 39, canvas_ptr->height + 3);
+				drawButton(button_layerTerrain, on, 39, canvas_ptr->height + 3);
 			else
-				drawButton(button_layerTerrain_off, 39, canvas_ptr->height + 3);
+				drawButton(button_layerTerrain, off, 39, canvas_ptr->height + 3);
 			if (canvas_ptr->layerVisible[TEMP])
-				drawButton(button_layerVisible_on, 39, canvas_ptr->height + 39);
+				drawButton(button_layerVisible, on, 39, canvas_ptr->height + 39);
 			else
-				drawButton(button_layerVisible_off, 39, canvas_ptr->height + 39);
+				drawButton(button_layerVisible, off, 39, canvas_ptr->height + 39);
 			SDL_Rect rect;
 			rect.x = 37;
 			rect.y = canvas_ptr->height + 1;
@@ -283,14 +317,15 @@ void Bar::draw( void )
 			SDL_RenderDrawRect(window_ptr->screen_renderer, &rect);
 		}
 		{
+			//draw tool layer buttons
 			if (type == TOOL)
-				drawButton(button_layerTool_on, 75, canvas_ptr->height + 3);
+				drawButton(button_layerTool, on, 75, canvas_ptr->height + 3);
 			else
-				drawButton(button_layerTool_off, 75, canvas_ptr->height + 3);
+				drawButton(button_layerTool, off, 75, canvas_ptr->height + 3);
 			if (canvas_ptr->layerVisible[TOOL])
-				drawButton(button_layerVisible_on, 75, canvas_ptr->height + 39);
+				drawButton(button_layerVisible, on, 75, canvas_ptr->height + 39);
 			else
-				drawButton(button_layerVisible_off, 75, canvas_ptr->height + 39);
+				drawButton(button_layerVisible, off, 75, canvas_ptr->height + 39);
 			SDL_Rect rect;
 			rect.x = 73;
 			rect.y = canvas_ptr->height + 1;
@@ -299,19 +334,37 @@ void Bar::draw( void )
 			SDL_RenderDrawRect(window_ptr->screen_renderer, &rect);
 		}
 
-		drawButton(button_save_up, 111, canvas_ptr->height + 3);
+		drawButton(button_save, off, 111, canvas_ptr->height + 3);
+		drawButton(button_moveToBack, off, 3, canvas_ptr->height + 75);
+		drawButton(button_moveToFront, off, 39, canvas_ptr->height + 75);
+
 	}
 
 	SDL_SetRenderTarget(window_ptr->screen_renderer, NULL);
 }
 
-void Bar::drawButton(SDL_Texture * texture, int x, int y)
+void Bar::drawButton(const buttonInfo & button, buttonState state, int x, int y)
 {
-	SDL_Rect rect;
-	rect.x = x;
-	rect.y = y;
-	rect.w = 32;
-	rect.h = 32;
 
-	SDL_RenderCopy(window_ptr->screen_renderer, texture, NULL, &rect);
+	SDL_Rect sourceRect;
+	if (state == off)
+	{
+		sourceRect.x = button.texOffX;
+		sourceRect.y = button.texOffY;
+	}
+	if (state == on)
+	{
+		sourceRect.x = button.texOnX;
+		sourceRect.y = button.texOnY;
+	}
+	sourceRect.w = 32;
+	sourceRect.h = 32;
+
+	SDL_Rect destRect;
+	destRect.x = x;
+	destRect.y = y;
+	destRect.w = 32;
+	destRect.h = 32;
+
+	SDL_RenderCopy(window_ptr->screen_renderer, buttonTexture, &sourceRect, &destRect);
 }

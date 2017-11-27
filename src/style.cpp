@@ -226,8 +226,8 @@ bool Style::load(unsigned int n, Window * window, SDL_Color *pal2)
 
 	megatex = SDL_CreateTexture(window->screen_renderer, SDL_PIXELFORMAT_RGB888, SDL_TEXTUREACCESS_TARGET, 1024, 1024);
 	SDL_SetTextureBlendMode(megatex, SDL_BLENDMODE_BLEND);
-	SDL_SetTextureAlphaMod(megatex, 0);
-	SDL_RenderCopy(window->screen_renderer, megatex, NULL, NULL);
+	//SDL_SetTextureAlphaMod(megatex, 0);
+	//SDL_RenderCopy(window->screen_renderer, megatex, NULL, NULL);
 	SDL_SetTextureAlphaMod(megatex, 255);
 	megatexAddX = 0;
 	megatexAddY = 0;
