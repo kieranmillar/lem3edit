@@ -39,13 +39,10 @@
 using namespace std;
 
 const char *prog_name = "lem3edit";
-const char *prog_ver = "0.6.1";
-const char *prog_date = "25/11/2017";
+const char *prog_ver = "0.7";
+const char *prog_date = "28/11/2017";
 
 void version(void);
-
-signed int snap( signed int &value, unsigned int snap );
-
 
 
 programMode g_currentMode;

@@ -345,7 +345,6 @@ void Bar::draw( void )
 
 void Bar::drawButton(const buttonInfo & button, buttonState state, int x, int y)
 {
-
 	SDL_Rect sourceRect;
 	if (state == off)
 	{
@@ -367,4 +366,4 @@ void Bar::drawButton(const buttonInfo & button, buttonState state, int x, int y)
 	destRect.h = 32;
 
 	SDL_RenderCopy(window_ptr->screen_renderer, buttonTexture, &sourceRect, &destRect);
-}
+	}

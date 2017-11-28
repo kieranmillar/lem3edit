@@ -545,16 +545,13 @@ void Editor_input::handleEvents(SDL_Event event)
 
 			//Only draw if time between this frame and last was neither too long nor too short
 			Uint32 ticksSinceLastFrame = SDL_GetTicks() - editor_ptr->gameFrameTick;
-			if (ticksSinceLastFrame <= 35 && ticksSinceLastFrame >= 30)
+			editor_ptr->gameFrameTick = SDL_GetTicks();
+			if (ticksSinceLastFrame <= 36 && ticksSinceLastFrame >= 30)
 			{
-				editor_ptr->gameFrameTick = SDL_GetTicks();
 				canvas_ptr->draw();
 				bar_ptr->draw();
 			}
-			else
-			{
-				editor_ptr->gameFrameTick = SDL_GetTicks();
-			}
+			//SDL_Log("Frame: %d", ticksSinceLastFrame);
 
 			SDL_SetRenderTarget(window_ptr->screen_renderer, NULL);
 			SDL_RenderCopy(window_ptr->screen_renderer, window_ptr->screen_texture, NULL, NULL);
