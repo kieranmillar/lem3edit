@@ -247,9 +247,13 @@ void Canvas::draw()
 		}
 		if (input_ptr->resizingLevel) // draw the one border we are currently resizing
 		{
-			if (input_ptr->resizingWhich == Editor_input::whichBorder::left || input_ptr->resizingWhich == Editor_input::whichBorder::right)
+			if (input_ptr->resizingWhich == Editor_input::whichBorder::left)
+				draw_dashed_level_border(vertical, (input_ptr->resizingNewPos - scroll_x) * zoom - scrollOffset_x - 1, scroll_y * zoom + scrollOffset_y, true);
+			if (input_ptr->resizingWhich == Editor_input::whichBorder::right)
 				draw_dashed_level_border(vertical, (input_ptr->resizingNewPos - scroll_x) * zoom - scrollOffset_x, scroll_y * zoom + scrollOffset_y, true);
-			if (input_ptr->resizingWhich == Editor_input::whichBorder::top || input_ptr->resizingWhich == Editor_input::whichBorder::bottom)
+			if (input_ptr->resizingWhich == Editor_input::whichBorder::top)
+				draw_dashed_level_border(horizontal, (input_ptr->resizingNewPos - scroll_y) * zoom - scrollOffset_y - 1, scroll_x * zoom + scrollOffset_x, true);
+			if (input_ptr->resizingWhich == Editor_input::whichBorder::bottom)
 				draw_dashed_level_border(horizontal, (input_ptr->resizingNewPos - scroll_y) * zoom - scrollOffset_y, scroll_x * zoom + scrollOffset_x, true);
 		}
 

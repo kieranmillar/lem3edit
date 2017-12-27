@@ -347,5 +347,5 @@ void Level::resizeLevel(int delta_x, int delta_y, bool shiftLevel)
 	if (cameraX + 320 > width)
 		cameraX = width - 320;
 	if (cameraY + 160 > height)
-		cameraX = height - 160;
+		cameraY = height - 160;
 }
