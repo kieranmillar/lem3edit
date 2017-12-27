@@ -330,6 +330,12 @@ void Level::resizeLevel(int delta_x, int delta_y, bool shiftLevel)
 			o.x += delta_x;
 			o.y += delta_y;
 		}
+		for (vector<Object>::iterator i = object[TOOL].begin(); i != object[TOOL].end(); ++i)
+		{
+			Object &o = *i;
+			o.x += delta_x;
+			o.y += delta_y;
+		}
 		cameraX += delta_x;
 		cameraY += delta_y;
 	}
