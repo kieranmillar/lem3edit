@@ -30,8 +30,10 @@ escape        -- select none
 delete        -- delete selected objects
 ctrl + c      -- copy
 ctrl + v      -- paste
+
 ,             -- move selected objects behind others on the same layer
 .             -- move selected objects infront of others on the same layer
+space         -- toggle start camera visibility
 
 scroll-wheel  -- zoom in and out
 ijkl          -- scroll

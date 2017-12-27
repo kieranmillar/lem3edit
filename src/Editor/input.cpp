@@ -63,6 +63,8 @@ void Editor_input::load(void)
 	resizingLevel = false;
 	resizingNewPos = 0;
 	resizingWhich = none;
+
+	movingCamera = false;
 }
 
 void Editor_input::handleEvents(SDL_Event event)
@@ -150,6 +152,10 @@ void Editor_input::handleEvents(SDL_Event event)
 					}
 				}
 			}
+			if (e.state & SDL_BUTTON(SDL_BUTTON_LEFT) && movingCamera)
+			{
+				editor_ptr->move_camera(mouse_x_window - mouse_prev_x, mouse_y_window - mouse_prev_y);
+			}
 
 			mouse_prev_x = mouse_x_window;
 			mouse_prev_y = mouse_y_window;
@@ -180,33 +186,44 @@ void Editor_input::handleEvents(SDL_Event event)
 					}
 					else
 					{
-						bool selectedSomething = editor_ptr->select(mouse_x, mouse_y, ctrl_down);
-						if (!selectedSomething)
+						if (editor_ptr->startCameraOn == true
+							&& mouse_x >= level_ptr->x
+							&& mouse_x <= level_ptr->x + 320
+							&& mouse_y >= level_ptr->y
+							&& mouse_y <= level_ptr->y + 160)
 						{
-							// grab level borders
-							if (mouse_x <= 8 && mouse_x >= -8)
+							movingCamera = true;
+						}
+						else
+						{
+							bool selectedSomething = editor_ptr->select(mouse_x, mouse_y, ctrl_down);
+							if (!selectedSomething)
 							{
-								resizingLevel = true;
-								resizingNewPos = 0;
-								resizingWhich = left;
-							}
-							else if (mouse_x >= level_ptr->width - 8 && mouse_x <= level_ptr->width + 8)
-							{
-								resizingLevel = true;
-								resizingNewPos = level_ptr->width;
-								resizingWhich = right;
-							}
-							else if (mouse_y <= 8 && mouse_y >= -8)
-							{
-								resizingLevel = true;
-								resizingNewPos = 0;
-								resizingWhich = top;
-							}
-							else if (mouse_y >= level_ptr->height - 8 && mouse_y <= level_ptr->height + 8)
-							{
-								resizingLevel = true;
-								resizingNewPos = level_ptr->height;
-								resizingWhich = bottom;
+								// grab level borders
+								if (mouse_x <= 8 && mouse_x >= -8)
+								{
+									resizingLevel = true;
+									resizingNewPos = 0;
+									resizingWhich = left;
+								}
+								else if (mouse_x >= level_ptr->width - 8 && mouse_x <= level_ptr->width + 8)
+								{
+									resizingLevel = true;
+									resizingNewPos = level_ptr->width;
+									resizingWhich = right;
+								}
+								else if (mouse_y <= 8 && mouse_y >= -8)
+								{
+									resizingLevel = true;
+									resizingNewPos = 0;
+									resizingWhich = top;
+								}
+								else if (mouse_y >= level_ptr->height - 8 && mouse_y <= level_ptr->height + 8)
+								{
+									resizingLevel = true;
+									resizingNewPos = level_ptr->height;
+									resizingWhich = bottom;
+								}
 							}
 						}
 					}
@@ -339,6 +356,7 @@ void Editor_input::handleEvents(SDL_Event event)
 				rightScrollButtonHolding = false;
 				scrollBarHolding = false;
 				scrollBarShifting = false;
+				movingCamera = false;
 				if (dragging)
 				{
 					if (startDragTime >= editor_ptr->gameFrameCount - 5) //single-clicked instead of dragging
@@ -477,6 +495,9 @@ void Editor_input::handleEvents(SDL_Event event)
 				break;
 			case SDLK_RIGHTBRACKET:
 				editor_ptr->increase_obj_id();
+				break;
+			case SDLK_SPACE:
+				editor_ptr->toggleCameraVisibility();
 				break;
 			case SDLK_q:
 				die();

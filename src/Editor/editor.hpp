@@ -56,6 +56,8 @@ public:
 
 	Uint32 gameFrameCount;
 	Uint32 gameFrameTick;
+
+	bool startCameraOn;
 	
 	void resize(int w, int h);
 
@@ -78,6 +80,9 @@ public:
 	
 	bool load(int n, Window * w);
 	bool save(int n);
+
+	bool toggleCameraVisibility(void);
+	bool move_camera(signed int delta_x, signed int delta_y);
 	
 	Editor( void );
 	~Editor( void ) { /* nothing to do */ }

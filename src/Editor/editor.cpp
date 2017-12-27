@@ -53,6 +53,7 @@ bool Editor::load( int n, Window * w )
 	editor_input.load();
 	gameFrameCount = 0;
 	gameFrameTick = SDL_GetTicks();
+	startCameraOn = false;
 	
 	return canvas.redraw = true;
 }
@@ -283,5 +284,43 @@ bool Editor::move_selected( signed int delta_x, signed int delta_y )
 		o.y += delta_y*2;
 	}
 	
+	return canvas.redraw = true;
+}
+
+bool Editor::toggleCameraVisibility(void)
+{
+	if (startCameraOn)
+		startCameraOn = false;
+	else
+		startCameraOn = true;
+	canvas.redraw = true;
+	return true;
+}
+
+bool Editor::move_camera(signed int delta_x, signed int delta_y)
+{
+	delta_x += canvas.mouse_remainder_x;
+	delta_y += canvas.mouse_remainder_y;
+	canvas.mouse_remainder_x = delta_x % (8 * canvas.zoom);
+	canvas.mouse_remainder_y = delta_y % (2 * canvas.zoom);
+
+	delta_x /= (8 * canvas.zoom);
+	delta_y /= (2 * canvas.zoom);
+
+	if (delta_x == 0 && delta_y == 0)
+		return false;
+
+	level.x += delta_x * 8;
+	level.y += delta_y * 2;
+	
+	if (level.x < 0)
+		level.x = 0;
+	if (level.y < 0)
+		level.y = 0;
+	if (level.x + 320 > level.width)
+		level.x = level.width - 320;
+	if (level.y + 160 > level.height)
+		level.y = level.height - 160;
+
 	return canvas.redraw = true;
 }

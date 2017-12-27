@@ -62,6 +62,8 @@ public:
 	int resizingNewPos;
 	whichBorder resizingWhich;
 
+	bool movingCamera;
+
 	void setReferences(Window * w, Editor * e, Bar * b, Canvas * c, Style * s, Level * l);
 	void load(void);
 
