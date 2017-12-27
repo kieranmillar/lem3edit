@@ -258,8 +258,8 @@ void Canvas::draw()
 		if (editor_ptr->startCameraOn == true) // draw start camera box
 		{
 			SDL_Rect camera_area;
-			camera_area.x = ((level_ptr->x - scroll_x) * zoom) - scrollOffset_x;
-			camera_area.y = ((level_ptr->y - scroll_y) * zoom) - scrollOffset_y;
+			camera_area.x = ((level_ptr->cameraX - scroll_x) * zoom) - scrollOffset_x;
+			camera_area.y = ((level_ptr->cameraY - scroll_y) * zoom) - scrollOffset_y;
 			camera_area.w = 320*zoom;
 			camera_area.h = 160*zoom;
 

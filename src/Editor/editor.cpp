@@ -310,17 +310,17 @@ bool Editor::move_camera(signed int delta_x, signed int delta_y)
 	if (delta_x == 0 && delta_y == 0)
 		return false;
 
-	level.x += delta_x * 8;
-	level.y += delta_y * 2;
+	level.cameraX += delta_x * 8;
+	level.cameraY += delta_y * 2;
 	
-	if (level.x < 0)
-		level.x = 0;
-	if (level.y < 0)
-		level.y = 0;
-	if (level.x + 320 > level.width)
-		level.x = level.width - 320;
-	if (level.y + 160 > level.height)
-		level.y = level.height - 160;
+	if (level.cameraX < 0)
+		level.cameraX = 0;
+	if (level.cameraY < 0)
+		level.cameraY = 0;
+	if (level.cameraX + 320 > level.width)
+		level.cameraX = level.width - 320;
+	if (level.cameraY + 160 > level.height)
+		level.cameraY = level.height - 160;
 
 	return canvas.redraw = true;
 }

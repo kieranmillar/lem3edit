@@ -187,10 +187,10 @@ void Editor_input::handleEvents(SDL_Event event)
 					else
 					{
 						if (editor_ptr->startCameraOn == true
-							&& mouse_x >= level_ptr->x
-							&& mouse_x <= level_ptr->x + 320
-							&& mouse_y >= level_ptr->y
-							&& mouse_y <= level_ptr->y + 160)
+							&& mouse_x >= level_ptr->cameraX
+							&& mouse_x <= level_ptr->cameraX + 320
+							&& mouse_y >= level_ptr->cameraY
+							&& mouse_y <= level_ptr->cameraY + 160)
 						{
 							movingCamera = true;
 						}

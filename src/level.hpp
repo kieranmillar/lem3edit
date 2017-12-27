@@ -38,7 +38,7 @@ public:
 	Uint16 temp, perm;
 	Uint16 style;
 	Uint16 width, height;
-	Sint16 x, y;
+	Sint16 cameraX, cameraY;
 	Uint16 time;
 	Uint8  extra_lemmings;
 	Uint8  unknown;

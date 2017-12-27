@@ -134,8 +134,8 @@ bool Level::load_level( const string &filename )
 	f.read((char *)&style,          sizeof(style));
 	f.read((char *)&width,          sizeof(width));
 	f.read((char *)&height,         sizeof(height));
-	f.read((char *)&x,              sizeof(x));
-	f.read((char *)&y,              sizeof(y));
+	f.read((char *)&cameraX,		sizeof(cameraX));
+	f.read((char *)&cameraY,		sizeof(cameraY));
 	f.read((char *)&time,           sizeof(time));
 	f.read((char *)&extra_lemmings, sizeof(extra_lemmings));
 	f.read((char *)&unknown,        sizeof(unknown));
@@ -249,8 +249,8 @@ bool Level::save_level(const string &filename)
 	f.write((char *)&style, sizeof(style));
 	f.write((char *)&width, sizeof(width));
 	f.write((char *)&height, sizeof(height));
-	f.write((char *)&x, sizeof(x));
-	f.write((char *)&y, sizeof(y));
+	f.write((char *)&cameraX, sizeof(cameraX));
+	f.write((char *)&cameraY, sizeof(cameraY));
 	f.write((char *)&time, sizeof(time));
 	f.write((char *)&extra_lemmings, sizeof(extra_lemmings));
 	f.write((char *)&unknown, sizeof(unknown));
@@ -315,6 +315,7 @@ void Level::resizeLevel(int delta_x, int delta_y, bool shiftLevel)
 {
 	width += delta_x;
 	height += delta_y;
+
 	if (shiftLevel)
 	{
 		for (vector<Object>::iterator i = object[PERM].begin(); i != object[PERM].end(); ++i)
@@ -329,5 +330,16 @@ void Level::resizeLevel(int delta_x, int delta_y, bool shiftLevel)
 			o.x += delta_x;
 			o.y += delta_y;
 		}
+		cameraX += delta_x;
+		cameraY += delta_y;
 	}
+
+	if (cameraX < 0)
+		cameraX = 0;
+	if (cameraY < 0)
+		cameraY = 0;
+	if (cameraX + 320 > width)
+		cameraX = width - 320;
+	if (cameraY + 160 > height)
+		cameraX = height - 160;
 }
