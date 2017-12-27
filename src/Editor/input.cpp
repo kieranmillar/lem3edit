@@ -284,11 +284,11 @@ void Editor_input::handleEvents(SDL_Event event)
 						{
 							editor_ptr->moveToFront();
 						}
-						/*if (mouse_x_window > 75 && mouse_x_window < 107)
+						if (mouse_x_window > 75 && mouse_x_window < 107)
 						{
-							
+							editor_ptr->toggleCameraVisibility();
 						}
-						if (mouse_x_window > 111 && mouse_x_window < 143)
+						/*if (mouse_x_window > 111 && mouse_x_window < 143)
 						{
 						
 						}*/

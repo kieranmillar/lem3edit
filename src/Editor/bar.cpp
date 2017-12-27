@@ -67,6 +67,7 @@ void Bar::load( void )
 	loadButtonGraphic(button_save, "./gfx/save_up.bmp", "./gfx/save_down.bmp");
 	loadButtonGraphic(button_moveToBack, "./gfx/moveToBack_up.bmp", "./gfx/moveToBack_down.bmp");
 	loadButtonGraphic(button_moveToFront, "./gfx/moveToFront_up.bmp", "./gfx/moveToFront_down.bmp");
+	loadButtonGraphic(button_camera, "./gfx/camera_off.bmp", "./gfx/camera_on.bmp");
 }
 
 bool Bar::loadButtonGraphic(buttonInfo & button, const char * filePathUp, const char * filePathDown)
@@ -337,6 +338,10 @@ void Bar::draw( void )
 		drawButton(button_save, off, 111, canvas_ptr->height + 3);
 		drawButton(button_moveToBack, off, 3, canvas_ptr->height + 75);
 		drawButton(button_moveToFront, off, 39, canvas_ptr->height + 75);
+		if (editor_ptr->startCameraOn)
+			drawButton(button_camera, on, 75, canvas_ptr->height + 75);
+		else
+			drawButton(button_camera, off, 75, canvas_ptr->height + 75);
 
 	}
 

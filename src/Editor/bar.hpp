@@ -60,6 +60,7 @@ public:
 	buttonInfo button_save;
 	buttonInfo button_moveToBack;
 	buttonInfo button_moveToFront;
+	buttonInfo button_camera;
 
 	void setReferences(Window * w, Editor * e, Canvas * c, Style * s);
 	void load(void);
