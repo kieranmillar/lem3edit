@@ -23,11 +23,67 @@ This file contains code for reading from Lemmings 3's DEL files. These contain g
 
 #include "del.hpp"
 #include "lem3edit.hpp"
+#include "style.hpp"
+#include "window.hpp"
 
 #include <cassert>
 #include <fstream>
 #include <iostream>
 using namespace std;
+
+void Del::setReferences(Window * w, Style * s)
+{
+	window_ptr = w;
+	style_ptr = s;
+}
+
+void Del::createFont(void)
+{
+	fontTex = SDL_CreateTexture(window_ptr->screen_renderer, SDL_PIXELFORMAT_RGB888, SDL_TEXTUREACCESS_TARGET, 64, 64);
+	SDL_SetTextureBlendMode(fontTex, SDL_BLENDMODE_BLEND);
+	SDL_SetTextureAlphaMod(fontTex, 255);
+	fontTexAddX = 0;
+	fontTexAddY = 0;
+
+	for (unsigned int i = 30; i < frame.size(); i++)
+	{
+		SDL_Surface *tempSurface;
+		tempSurface = SDL_CreateRGBSurface(0, 8, 8, 8, 0, 0, 0, 0);
+		SDL_SetPaletteColors(tempSurface->format->palette, style_ptr->palette, 0, 209);
+		SDL_FillRect(tempSurface, NULL, SDL_MapRGB(tempSurface->format, 0, 0, 0));//fill surface with dummy white colour to represent transparency
+		this->frame[i].blit(tempSurface, 0, 0, 8, 8);
+
+		//tempSurface now contains image in 8 bit colour depth format, and magenta for transparency
+
+		SDL_Surface *tempSurface2;
+		tempSurface2 = SDL_ConvertSurfaceFormat(tempSurface, SDL_PIXELFORMAT_RGB888, 0);//We need a surface format with higher colour depth that can handle transparency
+		SDL_SetColorKey(tempSurface2, SDL_TRUE, SDL_MapRGB(tempSurface2->format, 0, 0, 0));//Convert dummy white into transparency
+
+		SDL_Texture *tempTexture;//Need to turn surface into a texture so can draw it with transparency onto our font texture
+		tempTexture = SDL_CreateTextureFromSurface(window_ptr->screen_renderer, tempSurface2);
+
+		if (fontTexAddX + 8 > 64) {
+			fontTexAddX = 0;
+			fontTexAddY += 8;
+		}
+
+		SDL_Rect r;
+		r.x = fontTexAddX;
+		r.y = fontTexAddY;
+		r.w = 8;
+		r.h = 8;
+
+		SDL_SetRenderTarget(window_ptr->screen_renderer, fontTex);
+		SDL_RenderCopy(window_ptr->screen_renderer, tempTexture, NULL, &r);
+		SDL_SetRenderTarget(window_ptr->screen_renderer, NULL);
+
+		fontTexAddX += 8;
+		SDL_FreeSurface(tempSurface);
+		SDL_FreeSurface(tempSurface2);
+		SDL_DestroyTexture(tempTexture);
+
+	}
+}
 
 void Del::Frame::copy( const Del::Frame &that )
 {
@@ -99,7 +155,7 @@ void Del::blit_text( SDL_Surface *surface, signed int x, signed int y, const str
 	}
 }
 
-bool Del::load( const string &name )
+bool Del::load(const std::string &name)
 {
 	const string path = "GRAPHICS/";
 	const string din = ".DIN", del = ".DEL";
@@ -152,5 +208,6 @@ bool Del::load( const string &din_filename, const string &del_filename )
 	}
 	
 	SDL_Log("Loaded %d images from '%s'\n", frame.size(), del_filename.c_str());
+
 	return true;
 }

@@ -30,7 +30,6 @@ using namespace std;
 
 Editor::Editor(void)
 {
-	font.load("FONT");
 }
 
 void Editor::resize( int w, int h)
@@ -46,9 +45,12 @@ bool Editor::load( int n, Window * w )
 	canvas.setReferences(window_ptr, this, &editor_input, &bar, &style, &level);
 	editor_input.setReferences(window_ptr, this, &bar, &canvas, &style, &level);
 	level.setReferences(window_ptr, &canvas, &style);
+	font.setReferences(window_ptr, &style);
 	level.load(n);
 	tribe.load(level.tribe);
 	style.load(level.style, window_ptr, tribe.palette);
+	font.load("FONT");
+	font.createFont();
 	bar.load();
 	canvas.load();
 	editor_input.load();

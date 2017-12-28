@@ -24,6 +24,9 @@
 #include <string>
 #include <vector>
 
+class Window;
+class Style;
+
 class Del
 {
 public:
@@ -43,13 +46,24 @@ public:
 		void destroy( void );
 		Frame & operator=( const Frame & );
 	};
+
+	Window * window_ptr;
+	Style * style_ptr;
 	
 	std::vector<Frame> frame;
+
+	SDL_Texture *fontTex;
+
+	Uint16 fontTexAddX, fontTexAddY;
+
+	void setReferences(Window * w, Style * s);
 	
+	void createFont(void);
+
 	void blit( SDL_Surface *surface, signed int x, signed int y, unsigned int frame, unsigned int width, unsigned int height ) const;
 	void blit_text( SDL_Surface *surface, signed int x, signed int y, const std::string &text ) const;
 	
-	bool load( const std::string &name );
+	bool load(const std::string &name );
 	bool load( const std::string &path, const std::string &name, unsigned int n );
 	bool load( const std::string &din_filename, const std::string &del_filename );
 	
