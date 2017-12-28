@@ -171,7 +171,7 @@ void Canvas::draw()
 		SDL_SetRenderDrawColor(window_ptr->screen_renderer, 0, 0, 0, 255);
 		SDL_RenderFillRect(window_ptr->screen_renderer, &level_area);
 
-		level_ptr->draw(window_ptr, scroll_x, scrollOffset_x, scroll_y, scrollOffset_y, editor_ptr->style, *this, zoom);
+		level_ptr->draw(scroll_x, scrollOffset_x, scroll_y, scrollOffset_y, zoom);
 
 		for (Editor::Selection::const_iterator i = editor_ptr->selection.begin(); i != editor_ptr->selection.end(); ++i)
 		{

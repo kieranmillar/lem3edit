@@ -362,7 +362,7 @@ void Editor_input::handleEvents(SDL_Event event)
 					if (startDragTime >= editor_ptr->gameFrameCount - 5) //single-clicked instead of dragging
 					{
 						editor_ptr->selection.clear();
-						Level::Object::Index temp = level_ptr->get_object_by_position(mouse_x, mouse_y, *style_ptr, *canvas_ptr);
+						Level::Object::Index temp = level_ptr->get_object_by_position(mouse_x, mouse_y);
 						if (temp.i != -1)
 							editor_ptr->selection.insert(temp);
 					}

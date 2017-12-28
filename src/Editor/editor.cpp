@@ -45,7 +45,7 @@ bool Editor::load( int n, Window * w )
 	bar.setReferences(window_ptr, this, &canvas, &style);
 	canvas.setReferences(window_ptr, this, &editor_input, &bar, &style, &level);
 	editor_input.setReferences(window_ptr, this, &bar, &canvas, &style, &level);
-	level.setReferences(&style);
+	level.setReferences(window_ptr, &canvas, &style);
 	level.load(n);
 	tribe.load(level.tribe);
 	style.load(level.style, window_ptr, tribe.palette);
@@ -68,7 +68,7 @@ bool Editor::save(int n)
 
 bool Editor::select( signed int x, signed int y, bool modify_selection )
 {
-	Level::Object::Index temp = level.get_object_by_position(x, y, style, canvas);
+	Level::Object::Index temp = level.get_object_by_position(x, y);
 	
 	if (temp.i == -1)  // selected nothing
 	{

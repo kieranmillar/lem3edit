@@ -28,21 +28,23 @@
 #include <iostream>
 using namespace std;
 
-void Level::setReferences(Style * s)
+void Level::setReferences(Window * w, Canvas * c, Style * s)
 {
+	window_ptr = w;
+	canvas_ptr = c;
 	style_ptr = s;
 }
 
-void Level::draw(Window * window, signed int x, signed int xOffset, signed int y, signed int yOffset, const Style &style, const Canvas &canvas, int zoom) const
+void Level::draw(signed int x, signed int xOffset, signed int y, signed int yOffset, int zoom) const
 {
 	for (int i = 0; i < 3; i++)
 	{
-		if (canvas.layerVisible[i])
-			draw_objects(window, x, xOffset, y, yOffset, i, style, zoom);
+		if (canvas_ptr->layerVisible[i])
+			draw_objects(x, xOffset, y, yOffset, i, zoom);
 	}
 }
 
-void Level::draw_objects(Window * window, signed int x, signed int xOffset, signed int y, signed int yOffset, int type, const Style &style, int zoom) const
+void Level::draw_objects(signed int x, signed int xOffset, signed int y, signed int yOffset, int type, int zoom) const
 {
 	assert((unsigned)type < COUNTOF(this->object));
 
@@ -51,28 +53,28 @@ void Level::draw_objects(Window * window, signed int x, signed int xOffset, sign
 
 		const Object &o = *i;
 			
-		unsigned int so = style.object_by_id(type, o.id);
+		unsigned int so = style_ptr->object_by_id(type, o.id);
 		if (so == -1)
 			continue;
 
 		int onScreenX = (o.x - x)*zoom - xOffset;
 		int onScreenY = (o.y - y)*zoom - yOffset;
-		if (onScreenY < window->height - BAR_HEIGHT)
+		if (onScreenY < window_ptr->height - BAR_HEIGHT)
 		{
-			style.draw_object_texture(window, onScreenX, onScreenY, type, so, zoom, NULL);
+			style_ptr->draw_object_texture(window_ptr, onScreenX, onScreenY, type, so, zoom, NULL);
 		}
 	}
 }
 
-Level::Object::Index Level::get_object_by_position(signed int x, signed int y, const Style &style, const Canvas &canvas) const
+Level::Object::Index Level::get_object_by_position(signed int x, signed int y) const
 {
 	signed int i;
 
 	for (int j = 2; j >= 0; j--)
 	{
-		if (canvas.layerVisible[j])
+		if (canvas_ptr->layerVisible[j])
 		{
-			i = get_object_by_position(x, y, j, style);
+			i = get_object_by_position(x, y, j);
 			if (i != -1)
 				return Object::Index(j, i);
 		}
@@ -81,7 +83,7 @@ Level::Object::Index Level::get_object_by_position(signed int x, signed int y, c
 	return Object::Index(0, -1);
 }
 
-signed int Level::get_object_by_position(signed int x, signed int y, int type, const Style &style) const
+signed int Level::get_object_by_position(signed int x, signed int y, int type) const
 {
 	assert((unsigned)type < COUNTOF(this->object));
 	
@@ -92,11 +94,11 @@ signed int Level::get_object_by_position(signed int x, signed int y, int type, c
 		if (x < o.x || y < o.y)
 			continue;
 		
-		int so = style.object_by_id(type, o.id);
+		int so = style_ptr->object_by_id(type, o.id);
 		if (so == -1)
 			continue;
 		
-		if (x < o.x + style.object[type][so].width * 8 && y < o.y + style.object[type][so].height * 2)
+		if (x < o.x + style_ptr->object[type][so].width * 8 && y < o.y + style_ptr->object[type][so].height * 2)
 			return object[type].rend() - i - 1; // index
 	}
 	

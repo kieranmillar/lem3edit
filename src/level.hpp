@@ -19,18 +19,21 @@
 #ifndef LEVEL_HPP
 #define LEVEL_HPP
 
-#include "editor/canvas.hpp"
-#include "window.hpp"
-
 #include "SDL.h"
 
 #include <vector>
 #include <string>
 
+class Window;
+class Canvas;
+class Style;
+
 class Level
 {
 public:
 
+	Window * window_ptr;
+	Canvas * canvas_ptr;
 	Style * style_ptr;
 
 	int level_id;
@@ -67,13 +70,13 @@ public:
 	
 	std::vector<Object> object[3];
 
-	void setReferences(Style * s);
+	void setReferences(Window * w, Canvas * c, Style * s);
 	
-	void draw(Window * window, signed int x, signed int xOffset, signed int y, signed int yOffset, const Style &style, const Canvas &canvas, int zoom) const;
-	void draw_objects(Window * window, signed int x, signed int xOffset, signed int y, signed int yOffset, int type, const Style &style, int zoom) const;
+	void draw(signed int x, signed int xOffset, signed int y, signed int yOffset, int zoom) const;
+	void draw_objects(signed int x, signed int xOffset, signed int y, signed int yOffset, int type, int zoom) const;
 	
-	Object::Index get_object_by_position(signed int x, signed int y, const Style &style, const Canvas &canvas) const;
-	signed int get_object_by_position(signed int x, signed int y, int type, const Style &style) const;
+	Object::Index get_object_by_position(signed int x, signed int y) const;
+	signed int get_object_by_position(signed int x, signed int y, int type) const;
 	
 	bool load( unsigned int n );
 	bool load_level( const std::string &path, const std::string &name, unsigned int n );
