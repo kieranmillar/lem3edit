@@ -21,11 +21,17 @@
 #include "Editor/canvas.hpp"
 #include "lem3edit.hpp"
 #include "level.hpp"
+#include "style.hpp"
 
 #include <cassert>
 #include <fstream>
 #include <iostream>
 using namespace std;
+
+void Level::setReferences(Style * s)
+{
+	style_ptr = s;
+}
 
 void Level::draw(Window * window, signed int x, signed int xOffset, signed int y, signed int yOffset, const Style &style, const Canvas &canvas, int zoom) const
 {
@@ -202,6 +208,38 @@ bool Level::load_objects( int type, const string &filename )
 	return true;
 }
 
+//Return if object has invalid id or lies entirely outside level borders
+bool Level::validate(const Object * o, const int type)
+{
+	int so = style_ptr->object_by_id(type, o->id);
+	if (so == -1)
+	{
+		SDL_Log("Didn't save invalid object type: %d\n", o->id);
+		return false;
+	}
+
+	int w = style_ptr->object[type][so].width * 8;
+	int h = style_ptr->object[type][so].height * 2;
+	bool outsideBorder = false;
+	
+	if (o->x + w <= 0)
+		outsideBorder = true;
+	if (o->y + h <= 0)
+		outsideBorder = true;
+	if (o->x >= width)
+		outsideBorder = true;
+	if (o->y >= height)
+		outsideBorder = true;
+
+	if (outsideBorder)
+	{
+		SDL_Log("Didn't save object outside borders: ID %d, X %d, Y %d, W %d, H %d\n", o->id, o->x, o->y, w, h);
+		return false;
+	}
+
+	return true;
+}
+
 bool Level::save(unsigned int n)
 {
 	const string path = "LEVELS/";
@@ -283,6 +321,7 @@ bool Level::save_objects(int type, const string &filename)
 		return false;
 	}
 
+	int count = 0;
 	int numTypesToSave = 1;
 	int savingType = type;
 	if (type == PERM)
@@ -292,21 +331,23 @@ bool Level::save_objects(int type, const string &filename)
 		for (vector<Object>::const_iterator i = object[savingType].begin(); i != object[savingType].end(); ++i)
 		{
 			const Object &o = *i;
-			f.write((char *)&o.id, sizeof(o.id));
-			f.write((char *)&o.x, sizeof(o.x));
-			f.write((char *)&o.y, sizeof(o.y));
-			if (o.id == 10006 || o.id == 10007)
-				extra_lemmings++;
-			if (o.id >= 10010 && o.id <= 10017)
-				enemies++;
+			if (validate(&o, savingType))
+			{
+				count++;
+				f.write((char *)&o.id, sizeof(o.id));
+				f.write((char *)&o.x, sizeof(o.x));
+				f.write((char *)&o.y, sizeof(o.y));
+				if (o.id == 10006 || o.id == 10007)
+					extra_lemmings++;
+				if (o.id >= 10010 && o.id <= 10017)
+					enemies++;
+			}
 		}
 		savingType = TOOL;
 	}
 	
-	if (type == PERM)
-		SDL_Log("Wrote %d + %d objects to '%s'\n", object[type].size(), object[TOOL].size(), filename.c_str());
-	if (type == TEMP)
-		SDL_Log("Wrote %d objects to '%s'\n", object[type].size(), filename.c_str());
+	SDL_Log("Wrote %d objects to '%s'\n", count, filename.c_str());
+
 	f.close();
 	return true;
 }

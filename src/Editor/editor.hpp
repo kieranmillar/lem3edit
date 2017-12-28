@@ -26,6 +26,7 @@
 #include "input.hpp"
 #include "../del.hpp"
 #include "../level.hpp"
+#include "../style.hpp"
 #include "../tribe.hpp"
 #include "../window.hpp"
 

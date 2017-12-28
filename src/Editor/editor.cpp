@@ -45,6 +45,7 @@ bool Editor::load( int n, Window * w )
 	bar.setReferences(window_ptr, this, &canvas, &style);
 	canvas.setReferences(window_ptr, this, &editor_input, &bar, &style, &level);
 	editor_input.setReferences(window_ptr, this, &bar, &canvas, &style, &level);
+	level.setReferences(&style);
 	level.load(n);
 	tribe.load(level.tribe);
 	style.load(level.style, window_ptr, tribe.palette);

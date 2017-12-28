@@ -20,7 +20,6 @@
 #define LEVEL_HPP
 
 #include "editor/canvas.hpp"
-#include "style.hpp"
 #include "window.hpp"
 
 #include "SDL.h"
@@ -31,6 +30,9 @@
 class Level
 {
 public:
+
+	Style * style_ptr;
+
 	int level_id;
 	
 	Uint16 tribe;
@@ -64,6 +66,8 @@ public:
 	};
 	
 	std::vector<Object> object[3];
+
+	void setReferences(Style * s);
 	
 	void draw(Window * window, signed int x, signed int xOffset, signed int y, signed int yOffset, const Style &style, const Canvas &canvas, int zoom) const;
 	void draw_objects(Window * window, signed int x, signed int xOffset, signed int y, signed int yOffset, int type, const Style &style, int zoom) const;
@@ -77,7 +81,7 @@ public:
 	bool load_objects( int type, const std::string &path, const std::string &name, unsigned int n);
 	bool load_objects( int type, const std::string &filename );
 	
-	bool validate( void ); // TODO remove objects with non-existant IDs, remove objects outside the level boundaries
+	bool validate(const Object * o, const int type);
 	
 	bool save( unsigned int n );
 	bool save_level(const std::string &path, const std::string &name, unsigned int n);
