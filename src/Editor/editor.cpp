@@ -49,8 +49,8 @@ bool Editor::load( int n, Window * w )
 	level.load(n);
 	tribe.load(level.tribe);
 	style.load(level.style, window_ptr, tribe.palette);
-	font.load("FONT");
-	font.createFont();
+	//font.load("FONT"); //The in-game font. Not very practical for the editor so commented out
+	//font.createFont();
 	bar.load();
 	canvas.load();
 	editor_input.load();
