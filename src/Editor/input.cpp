@@ -576,6 +576,23 @@ void Editor_input::handleEvents(SDL_Event event)
 
 			SDL_SetRenderTarget(window_ptr->screen_renderer, NULL);
 			SDL_RenderCopy(window_ptr->screen_renderer, window_ptr->screen_texture, NULL, NULL);
+			//Commented out code below to view the palette
+			/*SDL_Rect r;
+			r.x = 0;
+			r.y = 0;
+			r.w = 20;
+			r.h = 20;
+			for (int i = 0; i < 209; i++)
+			{
+				SDL_SetRenderDrawColor(window_ptr->screen_renderer, style_ptr->palette[i].r, style_ptr->palette[i].g, style_ptr->palette[i].b, 255);
+				SDL_RenderFillRect(window_ptr->screen_renderer, &r);
+				r.x += 20;
+				if (r.x > 500)
+				{
+					r.x = 0;
+					r.y += 20;
+				}
+			}*/
 
 			if (holdingType != -1 && holdingID != -1)
 				canvas_ptr->drawHeldObject(holdingType, holdingID, mouse_x_window, mouse_y_window);
@@ -592,3 +609,4 @@ void Editor_input::handleEvents(SDL_Event event)
 		}
 	}
 }
+
