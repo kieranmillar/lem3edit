@@ -22,6 +22,7 @@
 #define EDITORINPUT_HPP
 
 #include "SDL.h"
+#include "SDL_ttf.h"
 
 class Window;
 class Editor;

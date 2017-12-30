@@ -27,6 +27,7 @@ This file handles the user inputs (mouse and kepyboard) of the editor
 #include "bar.hpp"
 #include "canvas.hpp"
 #include "editor.hpp"
+#include "../font.hpp"
 #include "../lem3edit.hpp"
 #include "../level.hpp"
 #include "../style.hpp"

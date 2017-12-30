@@ -20,6 +20,7 @@
 #define LEM3EDIT_HPP
 
 #include "SDL.h"
+#include "SDL_ttf.h"
 
 #include <string>
 #include <algorithm>
@@ -31,6 +32,8 @@
 static const int PERM = 0, TEMP = 1, TOOL = 2;
 
 enum programMode { EDITORMODE };
+
+extern TTF_Font * g_font;
 
 std::string l3_filename( const std::string &path, const std::string &name, const std::string &ext );
 std::string l3_filename( const std::string &path, const std::string &name, int n, const std::string &ext);

@@ -38,12 +38,6 @@ bool Window::initialise( int w, int h )
 	screen_renderer = NULL;
 	screen_texture = NULL;
 
-	if (SDL_Init(SDL_INIT_TIMER | SDL_INIT_VIDEO))
-	{
-		cerr << "failed to initialize SDL: " << SDL_GetError() << endl;
-		return false;
-	}
-
 	loop_timer_id = SDL_AddTimer((100.0 / 30.0) * 10.0, loop_timer, NULL);
 
 	//int already_init = screen != NULL || screen_renderer != NULL;
@@ -93,8 +87,6 @@ void Window::destroy(void)
 	if (screen_texture != NULL) SDL_DestroyTexture(screen_texture);
 	if (screen_renderer != NULL) SDL_DestroyRenderer(screen_renderer);
 	if (screen != NULL) SDL_DestroyWindow(screen);
-
-	SDL_Quit();
 }
 
 bool Window::resize(void)

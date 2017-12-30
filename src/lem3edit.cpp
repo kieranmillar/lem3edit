@@ -24,6 +24,7 @@
 #include "lem3edit.hpp"
 
 #include "Editor/editor.hpp"
+#include "font.hpp"
 #include "level.hpp"
 #include "raw.hpp"
 #include "style.hpp"
@@ -39,19 +40,35 @@
 using namespace std;
 
 const char *prog_name = "lem3edit";
-const char *prog_ver = "0.7";
-const char *prog_date = "28/11/2017";
+const char *prog_ver = "0.8";
+const char *prog_date = "29/12/2017";
 
 void version(void);
 
-
 programMode g_currentMode;
-
+TTF_Font * g_font;
 
 int main( int argc, char *argv[] )
 {
 
 	version();
+
+	if (SDL_Init(SDL_INIT_TIMER | SDL_INIT_VIDEO))
+	{
+		SDL_Log ("failed to initialize SDL: %s\n", SDL_GetError());
+		return false;
+	}
+
+	if (TTF_Init() == -1)
+	{
+		SDL_Log("failed to initialize SDL_ttf: %s\n", TTF_GetError());
+		return false;
+	}
+
+	g_font = NULL;
+	g_font = Font::loadFont("gfx/DejaVuSansMono.ttf", 12);
+	if (g_font == NULL)
+		SDL_Log("failed to initialize font: %s\n", TTF_GetError());
 
 	Window window;
 
@@ -74,10 +91,13 @@ int main( int argc, char *argv[] )
 	{
 		if (g_currentMode == EDITORMODE)
 			editor.editor_input.handleEvents(event);
-
 	}
 
 	window.destroy();
+
+	Font::closeFont(g_font);
+	TTF_Quit();
+	SDL_Quit();
 
 	editor.style.destroy_all_objects(PERM);
 	editor.style.destroy_all_objects(TEMP);
@@ -92,8 +112,6 @@ void die( void )
 	event.type = SDL_QUIT;
 	SDL_PushEvent(&event);
 }
-
-
 
 string l3_filename( const string &path, const string &name, const string &ext )
 {
