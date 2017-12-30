@@ -67,6 +67,13 @@ void LevelProperties::setup(void)
 	}
 }
 
+void LevelProperties::resize(void)
+{
+	dialogX = (window_ptr->width / 2) - 150;
+	dialogY = (window_ptr->height / 2) - 85;
+	redraw = true;
+}
+
 void LevelProperties::openDialog(void)
 {
 	g_currentMode = LEVELPROPERTIESMODE;
@@ -82,7 +89,8 @@ void LevelProperties::openDialog(void)
 	}
 	timeLimitMins = level_ptr->time / 60;
 	timeLimitSecs = level_ptr->time % 60;
-	redraw = true;
+	resize();
+	highlighting = NONE;
 }
 
 void LevelProperties::closeDialog(bool saveChanges)
@@ -117,26 +125,67 @@ void LevelProperties::handleLevelPropertiesEvents(SDL_Event event)
 				canvas_ptr->redraw = true;
 				canvas_ptr->draw();
 				bar_ptr->draw(mouse_x_window, mouse_y_window);
+				resize();
+			}
+			break;
+		}
+		case SDL_MOUSEBUTTONDOWN://when pressed
+		{
+			SDL_MouseButtonEvent &e = event.button;
+
+			if (e.button == SDL_BUTTON_LEFT)
+			{
 				redraw = true;
-			}
-			break;
-		}
-		case SDL_MOUSEBUTTONDOWN://when initially pressed
-		{
-			SDL_MouseButtonEvent &e = event.button;
+				highlighting = NONE;
 
-			if (e.button == SDL_BUTTON_LEFT)
-			{
-
-			}
-			break;
-		}
-		case SDL_MOUSEBUTTONUP://when released
-		{
-			SDL_MouseButtonEvent &e = event.button;
-
-			if (e.button == SDL_BUTTON_LEFT)
-			{
+				if (mouse_x_window > dialogX + 158
+					&& mouse_x_window < dialogX + 198
+					&& mouse_y_window > dialogY + 38
+					&& mouse_y_window < dialogY + 62)
+				{
+					//release rate text field
+					highlighting = RELEASERATE;
+				}
+				if (mouse_x_window > dialogX + 148
+					&& mouse_x_window < dialogX + 188
+					&& mouse_y_window > dialogY + 68
+					&& mouse_y_window < dialogY + 92)
+				{
+					//spawn delay text field
+					highlighting = SPAWNDELAY;
+				}
+				if (mouse_x_window > dialogX + 138
+					&& mouse_x_window < dialogX + 154
+					&& mouse_y_window > dialogY + 98
+					&& mouse_y_window < dialogY + 122)
+				{
+					//time limit mins text field
+					highlighting = TIMELIMITMINS;
+				}
+				if (mouse_x_window > dialogX + 188
+					&& mouse_x_window < dialogX + 216
+					&& mouse_y_window > dialogY + 98
+					&& mouse_y_window < dialogY + 122)
+				{
+					//time limit secs text field
+					highlighting = TIMELIMITSECS;
+				}
+				if (mouse_x_window > dialogX + 33
+					&& mouse_x_window < dialogX + 133
+					&& mouse_y_window > dialogY + 128
+					&& mouse_y_window < dialogY + 158)
+				{
+					//ok button
+					closeDialog(true);
+				}
+				if (mouse_x_window > dialogX + 166
+					&& mouse_x_window < dialogX + 266
+					&& mouse_y_window > dialogY + 128
+					&& mouse_y_window < dialogY + 158)
+				{
+					//cancel button
+					closeDialog(false);
+				}
 
 			}
 			break;
@@ -146,11 +195,66 @@ void LevelProperties::handleLevelPropertiesEvents(SDL_Event event)
 			SDL_MouseWheelEvent &e = event.wheel;
 			if (e.y == 1) // wheel up
 			{
-				
+				switch (highlighting)
+				{
+					case RELEASERATE:
+						releaseRate++;
+						if (releaseRate > 999) releaseRate = 999;
+						redraw = true;
+						break;
+					case SPAWNDELAY:
+						spawnDelay++;
+						if (spawnDelay > 999) spawnDelay = 999;
+						redraw = true;
+						break;
+					case TIMELIMITMINS:
+						timeLimitMins++;
+						if (timeLimitMins >= 7)
+						{
+							timeLimitMins = 7;
+							timeLimitSecs = 0;
+						}
+						redraw = true;
+						break;
+					case TIMELIMITSECS:
+						if (timeLimitMins != 7)
+						{
+							timeLimitSecs++;
+						}
+						if (timeLimitSecs > 59) timeLimitSecs = 59;
+						redraw = true;
+						break;
+					default:
+						break;
+				}
 			}
 			if (e.y == -1) // wheel down
 			{
-				
+				switch (highlighting)
+				{
+					case RELEASERATE:
+						releaseRate--;
+						if (releaseRate < 0) releaseRate = 0;
+						redraw = true;
+						break;
+					case SPAWNDELAY:
+						spawnDelay--;
+						if (spawnDelay < 0) spawnDelay = 0;
+						redraw = true;
+						break;
+					case TIMELIMITMINS:
+						timeLimitMins--;
+						if (timeLimitMins < 0) timeLimitMins = 0;
+						redraw = true;
+						break;
+					case TIMELIMITSECS:
+						timeLimitSecs--;
+						if (timeLimitSecs < 0) timeLimitSecs = 0;
+						redraw = true;
+						break;
+					default:
+						break;
+				}
 			}
 			break;
 		}
@@ -160,34 +264,68 @@ void LevelProperties::handleLevelPropertiesEvents(SDL_Event event)
 
 			switch (e.keysym.sym)
 			{
+			case SDLK_0:
+				typedNumber(highlighting, 0);
+				break;
 			case SDLK_1:
-				
+				typedNumber(highlighting, 1);
 				break;
 			case SDLK_2:
-				
+				typedNumber(highlighting, 2);
 				break;
 			case SDLK_3:
-				
+				typedNumber(highlighting, 3);
 				break;
-			case SDLK_UP:
-
+			case SDLK_4:
+				typedNumber(highlighting, 4);
 				break;
-			case SDLK_DOWN:
-				
+			case SDLK_5:
+				typedNumber(highlighting, 5);
 				break;
-			case SDLK_LEFT:
-
+			case SDLK_6:
+				typedNumber(highlighting, 6);
 				break;
-			case SDLK_RIGHT:
-				
+			case SDLK_7:
+				typedNumber(highlighting, 7);
 				break;
-			case SDLK_DELETE:
-				
+			case SDLK_8:
+				typedNumber(highlighting, 8);
+				break;
+			case SDLK_9:
+				typedNumber(highlighting, 9);
+				break;
+			case SDLK_BACKSPACE:
+				switch (highlighting)
+				{
+					case RELEASERATE:
+						releaseRate /= 10;
+						if (releaseRate < 0) releaseRate = 0;
+						redraw = true;
+						break;
+					case SPAWNDELAY:
+						spawnDelay /= 10;
+						if (spawnDelay < 0) spawnDelay = 0;
+						redraw = true;
+						break;
+					case TIMELIMITMINS:
+						timeLimitMins /= 10;
+						if (timeLimitMins < 0) timeLimitMins = 0;
+						redraw = true;
+						break;
+					case TIMELIMITSECS:
+						timeLimitSecs /= 10;
+						if (timeLimitSecs < 0) timeLimitSecs = 0;
+						redraw = true;
+						break;
+					default:
+						break;
+				}
 				break;
 			case SDLK_ESCAPE:
 				closeDialog(false);
 				break;
 			case SDLK_RETURN:
+			case SDLK_p:
 				closeDialog(true);
 				break;
 			case SDLK_q:
@@ -210,6 +348,50 @@ void LevelProperties::handleLevelPropertiesEvents(SDL_Event event)
 	}
 }
 
+void LevelProperties::typedNumber(inputBox input, const unsigned int value)
+{
+	switch (input)
+	{
+		case RELEASERATE:
+			if (releaseRate < 100)
+			{
+				releaseRate *= 10;
+				releaseRate += value;
+				redraw = true;
+			}
+			break;
+		case SPAWNDELAY:
+			if (spawnDelay < 100)
+			{
+				spawnDelay *= 10;
+				spawnDelay += value;
+				redraw = true;
+			}
+			break;
+		case TIMELIMITMINS:
+			if (value <= 7)
+			{
+				timeLimitMins = value;
+				redraw = true;
+			}
+			if (timeLimitMins == 7)
+			{
+				timeLimitSecs = 0;
+			}
+			break;
+		case TIMELIMITSECS:
+			if (timeLimitMins != 7 && timeLimitSecs < 6)
+			{
+				timeLimitSecs *= 10;
+				timeLimitSecs += value;
+				redraw = true;
+			}
+			break;
+		default:
+			break;
+	}
+}
+
 void LevelProperties::draw(void)
 {
 	if (redraw)
@@ -217,9 +399,6 @@ void LevelProperties::draw(void)
 		SDL_SetRenderDrawBlendMode(window_ptr->screen_renderer, SDL_BLENDMODE_BLEND);
 		SDL_SetRenderTarget(window_ptr->screen_renderer, window_ptr->screen_texture);
 
-		int dialogX, dialogY;
-		dialogX = (window_ptr->width / 2) - 150;
-		dialogY = (window_ptr->height / 2) - 85;
 		{
 			//draw dialog background
 			SDL_Rect dialogArea;
@@ -228,7 +407,7 @@ void LevelProperties::draw(void)
 			dialogArea.w = 300;
 			dialogArea.h = 170;
 
-			SDL_SetRenderDrawColor(window_ptr->screen_renderer, 170, 170, 170, 255);
+			SDL_SetRenderDrawColor(window_ptr->screen_renderer, 150, 150, 150, 255);
 			SDL_RenderFillRect(window_ptr->screen_renderer, &dialogArea);
 			SDL_SetRenderDrawColor(window_ptr->screen_renderer, 0, 0, 0, 255);
 			SDL_RenderDrawRect(window_ptr->screen_renderer, &dialogArea);
@@ -253,7 +432,10 @@ void LevelProperties::draw(void)
 			r.y = dialogY + 38;
 			r.w = 40;
 			r.h = 24;
-			SDL_SetRenderDrawColor(window_ptr->screen_renderer, 255, 255, 255, 255);
+			if (highlighting == RELEASERATE)
+				SDL_SetRenderDrawColor(window_ptr->screen_renderer, 255, 255, 255, 255);
+			else
+				SDL_SetRenderDrawColor(window_ptr->screen_renderer, 200, 200, 200, 255);
 			SDL_RenderFillRect(window_ptr->screen_renderer, &r);
 			SDL_SetRenderDrawColor(window_ptr->screen_renderer, 0, 0, 0, 255);
 			SDL_RenderDrawRect(window_ptr->screen_renderer, &r);
@@ -264,7 +446,10 @@ void LevelProperties::draw(void)
 			r.y = dialogY + 68;
 			r.w = 40;
 			r.h = 24;
-			SDL_SetRenderDrawColor(window_ptr->screen_renderer, 255, 255, 255, 255);
+			if (highlighting == SPAWNDELAY)
+				SDL_SetRenderDrawColor(window_ptr->screen_renderer, 255, 255, 255, 255);
+			else
+				SDL_SetRenderDrawColor(window_ptr->screen_renderer, 200, 200, 200, 255);
 			SDL_RenderFillRect(window_ptr->screen_renderer, &r);
 			SDL_SetRenderDrawColor(window_ptr->screen_renderer, 0, 0, 0, 255);
 			SDL_RenderDrawRect(window_ptr->screen_renderer, &r);
@@ -275,7 +460,10 @@ void LevelProperties::draw(void)
 			r.y = dialogY + 98;
 			r.w = 16;
 			r.h = 24;
-			SDL_SetRenderDrawColor(window_ptr->screen_renderer, 255, 255, 255, 255);
+			if (highlighting == TIMELIMITMINS)
+				SDL_SetRenderDrawColor(window_ptr->screen_renderer, 255, 255, 255, 255);
+			else
+				SDL_SetRenderDrawColor(window_ptr->screen_renderer, 200, 200, 200, 255);
 			SDL_RenderFillRect(window_ptr->screen_renderer, &r);
 			SDL_SetRenderDrawColor(window_ptr->screen_renderer, 0, 0, 0, 255);
 			SDL_RenderDrawRect(window_ptr->screen_renderer, &r);
@@ -286,7 +474,10 @@ void LevelProperties::draw(void)
 			r.y = dialogY + 98;
 			r.w = 28;
 			r.h = 24;
-			SDL_SetRenderDrawColor(window_ptr->screen_renderer, 255, 255, 255, 255);
+			if (highlighting == TIMELIMITSECS)
+				SDL_SetRenderDrawColor(window_ptr->screen_renderer, 255, 255, 255, 255);
+			else
+				SDL_SetRenderDrawColor(window_ptr->screen_renderer, 200, 200, 200, 255);
 			SDL_RenderFillRect(window_ptr->screen_renderer, &r);
 			SDL_SetRenderDrawColor(window_ptr->screen_renderer, 0, 0, 0, 255);
 			SDL_RenderDrawRect(window_ptr->screen_renderer, &r);
@@ -303,7 +494,7 @@ void LevelProperties::draw(void)
 			r.y = dialogY + 128;
 			r.w = 100;
 			r.h = 30;
-			SDL_SetRenderDrawColor(window_ptr->screen_renderer, 200, 200, 200, 200);
+			SDL_SetRenderDrawColor(window_ptr->screen_renderer, 200, 200, 200, 255);
 			SDL_RenderFillRect(window_ptr->screen_renderer, &r);
 			SDL_SetRenderDrawColor(window_ptr->screen_renderer, 0, 0, 0, 255);
 			SDL_RenderDrawRect(window_ptr->screen_renderer, &r);
@@ -346,23 +537,22 @@ void LevelProperties::renderText(SDL_Texture * tex, int x, int y)
 	SDL_RenderCopy(window_ptr->screen_renderer, tex, NULL, &textRect);
 }
 
-void LevelProperties::renderNumbers(int num, int rightX, int y)
+void LevelProperties::renderNumbers(int num, const int rightX, const int y)
 {
-	int temp = num;
 	int numChars[3];
 	int size = 0;
-	if (temp == 0)
+	if (num == 0)
 	{
 		size = 1;
 		numChars[0] = 0;
 	}
 	else
 	{
-		while (temp != 0)
+		while (num != 0)
 		{
 			//load number characters into array in reverse order
-			numChars[size] = temp % 10;
-			temp /= 10;
+			numChars[size] = num % 10;
+			num /= 10;
 			size++;
 		}
 	}

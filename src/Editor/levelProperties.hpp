@@ -46,6 +46,7 @@ public:
 	int timeLimitSecs;
 
 	bool redraw;
+	int dialogX, dialogY;
 
 	SDL_Texture * titleText;
 	SDL_Texture * releaseRateText;
@@ -57,17 +58,24 @@ public:
 	SDL_Texture * cancelButtonText;
 	SDL_Texture * numbers[10];
 
+	enum inputBox { NONE, RELEASERATE, SPAWNDELAY, TIMELIMITMINS, TIMELIMITSECS };
+
+	inputBox highlighting;
+
 	void setReferences(Window * w, Editor * e, Bar * b, Canvas * c, Level * l);
 	void setup(void);
+	void resize(void);
 
 	void openDialog(void);
 	void closeDialog(bool saveChanges);
 
 	void handleLevelPropertiesEvents(SDL_Event event);
 
+	void typedNumber(inputBox input, const unsigned int value);
+
 	void draw(void);
 	void renderText(SDL_Texture * tex, int x, int y);
-	void renderNumbers(int num, int rightX, int y);
+	void renderNumbers(int num, const int rightX, const int y);
 
 	LevelProperties(void) { /* nothing to do */ }
 
