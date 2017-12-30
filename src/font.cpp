@@ -23,18 +23,20 @@ This file contains code for printing text to the screen, using SDL_ttf
 */
 
 #include "font.hpp"
+#include "window.hpp"
 
+#include "SDL.h"
 #include "SDL_ttf.h"
+
+#include <string>
 
 using namespace std;
 
-TTF_Font* Font::loadFont(std::string path, int size)
+SDL_Texture * Font::createTextureFromString(Window * w, TTF_Font * f, std::string s)
 {
-	TTF_Font * f = TTF_OpenFont(path.c_str(), size);
-	return f;
-}
-
-void Font::closeFont(TTF_Font * f)
-{
-	TTF_CloseFont(f);
+	SDL_Color c = { 0, 0, 0 };
+	SDL_Surface * tempSurface = TTF_RenderText_Blended(f, s.c_str(), c);
+	SDL_Texture * t = SDL_CreateTextureFromSurface(w->screen_renderer, tempSurface);
+	SDL_FreeSurface(tempSurface);
+	return t;
 }

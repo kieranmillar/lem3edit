@@ -26,12 +26,13 @@
 
 #include <string>
 
+class Window;
+
 class Font
 {
 public:
 
-	static TTF_Font* loadFont(std::string path, int size);
-	static void closeFont(TTF_Font * f);
+	static SDL_Texture * createTextureFromString(Window * w, TTF_Font * f, std::string s);
 
 };
 

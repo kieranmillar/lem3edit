@@ -68,7 +68,7 @@ public:
 	void setReferences(Window * w, Editor * e, Bar * b, Canvas * c, Style * s, Level * l);
 	void load(void);
 
-	void handleEvents(SDL_Event event);
+	void handleEditorEvents(SDL_Event event);
 
 	Editor_input(void) { /* nothing to do */ }
 

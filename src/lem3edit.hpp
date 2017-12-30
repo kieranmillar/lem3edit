@@ -33,7 +33,7 @@ static const int PERM = 0, TEMP = 1, TOOL = 2;
 
 enum programMode { EDITORMODE };
 
-extern TTF_Font * g_font;
+extern programMode g_currentMode;
 
 std::string l3_filename( const std::string &path, const std::string &name, const std::string &ext );
 std::string l3_filename( const std::string &path, const std::string &name, int n, const std::string &ext);

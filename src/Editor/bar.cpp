@@ -24,6 +24,7 @@ This file includes code to deal with the object bar at the bottom of the editor 
 
 #include "bar.hpp"
 #include "editor.hpp"
+#include "../font.hpp"
 #include "../style.hpp"
 #include "../window.hpp"
 
@@ -68,6 +69,17 @@ void Bar::load( void )
 	loadButtonGraphic(button_moveToBack, "./gfx/moveToBack_up.bmp", "./gfx/moveToBack_down.bmp");
 	loadButtonGraphic(button_moveToFront, "./gfx/moveToFront_up.bmp", "./gfx/moveToFront_down.bmp");
 	loadButtonGraphic(button_camera, "./gfx/camera_off.bmp", "./gfx/camera_on.bmp");
+
+	tooltipFont = TTF_OpenFont("./gfx/DejaVuSansMono.ttf", 12);
+
+	setButtonTooltip(button_layerBackground, "Select Background Layer (1)");
+	setButtonTooltip(button_layerTerrain, "Select Terrain Layer (2)");
+	setButtonTooltip(button_layerTool, "Select Tool Layer (3)");
+	setButtonTooltip(button_layerVisible, "Toggle Layer Visibility");
+	setButtonTooltip(button_save, "Save Level (s)");
+	setButtonTooltip(button_moveToBack, "Move Selected Objects To Back (,)");
+	setButtonTooltip(button_moveToFront, "Move Selected Objects To Front (.)");
+	setButtonTooltip(button_camera, "Toggle Start Camera Visibility (space)");
 }
 
 bool Bar::loadButtonGraphic(buttonInfo & button, const char * filePathUp, const char * filePathDown)
@@ -127,6 +139,12 @@ bool Bar::loadButtonGraphic(buttonInfo & button, const char * filePathUp, const 
 
 	currentButtonTextureX += rect.w;
 
+	return true;
+}
+
+bool Bar::setButtonTooltip(buttonInfo & button, const char * text)
+{
+	button.tooltip = Font::createTextureFromString(window_ptr, tooltipFont, text);
 	return true;
 }
 
@@ -193,7 +211,7 @@ int Bar::getPieceIDByScreenPos(int mousePos)
 	return id;
 }
 
-void Bar::draw( void )
+void Bar::draw( int mouseX, int mouseY )
 {
 	{ // bar background in the absense of a proper graphic
 		SDL_SetRenderDrawBlendMode(window_ptr->screen_renderer, SDL_BLENDMODE_BLEND);
@@ -342,7 +360,72 @@ void Bar::draw( void )
 			drawButton(button_camera, on, 75, canvas_ptr->height + 75);
 		else
 			drawButton(button_camera, off, 75, canvas_ptr->height + 75);
+	}
+	{
+		//draw tooltip
+		if (mouseY > canvas_ptr->height)
+		{
+			if (mouseY > canvas_ptr->height + 3 && mouseY <canvas_ptr->height + 35)
+				//first row of buttons
+			{
+				if (mouseX > 3 && mouseX < 35)
+				{
+					drawTooltip(button_layerBackground, mouseX, mouseY);
+				}
+				if (mouseX > 39 && mouseX < 71)
+				{
+					drawTooltip(button_layerTerrain, mouseX, mouseY);
+				}
+				if (mouseX > 75 && mouseX < 107)
+				{
+					drawTooltip(button_layerTool, mouseX, mouseY);
+				}
+				if (mouseX > 111 && mouseX < 143)
+				{
+					drawTooltip(button_save, mouseX, mouseY);
+				}
+			}
+			if (mouseY > window_ptr->height - BAR_HEIGHT + 39 && mouseY < window_ptr->height - BAR_HEIGHT + 71)
+				//second row of buttons
+			{
+				if (mouseX > 3 && mouseX < 35)
+				{
+					drawTooltip(button_layerVisible, mouseX, mouseY);
+				}
+				if (mouseX > 39 && mouseX < 71)
+				{
+					drawTooltip(button_layerVisible, mouseX, mouseY);
+				}
+				if (mouseX > 75 && mouseX < 107)
+				{
+					drawTooltip(button_layerVisible, mouseX, mouseY);
+				}
+				/*if (mouseX > 111 && mouseX < 143)
+				{
 
+				}*/
+			}
+			if (mouseY > window_ptr->height - BAR_HEIGHT + 75 && mouseY < window_ptr->height - BAR_HEIGHT + 107)
+				//third row of buttons
+			{
+				if (mouseX > 3 && mouseX < 35)
+				{
+					drawTooltip(button_moveToBack, mouseX, mouseY);
+				}
+				if (mouseX > 39 && mouseX < 71)
+				{
+					drawTooltip(button_moveToFront, mouseX, mouseY);
+				}
+				if (mouseX > 75 && mouseX < 107)
+				{
+					drawTooltip(button_camera, mouseX, mouseY);
+				}
+				/*if (mouseX > 111 && mouseX < 143)
+				{
+
+				}*/
+			}
+		}
 	}
 
 	SDL_SetRenderTarget(window_ptr->screen_renderer, NULL);
@@ -371,4 +454,41 @@ void Bar::drawButton(const buttonInfo & button, buttonState state, int x, int y)
 	destRect.h = 32;
 
 	SDL_RenderCopy(window_ptr->screen_renderer, buttonTexture, &sourceRect, &destRect);
-	}
+}
+
+void Bar::drawTooltip(const buttonInfo & button, int x, int y)
+{
+	int tooltipW, tooltipH;
+	SDL_QueryTexture(button.tooltip, NULL, NULL, &tooltipW, &tooltipH);
+
+	SDL_Rect tooltipRect;
+	tooltipRect.x = x;
+	tooltipRect.y = y - tooltipH - 2;
+	tooltipRect.w = tooltipW + 2;
+	tooltipRect.h = tooltipH + 2;
+
+	SDL_SetRenderDrawColor(window_ptr->screen_renderer, 100, 100, 100, 255);
+	SDL_RenderFillRect(window_ptr->screen_renderer, &tooltipRect);
+	SDL_SetRenderDrawColor(window_ptr->screen_renderer, 0, 0, 0, 255);
+	SDL_RenderDrawRect(window_ptr->screen_renderer, &tooltipRect);
+
+	tooltipRect.x ++;
+	tooltipRect.y ++;
+	tooltipRect.w -= 2;
+	tooltipRect.h -= 2;
+
+	SDL_RenderCopy(window_ptr->screen_renderer, button.tooltip, NULL, &tooltipRect);
+}
+
+void Bar::destroy(void)
+{
+	if (button_layerBackground.tooltip != NULL)	SDL_DestroyTexture(button_layerBackground.tooltip);
+	if (button_layerTerrain.tooltip != NULL)	SDL_DestroyTexture(button_layerTerrain.tooltip);
+	if (button_layerTool.tooltip != NULL)	SDL_DestroyTexture(button_layerTool.tooltip);
+	if (button_layerVisible.tooltip != NULL)	SDL_DestroyTexture(button_layerVisible.tooltip);
+	if (button_save.tooltip != NULL)	SDL_DestroyTexture(button_save.tooltip);
+	if (button_moveToBack.tooltip != NULL)	SDL_DestroyTexture(button_moveToBack.tooltip);
+	if (button_moveToFront.tooltip != NULL)	SDL_DestroyTexture(button_moveToFront.tooltip);
+	if (button_camera.tooltip != NULL)	SDL_DestroyTexture(button_camera.tooltip);
+	TTF_CloseFont(tooltipFont);
+}

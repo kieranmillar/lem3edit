@@ -26,6 +26,7 @@
 #define PIECESIZE 132
 
 #include "SDL.h"
+#include "SDL_ttf.h"
 
 class Window;
 class Editor;
@@ -50,7 +51,7 @@ public:
 	SDL_Texture * buttonTexture;
 	int currentButtonTextureX;
 
-	struct buttonInfo { int texOnX; int texOnY; int texOffX; int texOffY; };
+	struct buttonInfo { int texOnX; int texOnY; int texOffX; int texOffY; SDL_Texture * tooltip; };
 	enum buttonState { on, off };
 
 	buttonInfo button_layerBackground;
@@ -62,9 +63,12 @@ public:
 	buttonInfo button_moveToFront;
 	buttonInfo button_camera;
 
+	TTF_Font * tooltipFont;
+
 	void setReferences(Window * w, Editor * e, Canvas * c, Style * s);
 	void load(void);
 	bool loadButtonGraphic(buttonInfo & button, const char * filePathUp, const char * filePathDown);
+	bool setButtonTooltip(buttonInfo & button, const char * text);
 
 	void resizeBarScrollRect(int windowWidth, int windowHeight);
 	void scroll(signed int moveAmount);
@@ -75,11 +79,14 @@ public:
 
 	int getPieceIDByScreenPos ( int mousePos );
 
-	void draw( void );
+	void draw( int mouseX, int mouseY );
 
 	void drawButton( const buttonInfo & button, buttonState state, int x, int y);
+	void drawTooltip(const buttonInfo & button, int x, int y);
 
 	Bar(void) { /* nothing to do */ };
+
+	void destroy(void);
 
 };
 

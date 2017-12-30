@@ -46,7 +46,6 @@ const char *prog_date = "29/12/2017";
 void version(void);
 
 programMode g_currentMode;
-TTF_Font * g_font;
 
 int main( int argc, char *argv[] )
 {
@@ -64,11 +63,6 @@ int main( int argc, char *argv[] )
 		SDL_Log("failed to initialize SDL_ttf: %s\n", TTF_GetError());
 		return false;
 	}
-
-	g_font = NULL;
-	g_font = Font::loadFont("gfx/DejaVuSansMono.ttf", 12);
-	if (g_font == NULL)
-		SDL_Log("failed to initialize font: %s\n", TTF_GetError());
 
 	Window window;
 
@@ -90,12 +84,15 @@ int main( int argc, char *argv[] )
 	while (SDL_WaitEvent(&event) && event.type != SDL_QUIT)
 	{
 		if (g_currentMode == EDITORMODE)
-			editor.editor_input.handleEvents(event);
+			editor.editor_input.handleEditorEvents(event);
 	}
 
+	//NOTE to self: These should be destructors, but objects need to go out of scope before
+	//calling Quit functions below or else will crash on exit
+	
+	editor.bar.destroy();
 	window.destroy();
 
-	Font::closeFont(g_font);
 	TTF_Quit();
 	SDL_Quit();
 

@@ -68,7 +68,7 @@ void Editor_input::load(void)
 	movingCamera = false;
 }
 
-void Editor_input::handleEvents(SDL_Event event)
+void Editor_input::handleEditorEvents(SDL_Event event)
 {
 	unsigned int delta_multiplier = (SDL_GetModState() & KMOD_SHIFT) ? 4 : 1;
 
@@ -571,7 +571,7 @@ void Editor_input::handleEvents(SDL_Event event)
 			if (ticksSinceLastFrame <= 36 && ticksSinceLastFrame >= 30)
 			{
 				canvas_ptr->draw();
-				bar_ptr->draw();
+				bar_ptr->draw(mouse_x_window, mouse_y_window);
 			}
 			//SDL_Log("Frame: %d", ticksSinceLastFrame);
 
