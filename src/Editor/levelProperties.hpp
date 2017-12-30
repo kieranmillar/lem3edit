@@ -47,7 +47,18 @@ public:
 
 	bool redraw;
 
+	SDL_Texture * titleText;
+	SDL_Texture * releaseRateText;
+	SDL_Texture * spawnDelayText;
+	SDL_Texture * timeLimitText;
+	SDL_Texture * timeLimitMinsText;
+	SDL_Texture * timeLimitSecsText;
+	SDL_Texture * OKButtonText;
+	SDL_Texture * cancelButtonText;
+	SDL_Texture * numbers[10];
+
 	void setReferences(Window * w, Editor * e, Bar * b, Canvas * c, Level * l);
+	void setup(void);
 
 	void openDialog(void);
 	void closeDialog(bool saveChanges);
@@ -55,6 +66,8 @@ public:
 	void handleLevelPropertiesEvents(SDL_Event event);
 
 	void draw(void);
+	void renderText(SDL_Texture * tex, int x, int y);
+	void renderNumbers(int num, int rightX, int y);
 
 	LevelProperties(void) { /* nothing to do */ }
 

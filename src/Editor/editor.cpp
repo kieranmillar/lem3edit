@@ -55,6 +55,7 @@ bool Editor::load( int n, Window * w )
 	bar.load();
 	canvas.load();
 	editor_input.load();
+	levelProperties.setup();
 	gameFrameCount = 0;
 	gameFrameTick = SDL_GetTicks();
 	startCameraOn = false;
