@@ -7,4 +7,4 @@ This tool allows you to edit levels for Lemmings 3 (also known as Lemmings Chron
 
 Requires a copy of Lemmings 3 to actually do anything.
 
-Dependencies: SDL2
+Dependencies: SDL2, SDL_ttf
