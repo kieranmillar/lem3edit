@@ -34,6 +34,7 @@ ctrl + v      -- paste
 ,             -- move selected objects behind others on the same layer
 .             -- move selected objects infront of others on the same layer
 space         -- toggle start camera visibility
+p             -- edit level properties
 
 scroll-wheel  -- zoom in and out
 ijkl          -- scroll

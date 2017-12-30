@@ -19,7 +19,9 @@
 */
 
 /*
-This file handles the user inputs (mouse and kepyboard) of the editor
+This file handles the user inputs (mouse and kepyboard) of the editor.
+Note that the level properties menu has its own commands, they are handled inside
+the levelProperties file.
 */
 
 #include "input.hpp"
@@ -94,6 +96,7 @@ void Editor_input::handleEditorEvents(SDL_Event event)
 				editor_ptr->resize(e.data1, e.data2);
 				canvas_ptr->redraw = true;
 			}
+			break;
 		}
 		case SDL_MOUSEMOTION:
 		{
@@ -466,6 +469,9 @@ void Editor_input::handleEditorEvents(SDL_Event event)
 				if (ctrl_down) {
 					editor_ptr->copy_selected();
 				}
+				break;
+			case SDLK_p:
+				editor_ptr->levelProperties.openDialog();
 				break;
 			case SDLK_v:
 				if (ctrl_down) {

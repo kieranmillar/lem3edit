@@ -31,7 +31,7 @@
 
 static const int PERM = 0, TEMP = 1, TOOL = 2;
 
-enum programMode { EDITORMODE };
+enum programMode { EDITORMODE, LEVELPROPERTIESMODE };
 
 extern programMode g_currentMode;
 

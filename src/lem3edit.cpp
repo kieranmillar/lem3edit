@@ -83,8 +83,15 @@ int main( int argc, char *argv[] )
 	SDL_Event event;
 	while (SDL_WaitEvent(&event) && event.type != SDL_QUIT)
 	{
-		if (g_currentMode == EDITORMODE)
-			editor.editor_input.handleEditorEvents(event);
+		switch (g_currentMode)
+		{
+			case EDITORMODE:
+				editor.editor_input.handleEditorEvents(event);
+				break;
+			case LEVELPROPERTIESMODE:
+				editor.levelProperties.handleLevelPropertiesEvents(event);
+				break;
+		}
 	}
 
 	//NOTE to self: These should be destructors, but objects need to go out of scope before

@@ -24,6 +24,7 @@
 #include "bar.hpp"
 #include "canvas.hpp"
 #include "input.hpp"
+#include "levelProperties.hpp"
 #include "../del.hpp"
 #include "../level.hpp"
 #include "../style.hpp"
@@ -42,7 +43,8 @@ public:
 	Bar bar;
 	Canvas canvas;
 	Editor_input editor_input;
-	
+	LevelProperties levelProperties;
+
 	Del font;
 	
 	Level level;
