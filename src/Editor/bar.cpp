@@ -65,9 +65,9 @@ void Bar::load( void )
 	loadButtonGraphic(button_layerTerrain, "./gfx/layerTerrain_off.bmp", "./gfx/layerTerrain_on.bmp");
 	loadButtonGraphic(button_layerTool, "./gfx/layerTool_off.bmp", "./gfx/layerTool_on.bmp");
 	loadButtonGraphic(button_layerVisible, "./gfx/layerVisible_off.bmp", "./gfx/layerVisible_on.bmp");
-	loadButtonGraphic(button_save, "./gfx/save_up.bmp", "./gfx/save_down.bmp");
-	loadButtonGraphic(button_moveToBack, "./gfx/moveToBack_up.bmp", "./gfx/moveToBack_down.bmp");
-	loadButtonGraphic(button_moveToFront, "./gfx/moveToFront_up.bmp", "./gfx/moveToFront_down.bmp");
+	loadButtonGraphic(button_save, "./gfx/save_up.bmp", NULL);
+	loadButtonGraphic(button_moveToBack, "./gfx/moveToBack_up.bmp", NULL);
+	loadButtonGraphic(button_moveToFront, "./gfx/moveToFront_up.bmp", NULL);
 	loadButtonGraphic(button_camera, "./gfx/camera_off.bmp", "./gfx/camera_on.bmp");
 
 	tooltipFont = TTF_OpenFont("./gfx/DejaVuSansMono.ttf", 12);
@@ -116,28 +116,33 @@ bool Bar::loadButtonGraphic(buttonInfo & button, const char * filePathUp, const 
 	currentButtonTextureX += rect.w;
 
 	//then the down graphic
-	graphic = SDL_LoadBMP(filePathDown);
-	if (graphic == NULL)
-	{
-		SDL_Log("Unable to load image '%s'! SDL Error: %s\n", filePathDown, SDL_GetError());
-		return false;
-	}
-
-	texture = SDL_CreateTextureFromSurface(window_ptr->screen_renderer, graphic);
-	rect.x = currentButtonTextureX;
-
-	SDL_SetRenderTarget(window_ptr->screen_renderer, buttonTexture);
-	SDL_RenderCopy(window_ptr->screen_renderer, texture, NULL, &rect);
-
-	SDL_FreeSurface(graphic);
-	graphic = NULL;
-	SDL_DestroyTexture(texture);
-	texture = NULL;
-
 	button.texOnX = rect.x;
 	button.texOnY = rect.y;
+	if (filePathDown != NULL)
+	{
+		graphic = SDL_LoadBMP(filePathDown);
+		if (graphic == NULL)
+		{
+			SDL_Log("Unable to load image '%s'! SDL Error: %s\n", filePathDown, SDL_GetError());
+			return false;
+		}
 
-	currentButtonTextureX += rect.w;
+		texture = SDL_CreateTextureFromSurface(window_ptr->screen_renderer, graphic);
+		rect.x = currentButtonTextureX;
+
+		SDL_SetRenderTarget(window_ptr->screen_renderer, buttonTexture);
+		SDL_RenderCopy(window_ptr->screen_renderer, texture, NULL, &rect);
+
+		SDL_FreeSurface(graphic);
+		graphic = NULL;
+		SDL_DestroyTexture(texture);
+		texture = NULL;
+
+		button.texOnX = rect.x;
+		button.texOnY = rect.y;
+
+		currentButtonTextureX += rect.w;
+	}
 
 	return true;
 }
