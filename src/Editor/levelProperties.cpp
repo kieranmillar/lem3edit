@@ -100,6 +100,10 @@ void LevelProperties::closeDialog(bool saveChanges)
 		level_ptr->release_rate = releaseRate;
 		level_ptr->release_delay = spawnDelay;
 		level_ptr->time = (timeLimitMins * 60) + timeLimitSecs;
+		if (level_ptr->time > 420)
+		{
+			level_ptr->time = 420;
+		}
 	}
 	g_currentMode = EDITORMODE;
 	canvas_ptr->redraw = true;
@@ -209,18 +213,11 @@ void LevelProperties::handleLevelPropertiesEvents(SDL_Event event)
 						break;
 					case TIMELIMITMINS:
 						timeLimitMins++;
-						if (timeLimitMins >= 7)
-						{
-							timeLimitMins = 7;
-							timeLimitSecs = 0;
-						}
+						if (timeLimitMins > 7) timeLimitMins = 7;
 						redraw = true;
 						break;
 					case TIMELIMITSECS:
-						if (timeLimitMins != 7)
-						{
-							timeLimitSecs++;
-						}
+						timeLimitSecs++;
 						if (timeLimitSecs > 59) timeLimitSecs = 59;
 						redraw = true;
 						break;
@@ -384,13 +381,9 @@ void LevelProperties::typedNumber(inputBox input, const unsigned int value)
 				timeLimitMins = value;
 				redraw = true;
 			}
-			if (timeLimitMins == 7)
-			{
-				timeLimitSecs = 0;
-			}
 			break;
 		case TIMELIMITSECS:
-			if (timeLimitMins != 7 && timeLimitSecs < 6)
+			if (timeLimitSecs < 6)
 			{
 				timeLimitSecs *= 10;
 				timeLimitSecs += value;
