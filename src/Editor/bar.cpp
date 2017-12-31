@@ -55,7 +55,7 @@ void Bar::load( void )
 	resizeBarScrollRect(window_ptr->width, window_ptr->height);
 	barScrollRect.h = 13;
 
-	buttonTexture = SDL_CreateTexture(window_ptr->screen_renderer, SDL_PIXELFORMAT_RGB888, SDL_TEXTUREACCESS_TARGET, 512, 32);
+	buttonTexture = SDL_CreateTexture(window_ptr->screen_renderer, SDL_PIXELFORMAT_RGB888, SDL_TEXTUREACCESS_TARGET, 1024, 32);
 	SDL_SetTextureBlendMode(buttonTexture, SDL_BLENDMODE_BLEND);
 	SDL_SetTextureAlphaMod(buttonTexture, 255);
 
@@ -64,7 +64,9 @@ void Bar::load( void )
 	loadButtonGraphic(button_layerBackground, "./gfx/layerBackground_off.bmp", "./gfx/layerBackground_on.bmp");
 	loadButtonGraphic(button_layerTerrain, "./gfx/layerTerrain_off.bmp", "./gfx/layerTerrain_on.bmp");
 	loadButtonGraphic(button_layerTool, "./gfx/layerTool_off.bmp", "./gfx/layerTool_on.bmp");
-	loadButtonGraphic(button_layerVisible, "./gfx/layerVisible_off.bmp", "./gfx/layerVisible_on.bmp");
+	loadButtonGraphic(button_layerBackgroundVisible, "./gfx/layerVisible_off.bmp", "./gfx/layerVisible_on.bmp");
+	loadButtonGraphic(button_layerTerrainVisible, "./gfx/layerVisible_off.bmp", "./gfx/layerVisible_on.bmp");
+	loadButtonGraphic(button_layerToolVisible, "./gfx/layerVisible_off.bmp", "./gfx/layerVisible_on.bmp");
 	loadButtonGraphic(button_save, "./gfx/save_up.bmp", NULL);
 	loadButtonGraphic(button_moveToBack, "./gfx/moveToBack_up.bmp", NULL);
 	loadButtonGraphic(button_moveToFront, "./gfx/moveToFront_up.bmp", NULL);
@@ -74,8 +76,10 @@ void Bar::load( void )
 
 	setButtonTooltip(button_layerBackground, "Select Background Layer (1)");
 	setButtonTooltip(button_layerTerrain, "Select Terrain Layer (2)");
-	setButtonTooltip(button_layerTool, "Select Tool Layer (3)");
-	setButtonTooltip(button_layerVisible, "Toggle Layer Visibility");
+	setButtonTooltip(button_layerTool, "Select Tool and Creature Layer (3)");
+	setButtonTooltip(button_layerBackgroundVisible, "Toggle Background Layer Visibility (Ctrl+1)");
+	setButtonTooltip(button_layerTerrainVisible, "Toggle Terrain Layer Visibility (Ctrl+2)");
+	setButtonTooltip(button_layerToolVisible, "Toggle Tool and Creature Layer Visibility (Ctrl+3)");
 	setButtonTooltip(button_save, "Save Level (s)");
 	setButtonTooltip(button_moveToBack, "Move Selected Objects To Back (,)");
 	setButtonTooltip(button_moveToFront, "Move Selected Objects To Front (.)");
@@ -313,9 +317,9 @@ void Bar::draw( int mouseX, int mouseY )
 			else
 				drawButton(button_layerBackground, off, 3, canvas_ptr->height + 3);
 			if (canvas_ptr->layerVisible[PERM])
-				drawButton(button_layerVisible, on, 3, canvas_ptr->height + 39);
+				drawButton(button_layerBackgroundVisible, on, 3, canvas_ptr->height + 39);
 			else
-				drawButton(button_layerVisible, off, 3, canvas_ptr->height + 39);
+				drawButton(button_layerBackgroundVisible, off, 3, canvas_ptr->height + 39);
 			SDL_Rect rect;
 			rect.x = 1;
 			rect.y = canvas_ptr->height + 1;
@@ -330,9 +334,9 @@ void Bar::draw( int mouseX, int mouseY )
 			else
 				drawButton(button_layerTerrain, off, 39, canvas_ptr->height + 3);
 			if (canvas_ptr->layerVisible[TEMP])
-				drawButton(button_layerVisible, on, 39, canvas_ptr->height + 39);
+				drawButton(button_layerTerrainVisible, on, 39, canvas_ptr->height + 39);
 			else
-				drawButton(button_layerVisible, off, 39, canvas_ptr->height + 39);
+				drawButton(button_layerTerrainVisible, off, 39, canvas_ptr->height + 39);
 			SDL_Rect rect;
 			rect.x = 37;
 			rect.y = canvas_ptr->height + 1;
@@ -347,9 +351,9 @@ void Bar::draw( int mouseX, int mouseY )
 			else
 				drawButton(button_layerTool, off, 75, canvas_ptr->height + 3);
 			if (canvas_ptr->layerVisible[TOOL])
-				drawButton(button_layerVisible, on, 75, canvas_ptr->height + 39);
+				drawButton(button_layerToolVisible, on, 75, canvas_ptr->height + 39);
 			else
-				drawButton(button_layerVisible, off, 75, canvas_ptr->height + 39);
+				drawButton(button_layerToolVisible, off, 75, canvas_ptr->height + 39);
 			SDL_Rect rect;
 			rect.x = 73;
 			rect.y = canvas_ptr->height + 1;
@@ -395,15 +399,15 @@ void Bar::draw( int mouseX, int mouseY )
 			{
 				if (mouseX > 3 && mouseX < 35)
 				{
-					drawTooltip(button_layerVisible, mouseX, mouseY);
+					drawTooltip(button_layerBackgroundVisible, mouseX, mouseY);
 				}
 				if (mouseX > 39 && mouseX < 71)
 				{
-					drawTooltip(button_layerVisible, mouseX, mouseY);
+					drawTooltip(button_layerTerrainVisible, mouseX, mouseY);
 				}
 				if (mouseX > 75 && mouseX < 107)
 				{
-					drawTooltip(button_layerVisible, mouseX, mouseY);
+					drawTooltip(button_layerToolVisible, mouseX, mouseY);
 				}
 				/*if (mouseX > 111 && mouseX < 143)
 				{
@@ -487,10 +491,13 @@ void Bar::drawTooltip(const buttonInfo & button, int x, int y)
 
 void Bar::destroy(void)
 {
+	if (buttonTexture != NULL) SDL_DestroyTexture(buttonTexture);
 	if (button_layerBackground.tooltip != NULL)	SDL_DestroyTexture(button_layerBackground.tooltip);
 	if (button_layerTerrain.tooltip != NULL)	SDL_DestroyTexture(button_layerTerrain.tooltip);
 	if (button_layerTool.tooltip != NULL)	SDL_DestroyTexture(button_layerTool.tooltip);
-	if (button_layerVisible.tooltip != NULL)	SDL_DestroyTexture(button_layerVisible.tooltip);
+	if (button_layerBackgroundVisible.tooltip != NULL)	SDL_DestroyTexture(button_layerBackgroundVisible.tooltip);
+	if (button_layerTerrainVisible.tooltip != NULL)	SDL_DestroyTexture(button_layerTerrainVisible.tooltip);
+	if (button_layerToolVisible.tooltip != NULL)	SDL_DestroyTexture(button_layerToolVisible.tooltip);
 	if (button_save.tooltip != NULL)	SDL_DestroyTexture(button_save.tooltip);
 	if (button_moveToBack.tooltip != NULL)	SDL_DestroyTexture(button_moveToBack.tooltip);
 	if (button_moveToFront.tooltip != NULL)	SDL_DestroyTexture(button_moveToFront.tooltip);

@@ -57,7 +57,9 @@ public:
 	buttonInfo button_layerBackground;
 	buttonInfo button_layerTerrain;
 	buttonInfo button_layerTool;
-	buttonInfo button_layerVisible;
+	buttonInfo button_layerBackgroundVisible;
+	buttonInfo button_layerTerrainVisible;
+	buttonInfo button_layerToolVisible;
 	buttonInfo button_save;
 	buttonInfo button_moveToBack;
 	buttonInfo button_moveToFront;
