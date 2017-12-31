@@ -64,6 +64,11 @@ public:
 	buttonInfo button_moveToBack;
 	buttonInfo button_moveToFront;
 	buttonInfo button_camera;
+	buttonInfo button_levelProperties;
+	buttonInfo button_copy;
+	buttonInfo button_paste;
+	buttonInfo button_delete;
+	buttonInfo button_quit;
 
 	TTF_Font * tooltipFont;
 

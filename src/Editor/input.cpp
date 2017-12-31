@@ -292,10 +292,30 @@ void Editor_input::handleEditorEvents(SDL_Event event)
 						{
 							editor_ptr->toggleCameraVisibility();
 						}
-						/*if (mouse_x_window > 111 && mouse_x_window < 143)
+						if (mouse_x_window > 111 && mouse_x_window < 143)
 						{
-						
-						}*/
+							editor_ptr->levelProperties.openDialog();
+						}
+					}
+					if (mouse_y_window > window_ptr->height - BAR_HEIGHT + 111 && mouse_y_window < window_ptr->height - BAR_HEIGHT + 143)
+						//fourth row of buttons
+					{
+						if (mouse_x_window > 3 && mouse_x_window < 35)
+						{
+							editor_ptr->copy_selected();
+						}
+						if (mouse_x_window > 39 && mouse_x_window < 71)
+						{
+							editor_ptr->paste();
+						}
+						if (mouse_x_window > 75 && mouse_x_window < 107)
+						{
+							editor_ptr->delete_selected();
+						}
+						if (mouse_x_window > 111 && mouse_x_window < 143)
+						{
+							die();
+						}
 					}
 				}
 				else if (mouse_y_window < window_ptr->height - 16)

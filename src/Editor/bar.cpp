@@ -71,6 +71,11 @@ void Bar::load( void )
 	loadButtonGraphic(button_moveToBack, "./gfx/moveToBack_up.bmp", NULL);
 	loadButtonGraphic(button_moveToFront, "./gfx/moveToFront_up.bmp", NULL);
 	loadButtonGraphic(button_camera, "./gfx/camera_off.bmp", "./gfx/camera_on.bmp");
+	loadButtonGraphic(button_levelProperties, "./gfx/levelProperties_up.bmp", NULL);
+	loadButtonGraphic(button_copy, "./gfx/copy_up.bmp", NULL);
+	loadButtonGraphic(button_paste, "./gfx/paste_up.bmp", NULL);
+	loadButtonGraphic(button_delete, "./gfx/delete_up.bmp", NULL);
+	loadButtonGraphic(button_quit, "./gfx/quit_up.bmp", NULL);
 
 	tooltipFont = TTF_OpenFont("./gfx/DejaVuSansMono.ttf", 12);
 
@@ -84,6 +89,11 @@ void Bar::load( void )
 	setButtonTooltip(button_moveToBack, "Move Selected Objects To Back (,)");
 	setButtonTooltip(button_moveToFront, "Move Selected Objects To Front (.)");
 	setButtonTooltip(button_camera, "Toggle Start Camera Visibility (space)");
+	setButtonTooltip(button_levelProperties, "Edit Level Properties (p)");
+	setButtonTooltip(button_copy, "Copy Selected Objects (Ctrl+c)");
+	setButtonTooltip(button_paste, "Paste Copied Objects (Ctrl+v)");
+	setButtonTooltip(button_delete, "Delete Selected Objects (delete)");
+	setButtonTooltip(button_quit, "Quit. ALL UNSAVED CHANGES WILL BE LOST! (q)");
 }
 
 bool Bar::loadButtonGraphic(buttonInfo & button, const char * filePathUp, const char * filePathDown)
@@ -361,14 +371,21 @@ void Bar::draw( int mouseX, int mouseY )
 			rect.h = 72;
 			SDL_RenderDrawRect(window_ptr->screen_renderer, &rect);
 		}
-
-		drawButton(button_save, off, 111, canvas_ptr->height + 3);
-		drawButton(button_moveToBack, off, 3, canvas_ptr->height + 75);
-		drawButton(button_moveToFront, off, 39, canvas_ptr->height + 75);
-		if (editor_ptr->startCameraOn)
-			drawButton(button_camera, on, 75, canvas_ptr->height + 75);
-		else
-			drawButton(button_camera, off, 75, canvas_ptr->height + 75);
+		{
+			//draw all the other buttons
+			drawButton(button_save, off, 111, canvas_ptr->height + 3);
+			drawButton(button_moveToBack, off, 3, canvas_ptr->height + 75);
+			drawButton(button_moveToFront, off, 39, canvas_ptr->height + 75);
+			if (editor_ptr->startCameraOn)
+				drawButton(button_camera, on, 75, canvas_ptr->height + 75);
+			else
+				drawButton(button_camera, off, 75, canvas_ptr->height + 75);
+			drawButton(button_levelProperties, off, 111, canvas_ptr->height + 75);
+			drawButton(button_copy, off, 3, canvas_ptr->height + 111);
+			drawButton(button_paste, off, 39, canvas_ptr->height + 111);
+			drawButton(button_delete, off, 75, canvas_ptr->height + 111);
+			drawButton(button_quit, off, 111, canvas_ptr->height + 111);
+		}
 	}
 	{
 		//draw tooltip
@@ -429,10 +446,30 @@ void Bar::draw( int mouseX, int mouseY )
 				{
 					drawTooltip(button_camera, mouseX, mouseY);
 				}
-				/*if (mouseX > 111 && mouseX < 143)
+				if (mouseX > 111 && mouseX < 143)
 				{
-
-				}*/
+					drawTooltip(button_levelProperties, mouseX, mouseY);
+				}
+			}
+			if (mouseY > window_ptr->height - BAR_HEIGHT + 111 && mouseY < window_ptr->height - BAR_HEIGHT + 143)
+				//fourth row of buttons
+			{
+				if (mouseX > 3 && mouseX < 35)
+				{
+					drawTooltip(button_copy, mouseX, mouseY);
+				}
+				if (mouseX > 39 && mouseX < 71)
+				{
+					drawTooltip(button_paste, mouseX, mouseY);
+				}
+				if (mouseX > 75 && mouseX < 107)
+				{
+					drawTooltip(button_delete, mouseX, mouseY);
+				}
+				if (mouseX > 111 && mouseX < 143)
+				{
+					drawTooltip(button_quit, mouseX, mouseY);
+				}
 			}
 		}
 	}
@@ -502,5 +539,10 @@ void Bar::destroy(void)
 	if (button_moveToBack.tooltip != NULL)	SDL_DestroyTexture(button_moveToBack.tooltip);
 	if (button_moveToFront.tooltip != NULL)	SDL_DestroyTexture(button_moveToFront.tooltip);
 	if (button_camera.tooltip != NULL)	SDL_DestroyTexture(button_camera.tooltip);
+	if (button_levelProperties.tooltip != NULL)	SDL_DestroyTexture(button_levelProperties.tooltip);
+	if (button_copy.tooltip != NULL)	SDL_DestroyTexture(button_copy.tooltip);
+	if (button_paste.tooltip != NULL)	SDL_DestroyTexture(button_paste.tooltip);
+	if (button_delete.tooltip != NULL)	SDL_DestroyTexture(button_delete.tooltip);
+	if (button_quit.tooltip != NULL)	SDL_DestroyTexture(button_quit.tooltip);
 	TTF_CloseFont(tooltipFont);
 }
