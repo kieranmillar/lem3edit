@@ -439,18 +439,21 @@ void Editor_input::handleEditorEvents(SDL_Event event)
 			switch (e.keysym.sym)
 			{
 			case SDLK_1:
+			case SDLK_KP_1:
 				if (ctrl_down)
 					canvas_ptr->toggleLayerVisibility(PERM);
 				else
 					bar_ptr->changeType(PERM);
 				break;
 			case SDLK_2:
+			case SDLK_KP_2:
 				if (ctrl_down)
 					canvas_ptr->toggleLayerVisibility(TEMP);
 				else
 					bar_ptr->changeType(TEMP);
 				break;
 			case SDLK_3:
+			case SDLK_KP_3:
 				if (ctrl_down)
 					canvas_ptr->toggleLayerVisibility(TOOL);
 				else

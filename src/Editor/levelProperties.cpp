@@ -265,33 +265,43 @@ void LevelProperties::handleLevelPropertiesEvents(SDL_Event event)
 			switch (e.keysym.sym)
 			{
 			case SDLK_0:
+			case SDLK_KP_0:
 				typedNumber(highlighting, 0);
 				break;
 			case SDLK_1:
+			case SDLK_KP_1:
 				typedNumber(highlighting, 1);
 				break;
 			case SDLK_2:
+			case SDLK_KP_2:
 				typedNumber(highlighting, 2);
 				break;
 			case SDLK_3:
+			case SDLK_KP_3:
 				typedNumber(highlighting, 3);
 				break;
 			case SDLK_4:
+			case SDLK_KP_4:
 				typedNumber(highlighting, 4);
 				break;
 			case SDLK_5:
+			case SDLK_KP_5:
 				typedNumber(highlighting, 5);
 				break;
 			case SDLK_6:
+			case SDLK_KP_6:
 				typedNumber(highlighting, 6);
 				break;
 			case SDLK_7:
+			case SDLK_KP_7:
 				typedNumber(highlighting, 7);
 				break;
 			case SDLK_8:
+			case SDLK_KP_8:
 				typedNumber(highlighting, 8);
 				break;
 			case SDLK_9:
+			case SDLK_KP_9:
 				typedNumber(highlighting, 9);
 				break;
 			case SDLK_BACKSPACE:
