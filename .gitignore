@@ -1,0 +1,21 @@
+# The most popular name for a cmake build directory
+build/
+
+# Typical layout of Visual Studio build directories
+bin/
+Debug/
+Release/
+
+# Files by Lemmings 3 that we instruct the user to add to our project's root
+AUDIO/
+FRONT/
+GRAPHICS/
+LEVELS/
+MOVIE/
+STYLES/
+INSTALL.EXE
+L3.BAT
+L3CD.EXE
+L3CDGUS.EXE
+L3GUS.BAT
+USER.DAT
