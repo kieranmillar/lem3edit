@@ -61,7 +61,7 @@ void Level::draw_objects(signed int x, signed int xOffset, signed int y, signed 
 		int onScreenY = (o.y - y)*zoom - yOffset;
 		if (onScreenY < window_ptr->height - BAR_HEIGHT)
 		{
-			style_ptr->draw_object_texture(window_ptr, onScreenX, onScreenY, type, so, zoom, NULL);
+			style_ptr->draw_object_texture(window_ptr, onScreenX, onScreenY, type, so, zoom, 0);
 		}
 	}
 }

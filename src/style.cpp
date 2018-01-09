@@ -392,8 +392,9 @@ bool Style::load_objects( int type, const string &obj_filename, const string &fr
 			o.frame.push_back(frame);
 		}
 
-		o.texX = NULL;
-		o.texY = NULL;
+		assert(0 == NULL /* Fix warning: Do not assign NULL to Uint16 */ );
+		o.texX = 0;
+		o.texY = 0;
 
 		if (o.id < 5000)
 		{
