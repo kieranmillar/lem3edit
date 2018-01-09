@@ -61,9 +61,9 @@ void LevelProperties::setup(void)
 	cancelButtonText = Font::createTextureFromString(window_ptr, smallFont, "Cancel");
 	for (int i = 0; i < 10; i++)
 	{
-		char c[2];
-		sprintf_s(c, "%d", i);
-		numbers[i] = Font::createTextureFromString(window_ptr, smallFont, c);
+		char digit[2] = "0";
+		digit[0] += i;
+		numbers[i] = Font::createTextureFromString(window_ptr, smallFont, digit);
 	}
 }
 
