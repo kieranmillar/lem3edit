@@ -314,7 +314,7 @@ void Canvas::drawHeldObject(int holdingType, int holdingID, int x, int y)
 		drawY = y;
 	}
 	int drawID = style_ptr->object_by_id(holdingType, holdingID);
-	style_ptr->draw_object_texture(window_ptr, drawX, drawY, holdingType, drawID, zoom, NULL);
+	style_ptr->draw_object_texture(window_ptr, drawX, drawY, holdingType, drawID, zoom, 0);
 }
 
 void Canvas::draw_dashed_level_border(borderType type, int pos, int offset, bool highlight)
