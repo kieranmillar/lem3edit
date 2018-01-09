@@ -2,17 +2,17 @@
  * lem3edit
  * Copyright (C) 2008-2009 Carl Reinke
  * Copyright (C) 2017 Kieran Millar
- * 
+ *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
  * as published by the Free Software Foundation; either version 2
  * of the License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
@@ -32,13 +32,13 @@ Editor::Editor(void)
 {
 }
 
-void Editor::resize( int w, int h)
+void Editor::resize(int w, int h)
 {
 	canvas.resize(h);
 	bar.resizeBarScrollRect(w, h);
 }
 
-bool Editor::load( int n, Window * w )
+bool Editor::load(int n, Window * w)
 {
 	window_ptr = w;
 	bar.setReferences(window_ptr, this, &canvas, &style);
@@ -59,7 +59,7 @@ bool Editor::load( int n, Window * w )
 	gameFrameCount = 0;
 	gameFrameTick = SDL_GetTicks();
 	startCameraOn = false;
-	
+
 	return canvas.redraw = true;
 }
 
@@ -70,10 +70,10 @@ bool Editor::save(int n)
 	return canvas.redraw = true;
 }
 
-bool Editor::select( signed int x, signed int y, bool modify_selection )
+bool Editor::select(signed int x, signed int y, bool modify_selection)
 {
 	Level::Object::Index temp = level.get_object_by_position(x, y);
-	
+
 	if (temp.i == -1)  // selected nothing
 	{
 		selection.clear();
@@ -109,17 +109,17 @@ bool Editor::select( signed int x, signed int y, bool modify_selection )
 	}
 }
 
-bool Editor::select_none( void )
+bool Editor::select_none(void)
 {
 	if (selection.empty())
 		return false;
-	
+
 	selection.clear();
-	
+
 	return canvas.redraw = true;
 }
 
-bool Editor::select_all( void )
+bool Editor::select_all(void)
 {
 	for (unsigned int type = 0; type < COUNTOF(level.object); ++type)
 	{
@@ -131,35 +131,35 @@ bool Editor::select_all( void )
 			}
 		}
 	}
-	
+
 	return canvas.redraw = !selection.empty();
 }
 
-bool Editor::copy_selected( void )
+bool Editor::copy_selected(void)
 {
 	clipboard.clear();
-	
+
 	for (Selection::const_iterator i = selection.begin(); i != selection.end(); ++i)
 	{
 		clipboard.push_back(pair<Level::Object::Index, Level::Object>(*i, level.object[i->type][i->i]));
 	}
-	
+
 	return !clipboard.empty();
 }
 
-bool Editor::paste( void )
+bool Editor::paste(void)
 {
 	selection.clear(); // maybe delete selection instead?
-	
+
 	for (Clipboard::const_iterator i = clipboard.begin(); i != clipboard.end(); ++i)
-	{		
+	{
 		const Level::Object::Index &index = i->first;
-		
+
 		level.object[index.type].push_back(i->second);
-		
+
 		selection.insert(Level::Object::Index(index.type, level.object[index.type].size() - 1));
 	}
-	
+
 	return canvas.redraw = !clipboard.empty();
 }
 
@@ -184,7 +184,7 @@ bool Editor::moveToFront(void)
 		indexes[i->type].push_back(i->i);
 	}
 	selection.clear();
-	
+
 	for (unsigned int type = 0; type < COUNTOF(level.object); ++type)
 	{
 		std::sort(indexes[type].begin(), indexes[type].end());
@@ -230,7 +230,7 @@ bool Editor::moveToBack(void)
 	return canvas.redraw = true;
 }
 
-bool Editor::decrease_obj_id( void )
+bool Editor::decrease_obj_id(void)
 {
 	for (Selection::const_iterator i = selection.begin(); i != selection.end(); ++i)
 	{
@@ -241,7 +241,7 @@ bool Editor::decrease_obj_id( void )
 	return canvas.redraw = true;
 }
 
-bool Editor::increase_obj_id( void )
+bool Editor::increase_obj_id(void)
 {
 	for (Selection::const_iterator i = selection.begin(); i != selection.end(); ++i)
 	{
@@ -252,16 +252,16 @@ bool Editor::increase_obj_id( void )
 	return canvas.redraw = true;
 }
 
-bool Editor::delete_selected( void )
+bool Editor::delete_selected(void)
 {
 	if (selection.empty())
 		return false;
-	
+
 	for (Selection::const_reverse_iterator i = selection.rbegin(); i != selection.rend(); ++i)
 		level.object[i->type].erase(level.object[i->type].begin() + i->i);
-	
+
 	selection.clear();
-	
+
 	return canvas.redraw = true;
 }
 
@@ -269,7 +269,7 @@ bool Editor::delete_selected( void )
 //Input is dependent of zoom, so provide screen pixel values
 //So to ensure smooth scrolling, it maintains a remainder after relocating the moved objects
 //and snapping them to the grid
-bool Editor::move_selected( signed int delta_x, signed int delta_y )
+bool Editor::move_selected(signed int delta_x, signed int delta_y)
 {
 	delta_x += canvas.mouse_remainder_x;
 	delta_y += canvas.mouse_remainder_y;
@@ -278,17 +278,17 @@ bool Editor::move_selected( signed int delta_x, signed int delta_y )
 
 	delta_x /= (8 * canvas.zoom);
 	delta_y /= (2 * canvas.zoom);
-	
+
 	if (selection.empty() || (delta_x == 0 && delta_y == 0))
 		return false;
-	
+
 	for (Selection::const_iterator i = selection.begin(); i != selection.end(); ++i)
 	{
 		Level::Object &o = level.object[i->type][i->i];
-		o.x += delta_x*8;
-		o.y += delta_y*2;
+		o.x += delta_x * 8;
+		o.y += delta_y * 2;
 	}
-	
+
 	return canvas.redraw = true;
 }
 
@@ -317,7 +317,7 @@ bool Editor::move_camera(signed int delta_x, signed int delta_y)
 
 	level.cameraX += delta_x * 8;
 	level.cameraY += delta_y * 2;
-	
+
 	if (level.cameraX < 0)
 		level.cameraX = 0;
 	if (level.cameraY < 0)

@@ -30,7 +30,7 @@ This file handles the initialisation of the program, so setting up the window an
 #include <string>
 using namespace std;
 
-bool Window::initialise( int w, int h )
+bool Window::initialise(int w, int h)
 {
 	width = w;
 	height = h;
@@ -43,7 +43,7 @@ bool Window::initialise( int w, int h )
 	//int already_init = screen != NULL || screen_renderer != NULL;
 	//preserve palette if display is being reinitialized
 	//if (already_init)
-		//memcpy(palette_buffer, main_surface->format->palette->colors, sizeof(palette_buffer));
+	//memcpy(palette_buffer, main_surface->format->palette->colors, sizeof(palette_buffer));
 
 	screen = SDL_CreateWindow("Lem3Edit", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, width, height, SDL_WINDOW_RESIZABLE);
 	if (screen == NULL)
@@ -73,16 +73,14 @@ bool Window::initialise( int w, int h )
 	SDL_RenderSetViewport(screen_renderer, NULL);
 
 	//if (already_init)
-		//SDL_SetSurfacePalette(main_surface, palette_buffer);
+	//SDL_SetSurfacePalette(main_surface, palette_buffer);
 
 	return true;
 }
 
 void Window::destroy(void)
 {
-
 	SDL_RemoveTimer(loop_timer_id);
-
 
 	if (screen_texture != NULL) SDL_DestroyTexture(screen_texture);
 	if (screen_renderer != NULL) SDL_DestroyRenderer(screen_renderer);

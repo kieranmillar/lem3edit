@@ -26,7 +26,7 @@
 class Window
 {
 public:
-	
+
 	Uint16 width;
 	Uint16 height;
 
@@ -41,7 +41,6 @@ public:
 	bool initialise(int w, int h);
 	void destroy(void);
 	bool resize(void);
-
 };
 
 Uint32 loop_timer(Uint32 interval, void *param);

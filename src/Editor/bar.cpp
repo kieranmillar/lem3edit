@@ -42,7 +42,7 @@ void Bar::setReferences(Window * w, Editor * e, Canvas * c, Style * s)
 	style_ptr = s;
 }
 
-void Bar::load( void )
+void Bar::load(void)
 {
 	for (int i = 0; i < 3; i++)
 	{
@@ -98,13 +98,12 @@ void Bar::load( void )
 
 bool Bar::loadButtonGraphic(buttonInfo & button, const char * filePathUp, const char * filePathDown)
 {
-
 	SDL_SetRenderDrawColor(window_ptr->screen_renderer, 255, 255, 255, 255);
 	SDL_Surface* graphic = NULL;
 	//first load the botton's up graphic
 	graphic = SDL_LoadBMP(filePathUp);
 	if (graphic == NULL)
-	{ 
+	{
 		SDL_Log("Unable to load image '%s'! SDL Error: %s\n", filePathUp, SDL_GetError());
 		return false;
 	}
@@ -230,7 +229,7 @@ int Bar::getPieceIDByScreenPos(int mousePos)
 	return id;
 }
 
-void Bar::draw( int mouseX, int mouseY )
+void Bar::draw(int mouseX, int mouseY)
 {
 	{ // bar background in the absense of a proper graphic
 		SDL_SetRenderDrawBlendMode(window_ptr->screen_renderer, SDL_BLENDMODE_BLEND);
@@ -243,7 +242,6 @@ void Bar::draw( int mouseX, int mouseY )
 		rPieceSelector.w = window_ptr->width - PANEL_WIDTH;
 		rPieceSelector.h = window_ptr->height;
 		SDL_RenderFillRect(window_ptr->screen_renderer, &rPieceSelector);
-
 	}
 
 	{ // draw the pieces
@@ -285,7 +283,6 @@ void Bar::draw( int mouseX, int mouseY )
 			if (x > window_ptr->width)
 				break;
 		}
-
 	}
 
 	{ // draw the scroll bar area
@@ -391,7 +388,7 @@ void Bar::draw( int mouseX, int mouseY )
 		//draw tooltip
 		if (mouseY > canvas_ptr->height)
 		{
-			if (mouseY > canvas_ptr->height + 3 && mouseY <canvas_ptr->height + 35)
+			if (mouseY > canvas_ptr->height + 3 && mouseY < canvas_ptr->height + 35)
 				//first row of buttons
 			{
 				if (mouseX > 3 && mouseX < 35)
@@ -428,7 +425,6 @@ void Bar::draw( int mouseX, int mouseY )
 				}
 				/*if (mouseX > 111 && mouseX < 143)
 				{
-
 				}*/
 			}
 			if (mouseY > window_ptr->height - BAR_HEIGHT + 75 && mouseY < window_ptr->height - BAR_HEIGHT + 107)
@@ -518,8 +514,8 @@ void Bar::drawTooltip(const buttonInfo & button, int x, int y)
 	SDL_SetRenderDrawColor(window_ptr->screen_renderer, 0, 0, 0, 255);
 	SDL_RenderDrawRect(window_ptr->screen_renderer, &tooltipRect);
 
-	tooltipRect.x ++;
-	tooltipRect.y ++;
+	tooltipRect.x++;
+	tooltipRect.y++;
 	tooltipRect.w -= 2;
 	tooltipRect.h -= 2;
 

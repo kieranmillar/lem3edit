@@ -58,7 +58,7 @@ public:
 
 	bool movingView;
 
-	enum whichBorder {none, top, bottom, left, right};
+	enum whichBorder { none, top, bottom, left, right };
 	bool resizingLevel;
 	int resizingNewPos;
 	whichBorder resizingWhich;
@@ -71,7 +71,6 @@ public:
 	void handleEditorEvents(SDL_Event event);
 
 	Editor_input(void) { /* nothing to do */ }
-
 };
 
 #endif // EDITORINPUT_HPP

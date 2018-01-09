@@ -2,17 +2,17 @@
  * lem3edit
  * Copyright (C) 2008-2009 Carl Reinke
  * Copyright (C) 2017 Kieran Millar
- * 
+ *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
  * as published by the Free Software Foundation; either version 2
  * of the License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
@@ -50,9 +50,8 @@ void Level::draw_objects(signed int x, signed int xOffset, signed int y, signed 
 
 	for (vector<Object>::const_iterator i = object[type].begin(); i != object[type].end(); ++i)
 	{
-
 		const Object &o = *i;
-			
+
 		unsigned int so = style_ptr->object_by_id(type, o.id);
 		if (so == -1)
 			continue;
@@ -79,53 +78,53 @@ Level::Object::Index Level::get_object_by_position(signed int x, signed int y) c
 				return Object::Index(j, i);
 		}
 	}
-	
+
 	return Object::Index(0, -1);
 }
 
 signed int Level::get_object_by_position(signed int x, signed int y, int type) const
 {
 	assert((unsigned)type < COUNTOF(this->object));
-	
+
 	for (vector<Object>::const_reverse_iterator i = object[type].rbegin(); i != object[type].rend(); ++i)
 	{
 		const Object &o = *i;
-		
+
 		if (x < o.x || y < o.y)
 			continue;
-		
+
 		int so = style_ptr->object_by_id(type, o.id);
 		if (so == -1)
 			continue;
-		
+
 		if (x < o.x + style_ptr->object[type][so].width * 8 && y < o.y + style_ptr->object[type][so].height * 2)
 			return object[type].rend() - i - 1; // index
 	}
-	
+
 	return -1;
 }
 
-bool Level::load( unsigned int n )
+bool Level::load(unsigned int n)
 {
 	const string path = "LEVELS/";
 	const string level = "LEVEL";
 	const string perm = "PERM", temp = "TEMP";
 
 	level_id = n;
-	
+
 	return load_level(path, level, n) &&
-	       load_objects(PERM, path, perm, n) &&
-	       load_objects(TEMP, path, temp, n);
+		load_objects(PERM, path, perm, n) &&
+		load_objects(TEMP, path, temp, n);
 }
 
-bool Level::load_level( const std::string &path, const std::string &name, unsigned int n )
+bool Level::load_level(const std::string &path, const std::string &name, unsigned int n)
 {
 	const string dat = ".DAT";
-	
+
 	return load_level(l3_filename(path, name, n, dat));
 }
 
-bool Level::load_level( const string &filename )
+bool Level::load_level(const string &filename)
 {
 	ifstream f(filename.c_str(), ios::binary);
 	if (!f)
@@ -133,62 +132,62 @@ bool Level::load_level( const string &filename )
 		SDL_Log("Failed to open '%s'\n", filename.c_str());
 		return false;
 	}
-	
-	f.read((char *)&tribe,          sizeof(tribe));
-	f.read((char *)&cave_map,       sizeof(cave_map));
-	f.read((char *)&cave_raw,       sizeof(cave_raw));
-	f.read((char *)&temp,           sizeof(temp));
-	f.read((char *)&perm,           sizeof(perm));
-	f.read((char *)&style,          sizeof(style));
-	f.read((char *)&width,          sizeof(width));
-	f.read((char *)&height,         sizeof(height));
-	f.read((char *)&cameraX,		sizeof(cameraX));
-	f.read((char *)&cameraY,		sizeof(cameraY));
-	f.read((char *)&time,           sizeof(time));
+
+	f.read((char *)&tribe, sizeof(tribe));
+	f.read((char *)&cave_map, sizeof(cave_map));
+	f.read((char *)&cave_raw, sizeof(cave_raw));
+	f.read((char *)&temp, sizeof(temp));
+	f.read((char *)&perm, sizeof(perm));
+	f.read((char *)&style, sizeof(style));
+	f.read((char *)&width, sizeof(width));
+	f.read((char *)&height, sizeof(height));
+	f.read((char *)&cameraX, sizeof(cameraX));
+	f.read((char *)&cameraY, sizeof(cameraY));
+	f.read((char *)&time, sizeof(time));
 	f.read((char *)&extra_lemmings, sizeof(extra_lemmings));
-	f.read((char *)&unknown,        sizeof(unknown));
-	f.read((char *)&release_rate,   sizeof(release_rate));
-	f.read((char *)&release_delay,  sizeof(release_delay));
-	f.read((char *)&enemies,        sizeof(enemies));
-	
+	f.read((char *)&unknown, sizeof(unknown));
+	f.read((char *)&release_rate, sizeof(release_rate));
+	f.read((char *)&release_delay, sizeof(release_delay));
+	f.read((char *)&enemies, sizeof(enemies));
+
 	SDL_Log("Loaded level from  '%s'\n", filename.c_str());
 
 	f.close();
 	return true;
 }
 
-bool Level::load_objects( int type, const string &path, const string &name, unsigned int n )
+bool Level::load_objects(int type, const string &path, const string &name, unsigned int n)
 {
 	assert((unsigned)type < COUNTOF(this->object));
-	
+
 	const string obs = ".OBS";
-	
+
 	return load_objects(type, l3_filename(path, name, n, obs));
 }
 
-bool Level::load_objects( int type, const string &filename )
+bool Level::load_objects(int type, const string &filename)
 {
 	assert((unsigned)type < COUNTOF(this->object));
-	
+
 	object[type].clear();
 	if (type == PERM)
 		object[TOOL].clear();
-	
+
 	ifstream f(filename.c_str(), ios::binary);
 	if (!f)
 	{
 		SDL_Log("Failed to open '%s'\n", filename.c_str());
 		return false;
 	}
-	
+
 	while (true)
 	{
 		Object o;
-		
+
 		f.read((char *)&o.id, sizeof(o.id));
-		f.read((char *)&o.x,  sizeof(o.x));
-		f.read((char *)&o.y,  sizeof(o.y));
-		
+		f.read((char *)&o.x, sizeof(o.x));
+		f.read((char *)&o.y, sizeof(o.y));
+
 		if (!f)
 			break;
 
@@ -201,7 +200,7 @@ bool Level::load_objects( int type, const string &filename )
 			object[TOOL].push_back(o);
 		}
 	}
-	
+
 	if (type == PERM)
 		SDL_Log("Loaded %d + %d objects from '%s'\n", object[type].size(), object[TOOL].size(), filename.c_str());
 	if (type == TEMP)
@@ -223,7 +222,7 @@ bool Level::validate(const Object * o, const int type)
 	int w = style_ptr->object[type][so].width * 8;
 	int h = style_ptr->object[type][so].height * 2;
 	bool outsideBorder = false;
-	
+
 	if (o->x + w <= 0)
 		outsideBorder = true;
 	if (o->y + h <= 0)
@@ -347,7 +346,7 @@ bool Level::save_objects(int type, const string &filename)
 		}
 		savingType = TOOL;
 	}
-	
+
 	SDL_Log("Wrote %d objects to '%s'\n", count, filename.c_str());
 
 	f.close();

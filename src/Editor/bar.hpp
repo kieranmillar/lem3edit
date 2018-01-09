@@ -82,19 +82,18 @@ public:
 	void updateBarScrollPos(int xPos);
 	void moveScrollBar(int moveLocationInWindow);
 
-	void changeType( int t);
+	void changeType(int t);
 
-	int getPieceIDByScreenPos ( int mousePos );
+	int getPieceIDByScreenPos(int mousePos);
 
-	void draw( int mouseX, int mouseY );
+	void draw(int mouseX, int mouseY);
 
-	void drawButton( const buttonInfo & button, buttonState state, int x, int y);
+	void drawButton(const buttonInfo & button, buttonState state, int x, int y);
 	void drawTooltip(const buttonInfo & button, int x, int y);
 
 	Bar(void) { /* nothing to do */ };
 
 	void destroy(void);
-
 };
 
 #endif // EDITOR_HPP

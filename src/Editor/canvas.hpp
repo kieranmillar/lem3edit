@@ -72,7 +72,6 @@ public:
 	bool toggleLayerVisibility(int type);
 
 	Canvas(void) { /* nothing to do */ }
-
 };
 
 #endif // CANVAS_HPP

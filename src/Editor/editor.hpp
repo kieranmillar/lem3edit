@@ -46,14 +46,14 @@ public:
 	LevelProperties levelProperties;
 
 	Del font;
-	
+
 	Level level;
 	Tribe tribe;
 	Style style;
-	
+
 	typedef std::set<Level::Object::Index> Selection;
 	Selection selection;
-	
+
 	typedef std::vector< std::pair<Level::Object::Index, Level::Object> > Clipboard;
 	Clipboard clipboard;
 
@@ -61,16 +61,16 @@ public:
 	Uint32 gameFrameTick;
 
 	bool startCameraOn;
-	
+
 	void resize(int w, int h);
 
-	bool select( signed int x, signed int y, bool modify );
-	bool select_none( void );
-	bool select_all( void );
+	bool select(signed int x, signed int y, bool modify);
+	bool select_none(void);
+	bool select_all(void);
 
 	bool copy_selected(void);
 	bool paste(void);
-	
+
 	bool addObject(int idToAdd, int typeToAdd, int xToAdd, int yToAdd);
 
 	bool moveToFront(void);
@@ -78,21 +78,21 @@ public:
 
 	bool decrease_obj_id(void);
 	bool increase_obj_id(void);
-	bool delete_selected( void );
-	bool move_selected( signed int delta_x, signed int delta_y );
-	
+	bool delete_selected(void);
+	bool move_selected(signed int delta_x, signed int delta_y);
+
 	bool load(int n, Window * w);
 	bool save(int n);
 
 	bool toggleCameraVisibility(void);
 	bool move_camera(signed int delta_x, signed int delta_y);
-	
-	Editor( void );
-	~Editor( void ) { /* nothing to do */ }
-	
+
+	Editor(void);
+	~Editor(void) { /* nothing to do */ }
+
 private:
-	Editor( const Editor & );
-	Editor & operator=( const Editor & );
+	Editor(const Editor &);
+	Editor & operator=(const Editor &);
 };
 
 #endif // EDITOR_HPP

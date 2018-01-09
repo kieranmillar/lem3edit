@@ -78,7 +78,6 @@ public:
 	void renderNumbers(int num, const int rightX, const int y);
 
 	LevelProperties(void) { /* nothing to do */ }
-
 };
 
 #endif // LEVELPROPERTIES_HPP

@@ -116,242 +116,241 @@ void LevelProperties::handleLevelPropertiesEvents(SDL_Event event)
 
 	switch (event.type)
 	{
-		case SDL_WINDOWEVENT:
-		{
-			SDL_WindowEvent &e = event.window;
+	case SDL_WINDOWEVENT:
+	{
+		SDL_WindowEvent &e = event.window;
 
-			if (e.event == SDL_WINDOWEVENT_RESIZED)
-			{
-				window_ptr->width = e.data1;
-				window_ptr->height = e.data2;
-				window_ptr->resize();
-				editor_ptr->resize(e.data1, e.data2);
-				canvas_ptr->redraw = true;
-				canvas_ptr->draw();
-				bar_ptr->draw(mouse_x_window, mouse_y_window);
-				resize();
-			}
-			break;
+		if (e.event == SDL_WINDOWEVENT_RESIZED)
+		{
+			window_ptr->width = e.data1;
+			window_ptr->height = e.data2;
+			window_ptr->resize();
+			editor_ptr->resize(e.data1, e.data2);
+			canvas_ptr->redraw = true;
+			canvas_ptr->draw();
+			bar_ptr->draw(mouse_x_window, mouse_y_window);
+			resize();
 		}
-		case SDL_MOUSEBUTTONDOWN://when pressed
+		break;
+	}
+	case SDL_MOUSEBUTTONDOWN://when pressed
+	{
+		SDL_MouseButtonEvent &e = event.button;
+
+		if (e.button == SDL_BUTTON_LEFT)
 		{
-			SDL_MouseButtonEvent &e = event.button;
+			redraw = true;
+			highlighting = NONE;
 
-			if (e.button == SDL_BUTTON_LEFT)
+			if (mouse_x_window > dialogX + 158
+				&& mouse_x_window < dialogX + 198
+				&& mouse_y_window > dialogY + 38
+				&& mouse_y_window < dialogY + 62)
 			{
-				redraw = true;
-				highlighting = NONE;
-
-				if (mouse_x_window > dialogX + 158
-					&& mouse_x_window < dialogX + 198
-					&& mouse_y_window > dialogY + 38
-					&& mouse_y_window < dialogY + 62)
-				{
-					//release rate text field
-					highlighting = RELEASERATE;
-				}
-				if (mouse_x_window > dialogX + 148
-					&& mouse_x_window < dialogX + 188
-					&& mouse_y_window > dialogY + 68
-					&& mouse_y_window < dialogY + 92)
-				{
-					//spawn delay text field
-					highlighting = SPAWNDELAY;
-				}
-				if (mouse_x_window > dialogX + 138
-					&& mouse_x_window < dialogX + 154
-					&& mouse_y_window > dialogY + 98
-					&& mouse_y_window < dialogY + 122)
-				{
-					//time limit mins text field
-					highlighting = TIMELIMITMINS;
-				}
-				if (mouse_x_window > dialogX + 188
-					&& mouse_x_window < dialogX + 216
-					&& mouse_y_window > dialogY + 98
-					&& mouse_y_window < dialogY + 122)
-				{
-					//time limit secs text field
-					highlighting = TIMELIMITSECS;
-				}
-				if (mouse_x_window > dialogX + 33
-					&& mouse_x_window < dialogX + 133
-					&& mouse_y_window > dialogY + 128
-					&& mouse_y_window < dialogY + 158)
-				{
-					//ok button
-					closeDialog(true);
-				}
-				if (mouse_x_window > dialogX + 166
-					&& mouse_x_window < dialogX + 266
-					&& mouse_y_window > dialogY + 128
-					&& mouse_y_window < dialogY + 158)
-				{
-					//cancel button
-					closeDialog(false);
-				}
-
+				//release rate text field
+				highlighting = RELEASERATE;
 			}
-			break;
-		}
-		case SDL_MOUSEWHEEL:
-		{
-			SDL_MouseWheelEvent &e = event.wheel;
-			if (e.y == 1) // wheel up
+			if (mouse_x_window > dialogX + 148
+				&& mouse_x_window < dialogX + 188
+				&& mouse_y_window > dialogY + 68
+				&& mouse_y_window < dialogY + 92)
 			{
-				switch (highlighting)
-				{
-					case RELEASERATE:
-						releaseRate++;
-						if (releaseRate > 999) releaseRate = 999;
-						redraw = true;
-						break;
-					case SPAWNDELAY:
-						spawnDelay++;
-						if (spawnDelay > 999) spawnDelay = 999;
-						redraw = true;
-						break;
-					case TIMELIMITMINS:
-						timeLimitMins++;
-						if (timeLimitMins > 7) timeLimitMins = 7;
-						redraw = true;
-						break;
-					case TIMELIMITSECS:
-						timeLimitSecs++;
-						if (timeLimitSecs > 59) timeLimitSecs = 59;
-						redraw = true;
-						break;
-					default:
-						break;
-				}
+				//spawn delay text field
+				highlighting = SPAWNDELAY;
 			}
-			if (e.y == -1) // wheel down
+			if (mouse_x_window > dialogX + 138
+				&& mouse_x_window < dialogX + 154
+				&& mouse_y_window > dialogY + 98
+				&& mouse_y_window < dialogY + 122)
 			{
-				switch (highlighting)
-				{
-					case RELEASERATE:
-						releaseRate--;
-						if (releaseRate < 0) releaseRate = 0;
-						redraw = true;
-						break;
-					case SPAWNDELAY:
-						spawnDelay--;
-						if (spawnDelay < 0) spawnDelay = 0;
-						redraw = true;
-						break;
-					case TIMELIMITMINS:
-						timeLimitMins--;
-						if (timeLimitMins < 0) timeLimitMins = 0;
-						redraw = true;
-						break;
-					case TIMELIMITSECS:
-						timeLimitSecs--;
-						if (timeLimitSecs < 0) timeLimitSecs = 0;
-						redraw = true;
-						break;
-					default:
-						break;
-				}
+				//time limit mins text field
+				highlighting = TIMELIMITMINS;
 			}
-			break;
-		}
-		case SDL_KEYDOWN:
-		{
-			SDL_KeyboardEvent &e = event.key;
-
-			switch (e.keysym.sym)
+			if (mouse_x_window > dialogX + 188
+				&& mouse_x_window < dialogX + 216
+				&& mouse_y_window > dialogY + 98
+				&& mouse_y_window < dialogY + 122)
 			{
-			case SDLK_0:
-			case SDLK_KP_0:
-				typedNumber(highlighting, 0);
-				break;
-			case SDLK_1:
-			case SDLK_KP_1:
-				typedNumber(highlighting, 1);
-				break;
-			case SDLK_2:
-			case SDLK_KP_2:
-				typedNumber(highlighting, 2);
-				break;
-			case SDLK_3:
-			case SDLK_KP_3:
-				typedNumber(highlighting, 3);
-				break;
-			case SDLK_4:
-			case SDLK_KP_4:
-				typedNumber(highlighting, 4);
-				break;
-			case SDLK_5:
-			case SDLK_KP_5:
-				typedNumber(highlighting, 5);
-				break;
-			case SDLK_6:
-			case SDLK_KP_6:
-				typedNumber(highlighting, 6);
-				break;
-			case SDLK_7:
-			case SDLK_KP_7:
-				typedNumber(highlighting, 7);
-				break;
-			case SDLK_8:
-			case SDLK_KP_8:
-				typedNumber(highlighting, 8);
-				break;
-			case SDLK_9:
-			case SDLK_KP_9:
-				typedNumber(highlighting, 9);
-				break;
-			case SDLK_BACKSPACE:
-				switch (highlighting)
-				{
-					case RELEASERATE:
-						releaseRate /= 10;
-						if (releaseRate < 0) releaseRate = 0;
-						redraw = true;
-						break;
-					case SPAWNDELAY:
-						spawnDelay /= 10;
-						if (spawnDelay < 0) spawnDelay = 0;
-						redraw = true;
-						break;
-					case TIMELIMITMINS:
-						timeLimitMins /= 10;
-						if (timeLimitMins < 0) timeLimitMins = 0;
-						redraw = true;
-						break;
-					case TIMELIMITSECS:
-						timeLimitSecs /= 10;
-						if (timeLimitSecs < 0) timeLimitSecs = 0;
-						redraw = true;
-						break;
-					default:
-						break;
-				}
-				break;
-			case SDLK_ESCAPE:
-				closeDialog(false);
-				break;
-			case SDLK_RETURN:
-			case SDLK_p:
+				//time limit secs text field
+				highlighting = TIMELIMITSECS;
+			}
+			if (mouse_x_window > dialogX + 33
+				&& mouse_x_window < dialogX + 133
+				&& mouse_y_window > dialogY + 128
+				&& mouse_y_window < dialogY + 158)
+			{
+				//ok button
 				closeDialog(true);
+			}
+			if (mouse_x_window > dialogX + 166
+				&& mouse_x_window < dialogX + 266
+				&& mouse_y_window > dialogY + 128
+				&& mouse_y_window < dialogY + 158)
+			{
+				//cancel button
+				closeDialog(false);
+			}
+		}
+		break;
+	}
+	case SDL_MOUSEWHEEL:
+	{
+		SDL_MouseWheelEvent &e = event.wheel;
+		if (e.y == 1) // wheel up
+		{
+			switch (highlighting)
+			{
+			case RELEASERATE:
+				releaseRate++;
+				if (releaseRate > 999) releaseRate = 999;
+				redraw = true;
 				break;
-			case SDLK_q:
-				die();
+			case SPAWNDELAY:
+				spawnDelay++;
+				if (spawnDelay > 999) spawnDelay = 999;
+				redraw = true;
+				break;
+			case TIMELIMITMINS:
+				timeLimitMins++;
+				if (timeLimitMins > 7) timeLimitMins = 7;
+				redraw = true;
+				break;
+			case TIMELIMITSECS:
+				timeLimitSecs++;
+				if (timeLimitSecs > 59) timeLimitSecs = 59;
+				redraw = true;
+				break;
+			default:
+				break;
+			}
+		}
+		if (e.y == -1) // wheel down
+		{
+			switch (highlighting)
+			{
+			case RELEASERATE:
+				releaseRate--;
+				if (releaseRate < 0) releaseRate = 0;
+				redraw = true;
+				break;
+			case SPAWNDELAY:
+				spawnDelay--;
+				if (spawnDelay < 0) spawnDelay = 0;
+				redraw = true;
+				break;
+			case TIMELIMITMINS:
+				timeLimitMins--;
+				if (timeLimitMins < 0) timeLimitMins = 0;
+				redraw = true;
+				break;
+			case TIMELIMITSECS:
+				timeLimitSecs--;
+				if (timeLimitSecs < 0) timeLimitSecs = 0;
+				redraw = true;
+				break;
+			default:
+				break;
+			}
+		}
+		break;
+	}
+	case SDL_KEYDOWN:
+	{
+		SDL_KeyboardEvent &e = event.key;
+
+		switch (e.keysym.sym)
+		{
+		case SDLK_0:
+		case SDLK_KP_0:
+			typedNumber(highlighting, 0);
+			break;
+		case SDLK_1:
+		case SDLK_KP_1:
+			typedNumber(highlighting, 1);
+			break;
+		case SDLK_2:
+		case SDLK_KP_2:
+			typedNumber(highlighting, 2);
+			break;
+		case SDLK_3:
+		case SDLK_KP_3:
+			typedNumber(highlighting, 3);
+			break;
+		case SDLK_4:
+		case SDLK_KP_4:
+			typedNumber(highlighting, 4);
+			break;
+		case SDLK_5:
+		case SDLK_KP_5:
+			typedNumber(highlighting, 5);
+			break;
+		case SDLK_6:
+		case SDLK_KP_6:
+			typedNumber(highlighting, 6);
+			break;
+		case SDLK_7:
+		case SDLK_KP_7:
+			typedNumber(highlighting, 7);
+			break;
+		case SDLK_8:
+		case SDLK_KP_8:
+			typedNumber(highlighting, 8);
+			break;
+		case SDLK_9:
+		case SDLK_KP_9:
+			typedNumber(highlighting, 9);
+			break;
+		case SDLK_BACKSPACE:
+			switch (highlighting)
+			{
+			case RELEASERATE:
+				releaseRate /= 10;
+				if (releaseRate < 0) releaseRate = 0;
+				redraw = true;
+				break;
+			case SPAWNDELAY:
+				spawnDelay /= 10;
+				if (spawnDelay < 0) spawnDelay = 0;
+				redraw = true;
+				break;
+			case TIMELIMITMINS:
+				timeLimitMins /= 10;
+				if (timeLimitMins < 0) timeLimitMins = 0;
+				redraw = true;
+				break;
+			case TIMELIMITSECS:
+				timeLimitSecs /= 10;
+				if (timeLimitSecs < 0) timeLimitSecs = 0;
+				redraw = true;
 				break;
 			default:
 				break;
 			}
 			break;
-		}
-		case SDL_USEREVENT:// stuff here happens every frame. Watch out, timer produces events on a separate thread to rest of program!
-		{
-			draw();
+		case SDLK_ESCAPE:
+			closeDialog(false);
 			break;
-		}
+		case SDLK_RETURN:
+		case SDLK_p:
+			closeDialog(true);
+			break;
+		case SDLK_q:
+			die();
+			break;
 		default:
-		{
 			break;
 		}
+		break;
+	}
+	case SDL_USEREVENT:// stuff here happens every frame. Watch out, timer produces events on a separate thread to rest of program!
+	{
+		draw();
+		break;
+	}
+	default:
+	{
+		break;
+	}
 	}
 }
 
@@ -359,39 +358,39 @@ void LevelProperties::typedNumber(inputBox input, const unsigned int value)
 {
 	switch (input)
 	{
-		case RELEASERATE:
-			if (releaseRate < 100)
-			{
-				releaseRate *= 10;
-				releaseRate += value;
-				redraw = true;
-			}
-			break;
-		case SPAWNDELAY:
-			if (spawnDelay < 100)
-			{
-				spawnDelay *= 10;
-				spawnDelay += value;
-				redraw = true;
-			}
-			break;
-		case TIMELIMITMINS:
-			if (value <= 7)
-			{
-				timeLimitMins = value;
-				redraw = true;
-			}
-			break;
-		case TIMELIMITSECS:
-			if (timeLimitSecs < 6)
-			{
-				timeLimitSecs *= 10;
-				timeLimitSecs += value;
-				redraw = true;
-			}
-			break;
-		default:
-			break;
+	case RELEASERATE:
+		if (releaseRate < 100)
+		{
+			releaseRate *= 10;
+			releaseRate += value;
+			redraw = true;
+		}
+		break;
+	case SPAWNDELAY:
+		if (spawnDelay < 100)
+		{
+			spawnDelay *= 10;
+			spawnDelay += value;
+			redraw = true;
+		}
+		break;
+	case TIMELIMITMINS:
+		if (value <= 7)
+		{
+			timeLimitMins = value;
+			redraw = true;
+		}
+		break;
+	case TIMELIMITSECS:
+		if (timeLimitSecs < 6)
+		{
+			timeLimitSecs *= 10;
+			timeLimitSecs += value;
+			redraw = true;
+		}
+		break;
+	default:
+		break;
 	}
 }
 

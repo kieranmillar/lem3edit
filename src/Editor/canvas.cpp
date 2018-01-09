@@ -65,7 +65,6 @@ void Canvas::resize(int h)
 // Measured in screen pixels (so zoom dependent)
 bool Canvas::scroll(signed int delta_x, signed int delta_y, bool drag)
 {
-
 	bool up = false;
 	bool down = false;
 	bool left = false;
@@ -264,10 +263,10 @@ void Canvas::draw()
 			SDL_Rect camera_area;
 			camera_area.x = ((level_ptr->cameraX - scroll_x) * zoom) - scrollOffset_x;
 			camera_area.y = ((level_ptr->cameraY - scroll_y) * zoom) - scrollOffset_y;
-			camera_area.w = 320*zoom;
-			camera_area.h = 160*zoom;
+			camera_area.w = 320 * zoom;
+			camera_area.h = 160 * zoom;
 
-			SDL_SetRenderDrawColor(window_ptr->screen_renderer, 255, 0, 0, 255/2);
+			SDL_SetRenderDrawColor(window_ptr->screen_renderer, 255, 0, 0, 255 / 2);
 			SDL_RenderFillRect(window_ptr->screen_renderer, &camera_area);
 			SDL_SetRenderDrawColor(window_ptr->screen_renderer, 255, 0, 0, 255);
 			SDL_RenderDrawRect(window_ptr->screen_renderer, &camera_area);
@@ -275,10 +274,8 @@ void Canvas::draw()
 
 		SDL_SetRenderTarget(window_ptr->screen_renderer, NULL);
 
-
 		redraw = false;
 	}
-
 }
 
 void Canvas::draw_selection_box(int x, int y, int w, int h)

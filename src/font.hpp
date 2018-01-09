@@ -33,7 +33,6 @@ class Font
 public:
 
 	static SDL_Texture * createTextureFromString(Window * w, TTF_Font * f, std::string s);
-
 };
 
 #endif // FONT_HPP
