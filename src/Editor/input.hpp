@@ -65,10 +65,15 @@ public:
 
 	bool movingCamera;
 
+	bool creatingSelectionBox;
+	int creatingSelectionBoxX, creatingSelectionBoxY;
+
 	void setReferences(Window * w, Editor * e, Bar * b, Canvas * c, Style * s, Level * l);
 	void load(void);
 
 	void handleEditorEvents(SDL_Event event);
+
+	void startSelectionBox(void);
 
 	Editor_input(void) { /* nothing to do */ }
 };
