@@ -76,7 +76,8 @@ bool Editor::select(signed int x, signed int y, bool modify_selection)
 
 	if (temp.i == -1)  // selected nothing
 	{
-		selection.clear();
+		if (modify_selection == false) // don't clear the selection if holding CTRL otherwise misclicks are annoying
+			selection.clear();
 		canvas.redraw = true;
 		return false;
 	}
