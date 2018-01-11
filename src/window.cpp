@@ -48,7 +48,7 @@ bool Window::initialise(int w, int h)
 	screen = SDL_CreateWindow("Lem3Edit", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, width, height, SDL_WINDOW_RESIZABLE);
 	if (screen == NULL)
 	{
-		cerr << "failed to initialize window: " << SDL_GetError() << endl;
+		SDL_Log("failed to initialize window: %s", SDL_GetError());
 		return false;
 	}
 
@@ -57,14 +57,14 @@ bool Window::initialise(int w, int h)
 	screen_renderer = SDL_CreateRenderer(screen, -1, SDL_RENDERER_ACCELERATED /*| SDL_RENDERER_PRESENTVSYNC*/);
 	if (screen_renderer == NULL)
 	{
-		cerr << "failed to initialize renderer: " << SDL_GetError() << endl;
+		SDL_Log("failed to initialize renderer: %s", SDL_GetError());
 		return false;
 	}
 
 	screen_texture = SDL_CreateTexture(screen_renderer, SDL_PIXELFORMAT_RGB888, SDL_TEXTUREACCESS_TARGET, width, height);
 	if (screen_texture == NULL)
 	{
-		cerr << "failed to initialize texture: " << SDL_GetError() << endl;
+		SDL_Log("failed to initialize texture: %s", SDL_GetError());
 		return false;
 	}
 
@@ -94,7 +94,7 @@ bool Window::resize(void)
 	screen_texture = SDL_CreateTexture(screen_renderer, SDL_PIXELFORMAT_RGB888, SDL_TEXTUREACCESS_TARGET, width, height);
 	if (screen_texture == NULL)
 	{
-		cerr << "failed to initialize texture: " << SDL_GetError() << endl;
+		SDL_Log("failed to initialize texture: %s", SDL_GetError());
 		return false;
 	}
 
