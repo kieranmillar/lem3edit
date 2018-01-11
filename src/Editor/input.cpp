@@ -70,7 +70,8 @@ void Editor_input::load(void)
 	movingCamera = false;
 
 	creatingSelectionBox = false;
-	creatingSelectionBoxX = creatingSelectionBoxY = 0;
+	creatingSelectionBoxStartX = creatingSelectionBoxStartY = 0;
+	creatingSelectionBoxCurrentX = creatingSelectionBoxCurrentY = 0;
 }
 
 void Editor_input::handleEditorEvents(SDL_Event event)
@@ -116,6 +117,12 @@ void Editor_input::handleEditorEvents(SDL_Event event)
 		if (e.state & SDL_BUTTON(SDL_BUTTON_RIGHT) && movingView)
 		{
 			canvas_ptr->scroll(mouse_prev_x - mouse_x_window, mouse_prev_y - mouse_y_window, false);
+		}
+		if (e.state & SDL_BUTTON(SDL_BUTTON_LEFT) && creatingSelectionBox)
+		{
+			creatingSelectionBoxCurrentX = mouse_x;
+			creatingSelectionBoxCurrentY = mouse_y;
+			canvas_ptr->redraw = true;
 		}
 		if (e.state & SDL_BUTTON(SDL_BUTTON_LEFT) && resizingLevel)
 		{
@@ -380,6 +387,7 @@ void Editor_input::handleEditorEvents(SDL_Event event)
 	case SDL_MOUSEBUTTONUP://when released
 	{
 		SDL_MouseButtonEvent &e = event.button;
+		bool ctrl_down = SDL_GetModState() & KMOD_CTRL;
 
 		if (e.button == SDL_BUTTON_LEFT)
 		{
@@ -435,8 +443,9 @@ void Editor_input::handleEditorEvents(SDL_Event event)
 			}
 			if (creatingSelectionBox)
 			{
-				//editor_ptr->selectAllInArea(creatingSelectionBoxX, creatingSelectionBoxY, mouse_x, mouse_y);
-				creatingSelectionBoxX = creatingSelectionBoxY = 0;
+				//editor_ptr->select_area(creatingSelectionBoxStartX, creatingSelectionBoxStartY, creatingSelectionBoxCurrentX, creatingSelectionBoxCurrentY, ctrl_down);
+				creatingSelectionBoxStartX = creatingSelectionBoxStartY = 0;
+				creatingSelectionBoxCurrentX = creatingSelectionBoxCurrentY = 0;
 				creatingSelectionBox = false;
 				canvas_ptr->redraw = true;
 			}
@@ -655,6 +664,6 @@ void Editor_input::handleEditorEvents(SDL_Event event)
 void Editor_input::startSelectionBox(void)
 {
 	creatingSelectionBox = true;
-	creatingSelectionBoxX = mouse_x;
-	creatingSelectionBoxY = mouse_y;
+	creatingSelectionBoxStartX = creatingSelectionBoxCurrentX = mouse_x;
+	creatingSelectionBoxStartY = creatingSelectionBoxCurrentY = mouse_y;
 }

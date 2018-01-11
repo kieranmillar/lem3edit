@@ -258,6 +258,20 @@ void Canvas::draw()
 
 		//END - Draw dotted lines on the level border
 
+		if (input_ptr->creatingSelectionBox == true) // draw area select box
+		{
+			SDL_Rect select_area;
+			select_area.x = ((input_ptr->creatingSelectionBoxStartX - scroll_x) * zoom) - scrollOffset_x;
+			select_area.y = ((input_ptr->creatingSelectionBoxStartY - scroll_y) * zoom) - scrollOffset_y;
+			select_area.w = (input_ptr->creatingSelectionBoxCurrentX - input_ptr->creatingSelectionBoxStartX)*zoom;
+			select_area.h = (input_ptr->creatingSelectionBoxCurrentY - input_ptr->creatingSelectionBoxStartY)*zoom;
+
+			SDL_SetRenderDrawColor(window_ptr->screen_renderer, 0, 0, 255, 255 / 2);
+			SDL_RenderFillRect(window_ptr->screen_renderer, &select_area);
+			SDL_SetRenderDrawColor(window_ptr->screen_renderer, 0, 0, 255, 255);
+			SDL_RenderDrawRect(window_ptr->screen_renderer, &select_area);
+		}
+
 		if (editor_ptr->startCameraOn == true) // draw start camera box
 		{
 			SDL_Rect camera_area;

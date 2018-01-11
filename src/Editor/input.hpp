@@ -66,7 +66,8 @@ public:
 	bool movingCamera;
 
 	bool creatingSelectionBox;
-	int creatingSelectionBoxX, creatingSelectionBoxY;
+	int creatingSelectionBoxStartX, creatingSelectionBoxStartY;
+	int creatingSelectionBoxCurrentX, creatingSelectionBoxCurrentY;
 
 	void setReferences(Window * w, Editor * e, Bar * b, Canvas * c, Style * s, Level * l);
 	void load(void);
