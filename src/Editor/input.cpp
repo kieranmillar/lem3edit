@@ -94,9 +94,7 @@ void Editor_input::handleEditorEvents(SDL_Event event)
 
 		if (e.event == SDL_WINDOWEVENT_RESIZED)
 		{
-			window_ptr->width = e.data1;
-			window_ptr->height = e.data2;
-			window_ptr->resize();
+			window_ptr->resize(e.data1, e.data2);
 			editor_ptr->resize(e.data1, e.data2);
 			canvas_ptr->redraw = true;
 		}

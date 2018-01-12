@@ -40,7 +40,7 @@ public:
 
 	bool initialise(int w, int h);
 	void destroy(void);
-	bool resize(void);
+	bool resize(int w, int h);
 };
 
 Uint32 loop_timer(Uint32 interval, void *param);

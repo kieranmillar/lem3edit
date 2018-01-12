@@ -61,7 +61,7 @@ bool Window::initialise(int w, int h)
 		return false;
 	}
 
-	screen_texture = SDL_CreateTexture(screen_renderer, SDL_PIXELFORMAT_RGB888, SDL_TEXTUREACCESS_TARGET, width, height);
+	screen_texture = SDL_CreateTexture(screen_renderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, width, height);
 	if (screen_texture == NULL)
 	{
 		SDL_Log("failed to initialize texture: %s", SDL_GetError());
@@ -87,17 +87,19 @@ void Window::destroy(void)
 	if (screen != NULL) SDL_DestroyWindow(screen);
 }
 
-bool Window::resize(void)
+bool Window::resize(int w, int h)
 {
+	width = w;
+	height = h;
 	SDL_RenderSetLogicalSize(screen_renderer, width, height);
-	if (screen_texture != NULL) SDL_DestroyTexture(screen_texture);
-	screen_texture = SDL_CreateTexture(screen_renderer, SDL_PIXELFORMAT_RGB888, SDL_TEXTUREACCESS_TARGET, width, height);
+	if (screen_texture != NULL)
+		SDL_DestroyTexture(screen_texture);
+	screen_texture = SDL_CreateTexture(screen_renderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, width, height);
 	if (screen_texture == NULL)
 	{
 		SDL_Log("failed to initialize texture: %s", SDL_GetError());
 		return false;
 	}
-
 	return true;
 }
 
