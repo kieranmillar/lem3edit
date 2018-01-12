@@ -1,7 +1,7 @@
 /*
  * lem3edit
  * Copyright (C) 2008-2009 Carl Reinke
- * Copyright (C) 2017 Kieran Millar
+ * Copyright (C) 2017-2018 Kieran Millar
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
