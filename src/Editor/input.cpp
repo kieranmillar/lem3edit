@@ -83,8 +83,8 @@ void Editor_input::handleEditorEvents(SDL_Event event)
 	// Due to zooming we can't rely on the mouse's position in the window to map correctly
 	// So we need to create our own variables instead
 	// These ones give the real x co-ordinate of the level, ignoring zoom and scroll
-	mouse_x = (mouse_x_window / canvas_ptr->zoom) + canvas_ptr->scroll_x;
-	mouse_y = (mouse_y_window / canvas_ptr->zoom) + canvas_ptr->scroll_y;
+	mouse_x = ((mouse_x_window + canvas_ptr->scrollOffset_x) / canvas_ptr->zoom) + canvas_ptr->scroll_x;
+	mouse_y = ((mouse_y_window + canvas_ptr->scrollOffset_y) / canvas_ptr->zoom) + canvas_ptr->scroll_y;
 
 	switch (event.type)
 	{
@@ -201,6 +201,8 @@ void Editor_input::handleEditorEvents(SDL_Event event)
 				}
 				else if (alt_down)
 				{
+					if (!ctrl_down)
+						editor_ptr->selection.clear();
 					startSelectionBox();
 				}
 				else if (editor_ptr->startCameraOn == true
@@ -443,7 +445,7 @@ void Editor_input::handleEditorEvents(SDL_Event event)
 			}
 			if (creatingSelectionBox)
 			{
-				//editor_ptr->select_area(creatingSelectionBoxStartX, creatingSelectionBoxStartY, creatingSelectionBoxCurrentX, creatingSelectionBoxCurrentY, ctrl_down);
+				editor_ptr->select_area(creatingSelectionBoxStartX, creatingSelectionBoxStartY, creatingSelectionBoxCurrentX - creatingSelectionBoxStartX, creatingSelectionBoxCurrentY - creatingSelectionBoxStartY);
 				creatingSelectionBoxStartX = creatingSelectionBoxStartY = 0;
 				creatingSelectionBoxCurrentX = creatingSelectionBoxCurrentY = 0;
 				creatingSelectionBox = false;

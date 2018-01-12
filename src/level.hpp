@@ -78,6 +78,8 @@ public:
 	Object::Index get_object_by_position(signed int x, signed int y) const;
 	signed int get_object_by_position(signed int x, signed int y, int type) const;
 
+	std::vector<int> get_objects_in_area(int areaX, int areaY, int areaW, int areaH, int type) const;
+
 	bool load(unsigned int n);
 	bool load_level(const std::string &path, const std::string &name, unsigned int n);
 	bool load_level(const std::string &filename);

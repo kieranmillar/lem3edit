@@ -136,6 +136,43 @@ bool Editor::select_all(void)
 	return canvas.redraw = !selection.empty();
 }
 
+bool Editor::select_area(const int areaX, const int areaY, const int areaW, const int areaH)
+{
+	vector<int> tmp[3];
+
+	int x = areaX;
+	int y = areaY;
+	int w = areaW;
+	int h = areaH;
+	// We want the area to always have x and y be in the top-left corner, with w and h positive
+	if (areaW < 0)
+	{
+		x = areaX + areaW;
+		w = 0 - areaW;
+	}
+	if (areaH < 0)
+	{
+		y = areaY + areaH;
+		h = 0 - areaH;
+	}
+
+	for (int i = 0; i < 3; ++i)
+	{
+		if (canvas.layerVisible[i] == false)
+			continue;
+
+		tmp[i] = level.get_objects_in_area(x, y, w, h, i);
+
+		for (std::vector<int>::const_reverse_iterator j = tmp[i].rbegin(); j != tmp[i].rend(); ++j)
+		{
+			selection.insert(Level::Object::Index(i, *j));
+		}
+	}
+
+	canvas.redraw = !selection.empty();
+	return true;
+}
+
 bool Editor::copy_selected(void)
 {
 	clipboard.clear();

@@ -266,6 +266,19 @@ void Canvas::draw()
 			select_area.w = (input_ptr->creatingSelectionBoxCurrentX - input_ptr->creatingSelectionBoxStartX)*zoom;
 			select_area.h = (input_ptr->creatingSelectionBoxCurrentY - input_ptr->creatingSelectionBoxStartY)*zoom;
 
+			if (select_area.w < 0)
+			{
+				select_area.x += select_area.w;
+				select_area.w = 0 - select_area.w;
+			}
+			if (select_area.h < 0)
+			{
+				select_area.y += select_area.h;
+				select_area.h = 0 - select_area.h;
+			}
+			select_area.w += zoom;
+			select_area.h += zoom;
+
 			SDL_SetRenderDrawColor(window_ptr->screen_renderer, 0, 0, 255, 255 / 2);
 			SDL_RenderFillRect(window_ptr->screen_renderer, &select_area);
 			SDL_SetRenderDrawColor(window_ptr->screen_renderer, 0, 0, 255, 255);
