@@ -44,9 +44,8 @@ void Style::Object::copy(const Style::Object &that)
 	id = that.id;
 	width = that.width;
 	height = that.height;
+	objTex = that.objTex;
 	frl = that.frl;
-	texX = that.texX;
-	texY = that.texY;
 
 	for (unsigned int i = 0; i < COUNTOF(unknown); ++i)
 		unknown[i] = that.unknown[i];
@@ -61,6 +60,7 @@ void Style::Object::copy(const Style::Object &that)
 
 void Style::Object::destroy(void)
 {
+	SDL_DestroyTexture(objTex);
 	for (vector<Uint16 *>::const_iterator f = frame.begin(); f != frame.end(); ++f)
 		delete[] * f;
 }
@@ -187,11 +187,13 @@ void Style::draw_object_texture(Window * window, signed int x, signed int y, int
 	if (object >= this->object[type].size())
 		return assert(false);
 
+	const Object *o = &this->object[type][object];
+
 	SDL_Rect rdest;
 	rdest.x = x;
 	rdest.y = y;
-	rdest.w = this->object[type][object].width * 8 * zoom;
-	rdest.h = this->object[type][object].height * 2 * zoom;
+	rdest.w = o->width * 8 * zoom;
+	rdest.h = o->height * 2 * zoom;
 	if (maxSize != 0) {
 		if (max(rdest.w, rdest.h) > maxSize)
 		{
@@ -204,13 +206,7 @@ void Style::draw_object_texture(Window * window, signed int x, signed int y, int
 	if (x + rdest.w < 0 || y + rdest.h < 0)
 		return;
 
-	SDL_Rect rsource;
-	rsource.x = this->object[type][object].texX;
-	rsource.y = this->object[type][object].texY;
-	rsource.w = this->object[type][object].width * 8;
-	rsource.h = this->object[type][object].height * 2;
-
-	SDL_RenderCopy(window->screen_renderer, megatex, &rsource, &rdest);
+	SDL_RenderCopy(window->screen_renderer, o->objTex, NULL, &rdest);
 }
 
 bool Style::load(unsigned int n, Window * window, SDL_Color *pal2)
@@ -219,19 +215,6 @@ bool Style::load(unsigned int n, Window * window, SDL_Color *pal2)
 	const string data = "DATA";
 	const string perm = "PERM", temp = "TEMP";
 	const string objec = "OBJEC";
-
-	//The megatex is a big texture with all the graphics info.
-	//So we just draw objects to the screen by drawing the section of the megatexture.
-	//This should be faster than a separate texture for each object
-
-	megatex = SDL_CreateTexture(window->screen_renderer, SDL_PIXELFORMAT_RGB888, SDL_TEXTUREACCESS_TARGET, 1024, 1024);
-	SDL_SetTextureBlendMode(megatex, SDL_BLENDMODE_BLEND);
-	//SDL_SetTextureAlphaMod(megatex, 0);
-	//SDL_RenderCopy(window->screen_renderer, megatex, NULL, NULL);
-	SDL_SetTextureAlphaMod(megatex, 255);
-	megatexAddX = 0;
-	megatexAddY = 0;
-	megatexBiggestY = 0;
 
 	return load_palette(path, data, n) &&
 		load_objects(PERM, path, perm, n) &&
@@ -392,10 +375,6 @@ bool Style::load_objects(int type, const string &obj_filename, const string &frl
 			o.frame.push_back(frame);
 		}
 
-		assert(0 == NULL /* Fix warning: Do not assign NULL to Uint16 */);
-		o.texX = 0;
-		o.texY = 0;
-
 		if (o.id < 5000)
 		{
 			object[type].push_back(o);
@@ -476,33 +455,10 @@ bool Style::create_object_textures(int type, Window * window, SDL_Color *pal2)
 		tempSurface2 = SDL_ConvertSurfaceFormat(tempSurface, SDL_PIXELFORMAT_RGB888, 0);//We need a surface format with higher colour depth that can handle transparency
 		SDL_SetColorKey(tempSurface2, SDL_TRUE, SDL_MapRGB(tempSurface2->format, 255, 0, 255));//Convert dummy magenta into transparency
 
-		SDL_Texture *tempTexture;//Need to turn surface into a texture so can draw it with transparency onto our megatexture
-		tempTexture = SDL_CreateTextureFromSurface(window->screen_renderer, tempSurface2);
+		object[type][so].objTex = SDL_CreateTextureFromSurface(window->screen_renderer, tempSurface2);
 
-		if (megatexAddX + (i->width * 8) > 1024) {
-			megatexAddX = 0;
-			megatexAddY += megatexBiggestY;
-			megatexBiggestY = 0;
-		}
-
-		SDL_Rect r;
-		r.x = megatexAddX;
-		r.y = megatexAddY;
-		r.w = i->width * 8;
-		r.h = i->height * 2;
-
-		SDL_SetRenderTarget(window->screen_renderer, megatex);
-		SDL_RenderCopy(window->screen_renderer, tempTexture, NULL, &r);
-		SDL_SetRenderTarget(window->screen_renderer, NULL);
-
-		i->texX = megatexAddX;
-		i->texY = megatexAddY;
-		megatexAddX += r.w;
-		if ((i->height * 2) > megatexBiggestY)
-			megatexBiggestY = i->height * 2;
 		SDL_FreeSurface(tempSurface);
 		SDL_FreeSurface(tempSurface2);
-		SDL_DestroyTexture(tempTexture);
 	}
 	return true;
 }
@@ -513,9 +469,9 @@ bool Style::destroy_all_objects(int type)
 
 	/*for (vector<Object>::const_iterator i = object[type].begin(); i != object[type].end(); ++i)
 	{
-	delete &i;
+	int j = object[type].begin() - i;
+	SDL_DestroyTexture(object[type][j].objTex);
 	}*/
 
-	SDL_DestroyTexture(megatex);
 	return true;
 }

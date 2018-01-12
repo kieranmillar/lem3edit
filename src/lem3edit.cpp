@@ -40,8 +40,8 @@
 using namespace std;
 
 const char *prog_name = "lem3edit";
-const char *prog_ver = "1.0";
-const char *prog_date = "31/12/2017";
+const char *prog_ver = "1.1";
+const char *prog_date = "12/01/2018";
 
 void version(void);
 

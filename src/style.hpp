@@ -38,7 +38,8 @@ public:
 	public:
 		Uint16 id;
 		Uint8 width, height;
-		Uint16 texX, texY;
+
+		SDL_Texture * objTex;
 
 		Uint16 frl, unknown[4];
 
@@ -72,11 +73,6 @@ public:
 	Cmp skill;
 
 	SDL_Color palette[209];
-
-	SDL_Texture *megatex;
-
-	Uint16 megatexAddX, megatexAddY;
-	Uint16 megatexBiggestY;
 
 	signed int object_by_id(int type, unsigned int id) const;
 	signed int object_next_id(int type, unsigned int id) const;
