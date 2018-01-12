@@ -68,6 +68,10 @@ void Editor_input::load(void)
 	resizingWhich = none;
 
 	movingCamera = false;
+
+	creatingSelectionBox = false;
+	creatingSelectionBoxStartX = creatingSelectionBoxStartY = 0;
+	creatingSelectionBoxCurrentX = creatingSelectionBoxCurrentY = 0;
 }
 
 void Editor_input::handleEditorEvents(SDL_Event event)
@@ -79,8 +83,8 @@ void Editor_input::handleEditorEvents(SDL_Event event)
 	// Due to zooming we can't rely on the mouse's position in the window to map correctly
 	// So we need to create our own variables instead
 	// These ones give the real x co-ordinate of the level, ignoring zoom and scroll
-	mouse_x = (mouse_x_window / canvas_ptr->zoom) + canvas_ptr->scroll_x;
-	mouse_y = (mouse_y_window / canvas_ptr->zoom) + canvas_ptr->scroll_y;
+	mouse_x = ((mouse_x_window + canvas_ptr->scrollOffset_x) / canvas_ptr->zoom) + canvas_ptr->scroll_x;
+	mouse_y = ((mouse_y_window + canvas_ptr->scrollOffset_y) / canvas_ptr->zoom) + canvas_ptr->scroll_y;
 
 	switch (event.type)
 	{
@@ -113,6 +117,12 @@ void Editor_input::handleEditorEvents(SDL_Event event)
 		if (e.state & SDL_BUTTON(SDL_BUTTON_RIGHT) && movingView)
 		{
 			canvas_ptr->scroll(mouse_prev_x - mouse_x_window, mouse_prev_y - mouse_y_window, false);
+		}
+		if (e.state & SDL_BUTTON(SDL_BUTTON_LEFT) && creatingSelectionBox)
+		{
+			creatingSelectionBoxCurrentX = mouse_x;
+			creatingSelectionBoxCurrentY = mouse_y;
+			canvas_ptr->redraw = true;
 		}
 		if (e.state & SDL_BUTTON(SDL_BUTTON_LEFT) && resizingLevel)
 		{
@@ -170,6 +180,7 @@ void Editor_input::handleEditorEvents(SDL_Event event)
 	{
 		SDL_MouseButtonEvent &e = event.button;
 		bool ctrl_down = SDL_GetModState() & KMOD_CTRL;
+		bool alt_down = SDL_GetModState() & KMOD_ALT;
 
 		if (e.button == SDL_BUTTON_LEFT)
 		{
@@ -188,46 +199,53 @@ void Editor_input::handleEditorEvents(SDL_Event event)
 					holdingType = -1;
 					holdingID = -1;
 				}
+				else if (alt_down)
+				{
+					if (!ctrl_down)
+						editor_ptr->selection.clear();
+					startSelectionBox();
+				}
+				else if (editor_ptr->startCameraOn == true
+					&& mouse_x >= level_ptr->cameraX
+					&& mouse_x <= level_ptr->cameraX + 320
+					&& mouse_y >= level_ptr->cameraY
+					&& mouse_y <= level_ptr->cameraY + 160)
+				{
+					movingCamera = true;
+				}
 				else
 				{
-					if (editor_ptr->startCameraOn == true
-						&& mouse_x >= level_ptr->cameraX
-						&& mouse_x <= level_ptr->cameraX + 320
-						&& mouse_y >= level_ptr->cameraY
-						&& mouse_y <= level_ptr->cameraY + 160)
+					bool selectedSomething = editor_ptr->select(mouse_x, mouse_y, ctrl_down);
+					if (!selectedSomething)
 					{
-						movingCamera = true;
-					}
-					else
-					{
-						bool selectedSomething = editor_ptr->select(mouse_x, mouse_y, ctrl_down);
-						if (!selectedSomething)
+						// grab level borders
+						if (mouse_x <= 8 && mouse_x >= -8)
 						{
-							// grab level borders
-							if (mouse_x <= 8 && mouse_x >= -8)
-							{
-								resizingLevel = true;
-								resizingNewPos = 0;
-								resizingWhich = left;
-							}
-							else if (mouse_x >= level_ptr->width - 8 && mouse_x <= level_ptr->width + 8)
-							{
-								resizingLevel = true;
-								resizingNewPos = level_ptr->width;
-								resizingWhich = right;
-							}
-							else if (mouse_y <= 8 && mouse_y >= -8)
-							{
-								resizingLevel = true;
-								resizingNewPos = 0;
-								resizingWhich = top;
-							}
-							else if (mouse_y >= level_ptr->height - 8 && mouse_y <= level_ptr->height + 8)
-							{
-								resizingLevel = true;
-								resizingNewPos = level_ptr->height;
-								resizingWhich = bottom;
-							}
+							resizingLevel = true;
+							resizingNewPos = 0;
+							resizingWhich = left;
+						}
+						else if (mouse_x >= level_ptr->width - 8 && mouse_x <= level_ptr->width + 8)
+						{
+							resizingLevel = true;
+							resizingNewPos = level_ptr->width;
+							resizingWhich = right;
+						}
+						else if (mouse_y <= 8 && mouse_y >= -8)
+						{
+							resizingLevel = true;
+							resizingNewPos = 0;
+							resizingWhich = top;
+						}
+						else if (mouse_y >= level_ptr->height - 8 && mouse_y <= level_ptr->height + 8)
+						{
+							resizingLevel = true;
+							resizingNewPos = level_ptr->height;
+							resizingWhich = bottom;
+						}
+						else //nothing else was selected, so start creating a selection box
+						{
+							startSelectionBox();
 						}
 					}
 				}
@@ -371,6 +389,7 @@ void Editor_input::handleEditorEvents(SDL_Event event)
 	case SDL_MOUSEBUTTONUP://when released
 	{
 		SDL_MouseButtonEvent &e = event.button;
+		bool ctrl_down = SDL_GetModState() & KMOD_CTRL;
 
 		if (e.button == SDL_BUTTON_LEFT)
 		{
@@ -422,6 +441,14 @@ void Editor_input::handleEditorEvents(SDL_Event event)
 				resizingLevel = false;
 				resizingWhich = none;
 				resizingNewPos = 0;
+				canvas_ptr->redraw = true;
+			}
+			if (creatingSelectionBox)
+			{
+				editor_ptr->select_area(creatingSelectionBoxStartX, creatingSelectionBoxStartY, creatingSelectionBoxCurrentX - creatingSelectionBoxStartX, creatingSelectionBoxCurrentY - creatingSelectionBoxStartY);
+				creatingSelectionBoxStartX = creatingSelectionBoxStartY = 0;
+				creatingSelectionBoxCurrentX = creatingSelectionBoxCurrentY = 0;
+				creatingSelectionBox = false;
 				canvas_ptr->redraw = true;
 			}
 		}
@@ -634,4 +661,11 @@ void Editor_input::handleEditorEvents(SDL_Event event)
 		break;
 	}
 	}
+}
+
+void Editor_input::startSelectionBox(void)
+{
+	creatingSelectionBox = true;
+	creatingSelectionBoxStartX = creatingSelectionBoxCurrentX = mouse_x;
+	creatingSelectionBoxStartY = creatingSelectionBoxCurrentY = mouse_y;
 }

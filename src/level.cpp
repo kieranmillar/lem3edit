@@ -104,6 +104,29 @@ signed int Level::get_object_by_position(signed int x, signed int y, int type) c
 	return -1;
 }
 
+std::vector<int> Level::get_objects_in_area(int areaX, int areaY, int areaW, int areaH, int type) const
+{
+	vector<int> tmp;
+
+	for (vector<Object>::const_reverse_iterator i = object[type].rbegin(); i != object[type].rend(); ++i)
+	{
+		const Object &o = *i;
+		int so = style_ptr->object_by_id(type, o.id);
+		if (so == -1)
+			continue;
+		if (areaX >= o.x + style_ptr->object[type][so].width * 8)
+			continue;
+		if (areaY >= o.y + style_ptr->object[type][so].height * 2)
+			continue;
+		if (areaX + areaW < o.x)
+			continue;
+		if (areaY + areaH < o.y)
+			continue;
+		tmp.push_back(object[type].rend() - i - 1);
+	}
+	return tmp;
+}
+
 bool Level::load(unsigned int n)
 {
 	const string path = "LEVELS/";

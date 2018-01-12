@@ -64,9 +64,10 @@ public:
 
 	void resize(int w, int h);
 
-	bool select(signed int x, signed int y, bool modify);
+	bool select(signed int x, signed int y, bool modify_selection);
 	bool select_none(void);
 	bool select_all(void);
+	bool select_area(const int areaX, const int areaY, const int width, const int height);
 
 	bool copy_selected(void);
 	bool paste(void);

@@ -2,17 +2,17 @@
  * lem3edit
  * Copyright (C) 2008-2009 Carl Reinke
  * Copyright (C) 2017 Kieran Millar
- * 
+ *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
  * as published by the Free Software Foundation; either version 2
  * of the License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
@@ -47,14 +47,13 @@ void version(void);
 
 programMode g_currentMode;
 
-int main( int argc, char *argv[] )
+int main(int argc, char *argv[])
 {
-
 	version();
 
 	if (SDL_Init(SDL_INIT_TIMER | SDL_INIT_VIDEO))
 	{
-		SDL_Log ("failed to initialize SDL: %s\n", SDL_GetError());
+		SDL_Log("failed to initialize SDL: %s\n", SDL_GetError());
 		return false;
 	}
 
@@ -67,16 +66,16 @@ int main( int argc, char *argv[] )
 	Window window;
 
 	if (window.initialise(DEFAULT_WINDOW_WIDTH, DEFAULT_WINDOW_HEIGHT) == false) // Initialise the main program window
-	{ 
+	{
 		return EXIT_FAILURE;
 	}
-	
+
 	//SDL_EnableKeyboardRepeat(SDL_DEFAULT_REPEAT_DELAY, SDL_DEFAULT_REPEAT_INTERVAL);
-	
+
 	int level_id = (argc > 1) ? atoi(argv[1]) : 1;
 
 	g_currentMode = EDITORMODE;
-	
+
 	Editor editor;
 	editor.load(level_id, &window);
 
@@ -85,18 +84,18 @@ int main( int argc, char *argv[] )
 	{
 		switch (g_currentMode)
 		{
-			case EDITORMODE:
-				editor.editor_input.handleEditorEvents(event);
-				break;
-			case LEVELPROPERTIESMODE:
-				editor.levelProperties.handleLevelPropertiesEvents(event);
-				break;
+		case EDITORMODE:
+			editor.editor_input.handleEditorEvents(event);
+			break;
+		case LEVELPROPERTIESMODE:
+			editor.levelProperties.handleLevelPropertiesEvents(event);
+			break;
 		}
 	}
 
 	//NOTE to self: These should be destructors, but objects need to go out of scope before
 	//calling Quit functions below or else will crash on exit
-	
+
 	editor.bar.destroy();
 	window.destroy();
 
@@ -106,25 +105,25 @@ int main( int argc, char *argv[] )
 	editor.style.destroy_all_objects(PERM);
 	editor.style.destroy_all_objects(TEMP);
 	editor.style.destroy_all_objects(TOOL);
-	
+
 	return EXIT_SUCCESS;
 }
 
-void die( void )
+void die(void)
 {
 	SDL_Event event;
 	event.type = SDL_QUIT;
 	SDL_PushEvent(&event);
 }
 
-string l3_filename( const string &path, const string &name, const string &ext )
+string l3_filename(const string &path, const string &name, const string &ext)
 {
 	ostringstream filename;
 	filename << path << name << ext;
 	return filename.str();
 }
 
-string l3_filename( const string &path, const string &name, int n, const string &ext )
+string l3_filename(const string &path, const string &name, int n, const string &ext)
 {
 	ostringstream filename;
 	filename << path << name << setfill('0') << setw(3) << n << ext;
