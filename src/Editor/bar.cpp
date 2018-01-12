@@ -55,12 +55,6 @@ void Bar::load(void)
 	resizeBarScrollRect(window_ptr->width, window_ptr->height);
 	barScrollRect.h = 13;
 
-	buttonTexture = SDL_CreateTexture(window_ptr->screen_renderer, SDL_PIXELFORMAT_RGB888, SDL_TEXTUREACCESS_TARGET, 1024, 32);
-	SDL_SetTextureBlendMode(buttonTexture, SDL_BLENDMODE_BLEND);
-	SDL_SetTextureAlphaMod(buttonTexture, 255);
-
-	currentButtonTextureX = 0;
-
 	loadButtonGraphic(button_layerBackground, "./gfx/layerBackground_off.bmp", "./gfx/layerBackground_on.bmp");
 	loadButtonGraphic(button_layerTerrain, "./gfx/layerTerrain_off.bmp", "./gfx/layerTerrain_on.bmp");
 	loadButtonGraphic(button_layerTool, "./gfx/layerTool_off.bmp", "./gfx/layerTool_on.bmp");
@@ -107,30 +101,14 @@ bool Bar::loadButtonGraphic(buttonInfo & button, const char * filePathUp, const 
 		SDL_Log("Unable to load image '%s'! SDL Error: %s\n", filePathUp, SDL_GetError());
 		return false;
 	}
-	SDL_ConvertSurfaceFormat(graphic, SDL_PIXELFORMAT_RGB888, 0);
+	SDL_ConvertSurfaceFormat(graphic, SDL_PIXELFORMAT_RGBA8888, 0);
 
-	SDL_Texture * texture = SDL_CreateTextureFromSurface(window_ptr->screen_renderer, graphic);
-	SDL_Rect rect;
-	rect.x = currentButtonTextureX;
-	rect.y = 0;
-	rect.w = 32;
-	rect.h = 32;
-
-	SDL_SetRenderTarget(window_ptr->screen_renderer, buttonTexture);
-	SDL_RenderCopy(window_ptr->screen_renderer, texture, NULL, &rect);
+	button.buttonTexUp = SDL_CreateTextureFromSurface(window_ptr->screen_renderer, graphic);
 
 	SDL_FreeSurface(graphic);
 	graphic = NULL;
-	SDL_DestroyTexture(texture);
-	texture = NULL;
-	button.texOffX = rect.x;
-	button.texOffY = rect.y;
-
-	currentButtonTextureX += rect.w;
 
 	//then the down graphic
-	button.texOnX = rect.x;
-	button.texOnY = rect.y;
 	if (filePathDown != NULL)
 	{
 		graphic = SDL_LoadBMP(filePathDown);
@@ -140,21 +118,10 @@ bool Bar::loadButtonGraphic(buttonInfo & button, const char * filePathUp, const 
 			return false;
 		}
 
-		texture = SDL_CreateTextureFromSurface(window_ptr->screen_renderer, graphic);
-		rect.x = currentButtonTextureX;
-
-		SDL_SetRenderTarget(window_ptr->screen_renderer, buttonTexture);
-		SDL_RenderCopy(window_ptr->screen_renderer, texture, NULL, &rect);
+		button.buttonTexDown = SDL_CreateTextureFromSurface(window_ptr->screen_renderer, graphic);
 
 		SDL_FreeSurface(graphic);
 		graphic = NULL;
-		SDL_DestroyTexture(texture);
-		texture = NULL;
-
-		button.texOnX = rect.x;
-		button.texOnY = rect.y;
-
-		currentButtonTextureX += rect.w;
 	}
 
 	return true;
@@ -475,27 +442,19 @@ void Bar::draw(int mouseX, int mouseY)
 
 void Bar::drawButton(const buttonInfo & button, buttonState state, int x, int y)
 {
-	SDL_Rect sourceRect;
-	if (state == off)
-	{
-		sourceRect.x = button.texOffX;
-		sourceRect.y = button.texOffY;
-	}
-	if (state == on)
-	{
-		sourceRect.x = button.texOnX;
-		sourceRect.y = button.texOnY;
-	}
-	sourceRect.w = 32;
-	sourceRect.h = 32;
-
 	SDL_Rect destRect;
 	destRect.x = x;
 	destRect.y = y;
 	destRect.w = 32;
 	destRect.h = 32;
-
-	SDL_RenderCopy(window_ptr->screen_renderer, buttonTexture, &sourceRect, &destRect);
+	if (state == off)
+	{
+		SDL_RenderCopy(window_ptr->screen_renderer, button.buttonTexUp, NULL, &destRect);
+	}
+	if (state == on)
+	{
+		SDL_RenderCopy(window_ptr->screen_renderer, button.buttonTexDown, NULL, &destRect);
+	}
 }
 
 void Bar::drawTooltip(const buttonInfo & button, int x, int y)
@@ -524,21 +483,27 @@ void Bar::drawTooltip(const buttonInfo & button, int x, int y)
 
 void Bar::destroy(void)
 {
-	if (buttonTexture != NULL) SDL_DestroyTexture(buttonTexture);
-	if (button_layerBackground.tooltip != NULL)	SDL_DestroyTexture(button_layerBackground.tooltip);
-	if (button_layerTerrain.tooltip != NULL)	SDL_DestroyTexture(button_layerTerrain.tooltip);
-	if (button_layerTool.tooltip != NULL)	SDL_DestroyTexture(button_layerTool.tooltip);
-	if (button_layerBackgroundVisible.tooltip != NULL)	SDL_DestroyTexture(button_layerBackgroundVisible.tooltip);
-	if (button_layerTerrainVisible.tooltip != NULL)	SDL_DestroyTexture(button_layerTerrainVisible.tooltip);
-	if (button_layerToolVisible.tooltip != NULL)	SDL_DestroyTexture(button_layerToolVisible.tooltip);
-	if (button_save.tooltip != NULL)	SDL_DestroyTexture(button_save.tooltip);
-	if (button_moveToBack.tooltip != NULL)	SDL_DestroyTexture(button_moveToBack.tooltip);
-	if (button_moveToFront.tooltip != NULL)	SDL_DestroyTexture(button_moveToFront.tooltip);
-	if (button_camera.tooltip != NULL)	SDL_DestroyTexture(button_camera.tooltip);
-	if (button_levelProperties.tooltip != NULL)	SDL_DestroyTexture(button_levelProperties.tooltip);
-	if (button_copy.tooltip != NULL)	SDL_DestroyTexture(button_copy.tooltip);
-	if (button_paste.tooltip != NULL)	SDL_DestroyTexture(button_paste.tooltip);
-	if (button_delete.tooltip != NULL)	SDL_DestroyTexture(button_delete.tooltip);
-	if (button_quit.tooltip != NULL)	SDL_DestroyTexture(button_quit.tooltip);
+	destroyButtonTextures(button_layerBackground);
+	destroyButtonTextures(button_layerTerrain);
+	destroyButtonTextures(button_layerTool);
+	destroyButtonTextures(button_layerBackgroundVisible);
+	destroyButtonTextures(button_layerTerrainVisible);
+	destroyButtonTextures(button_layerToolVisible);
+	destroyButtonTextures(button_save);
+	destroyButtonTextures(button_moveToBack);
+	destroyButtonTextures(button_moveToFront);
+	destroyButtonTextures(button_camera);
+	destroyButtonTextures(button_levelProperties);
+	destroyButtonTextures(button_copy);
+	destroyButtonTextures(button_paste);
+	destroyButtonTextures(button_delete);
+	destroyButtonTextures(button_quit);
 	TTF_CloseFont(tooltipFont);
+}
+
+void Bar::destroyButtonTextures(buttonInfo &button)
+{
+	if (button.buttonTexUp != NULL)	SDL_DestroyTexture(button.buttonTexUp);
+	if (button.buttonTexDown != NULL)	SDL_DestroyTexture(button.buttonTexDown);
+	if (button.tooltip != NULL)	SDL_DestroyTexture(button.tooltip);
 }

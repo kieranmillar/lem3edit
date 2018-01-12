@@ -48,10 +48,7 @@ public:
 	int type;
 	SDL_Rect barScrollRect;
 
-	SDL_Texture * buttonTexture;
-	int currentButtonTextureX;
-
-	struct buttonInfo { int texOnX; int texOnY; int texOffX; int texOffY; SDL_Texture * tooltip; };
+	struct buttonInfo { SDL_Texture * buttonTexUp; SDL_Texture * buttonTexDown; SDL_Texture * tooltip; };
 	enum buttonState { on, off };
 
 	buttonInfo button_layerBackground;
@@ -94,6 +91,7 @@ public:
 	Bar(void) { /* nothing to do */ };
 
 	void destroy(void);
+	void destroyButtonTextures(buttonInfo & button);
 };
 
 #endif // EDITOR_HPP
