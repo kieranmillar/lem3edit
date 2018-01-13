@@ -26,6 +26,7 @@ x             -- scroll object bar right
 
 a             -- select all on visible layers
 ctrl          -- select multiple
+alt           -- area select
 escape        -- select none
 delete        -- delete selected objects
 ctrl + c      -- copy
