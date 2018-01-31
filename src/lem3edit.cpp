@@ -28,6 +28,7 @@
 #include "level.hpp"
 #include "raw.hpp"
 #include "style.hpp"
+#include "tinyfiledialogs.h"
 #include "tribe.hpp"
 #include "window.hpp"
 
@@ -72,12 +73,30 @@ int main(int argc, char *argv[])
 
 	//SDL_EnableKeyboardRepeat(SDL_DEFAULT_REPEAT_DELAY, SDL_DEFAULT_REPEAT_INTERVAL);
 
-	int level_id = (argc > 1) ? atoi(argv[1]) : 1;
+	int level_id = 1;
+	char const * fileToOpen = NULL;
+
+	if (argc > 1)
+	{
+		level_id = atoi(argv[1]);
+	}
+	else
+	{
+		char const * filterPatterns[1] = { "*.DAT" };
+		fileToOpen = tinyfd_openFileDialog("Open level", NULL, 1, filterPatterns, "Lemmings 3 Level File", 0);
+	}
 
 	g_currentMode = EDITORMODE;
 
 	Editor editor;
-	editor.load(level_id, &window);
+	if (!fileToOpen)
+	{
+		editor.load(level_id, &window);
+	}
+	else
+	{
+		editor.load(fileToOpen, &window);
+	}
 
 	SDL_Event event;
 	while (SDL_WaitEvent(&event) && event.type != SDL_QUIT)

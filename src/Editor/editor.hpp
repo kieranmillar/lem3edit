@@ -83,6 +83,7 @@ public:
 	bool move_selected(signed int delta_x, signed int delta_y);
 
 	bool load(int n, Window * w);
+	bool load(const std::string &filename, Window * w);
 	bool save(int n);
 
 	bool toggleCameraVisibility(void);

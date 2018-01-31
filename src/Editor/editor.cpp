@@ -40,6 +40,15 @@ void Editor::resize(int w, int h)
 
 bool Editor::load(int n, Window * w)
 {
+	const string path = "LEVELS/";
+	const string level = "LEVEL";
+	const string dat = ".DAT";
+
+	return load(l3_filename(path, level, n, dat), w);
+}
+
+bool Editor::load(const std::string &filename, Window * w)
+{
 	window_ptr = w;
 	bar.setReferences(window_ptr, this, &canvas, &style);
 	canvas.setReferences(window_ptr, this, &editor_input, &bar, &style, &level);
@@ -47,7 +56,7 @@ bool Editor::load(int n, Window * w)
 	levelProperties.setReferences(window_ptr, this, &bar, &canvas, &level);
 	level.setReferences(window_ptr, &canvas, &style);
 	font.setReferences(window_ptr, &style);
-	level.load(n);
+	level.load(filename);
 	tribe.load(level.tribe);
 	style.load(level.style, window_ptr, tribe.palette);
 	//font.load("FONT"); //The in-game font. Not very practical for the editor so commented out

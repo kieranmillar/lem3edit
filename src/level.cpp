@@ -140,6 +140,13 @@ bool Level::load(unsigned int n)
 		load_objects(TEMP, path, temp, n);
 }
 
+bool Level::load(const std::string &filename)
+{
+	return load_level(filename) &&
+		load_objects(PERM, "LEVELS/", "PERM", perm) &&
+		load_objects(TEMP, "LEVELS/", "TEMP", temp);
+}
+
 bool Level::load_level(const std::string &path, const std::string &name, unsigned int n)
 {
 	const string dat = ".DAT";
