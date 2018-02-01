@@ -82,8 +82,8 @@ int main(int argc, char *argv[])
 	}
 	else
 	{
-		char const * filterPatterns[1] = { "*.DAT" };
-		fileToOpen = tinyfd_openFileDialog("Open level", NULL, 1, filterPatterns, "Lemmings 3 Level File", 0);
+		char const * filterPatterns[1] = { "LEVEL*.DAT" };
+		fileToOpen = tinyfd_openFileDialog("Open level", NULL, 1, filterPatterns, "Lemmings 3 Level File (LEVEL###.DAT)", 0);
 	}
 
 	g_currentMode = EDITORMODE;
@@ -135,6 +135,13 @@ void die(void)
 	SDL_PushEvent(&event);
 }
 
+string l3_filename_number(const int n)
+{
+	ostringstream filename;
+	filename << setfill('0') << setw(3) << n;
+	return filename.str();
+}
+
 string l3_filename(const string &path, const string &name, const string &ext)
 {
 	ostringstream filename;
@@ -145,7 +152,7 @@ string l3_filename(const string &path, const string &name, const string &ext)
 string l3_filename(const string &path, const string &name, int n, const string &ext)
 {
 	ostringstream filename;
-	filename << path << name << setfill('0') << setw(3) << n << ext;
+	filename << path << name << l3_filename_number(n) << ext;
 	return filename.str();
 }
 

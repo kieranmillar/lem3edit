@@ -36,6 +36,7 @@ enum programMode { EDITORMODE, LEVELPROPERTIESMODE };
 
 extern programMode g_currentMode;
 
+std::string l3_filename_number(const int n);
 std::string l3_filename(const std::string &path, const std::string &name, const std::string &ext);
 std::string l3_filename(const std::string &path, const std::string &name, int n, const std::string &ext);
 
