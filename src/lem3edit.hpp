@@ -25,6 +25,7 @@
 
 #include <string>
 #include <algorithm>
+#include <filesystem>
 
 #define BETWEEN(min_, val, max_) (std::max((int)(min_), std::min((int)(max_), (int)(val))))
 
@@ -41,7 +42,5 @@ std::string l3_filename(const std::string &path, const std::string &name, const 
 std::string l3_filename(const std::string &path, const std::string &name, int n, const std::string &ext);
 
 void die(void);
-
-void printDebugNumber(int n);
 
 #endif // LEM3EDIT_HPP

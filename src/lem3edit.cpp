@@ -25,6 +25,7 @@
 
 #include "Editor/editor.hpp"
 #include "font.hpp"
+#include "ini.hpp"
 #include "level.hpp"
 #include "raw.hpp"
 #include "style.hpp"
@@ -72,6 +73,34 @@ int main(int argc, char *argv[])
 	}
 
 	//SDL_EnableKeyboardRepeat(SDL_DEFAULT_REPEAT_DELAY, SDL_DEFAULT_REPEAT_INTERVAL);
+
+	//load ini file
+	Ini ini;
+
+	if (! ini.load())
+	{
+		tinyfd_messageBox(
+			"Welcome to Lem3edit!",
+			"Welcome to Lem3edit!\n\nBefore we begin, Lem3edit needs to know the location of L3CD.EXE so it can extract the game's graphics.\n\nIf you have not already done so, you need to extract the contents of your Lemmings 3 CD to your hard drive, and you will find L3CD there.\n\nYou will now be asked to browse to and select L3CD.EXE",
+			"ok",
+			"info",
+			0);
+		char const * filterPatterns[1] = { "L3CD.EXE" };
+		char const * lem3cd = NULL;
+		lem3cd = tinyfd_openFileDialog("Find L3CD.EXE", NULL, 1, filterPatterns, "Lemmings 3 Executable (L3CD.EXE)", 0);
+		if (lem3cd == NULL)
+		{
+			tinyfd_messageBox(
+				"Fatal Error!",
+				"Without a link to L3CD, Lem3Edit cannot run. Sorry!",
+				"ok",
+				"error",
+				0);
+			return EXIT_FAILURE;
+		}
+		ini.setLem3cdPath(lem3cd);
+		ini.save();
+	}
 
 	int level_id = 1;
 	char const * fileToOpen = NULL;
@@ -164,11 +193,4 @@ void version(void)
 	SDL_Log("This is free software.  You may redistribute copies of it under the terms of\n");
 	SDL_Log("the GNU General Public License <http://www.gnu.org/licenses/gpl.html>.\n");
 	SDL_Log("There is NO WARRANTY, to the extent permitted by law.\n");
-}
-
-void printDebugNumber(int n)
-{
-	std::string str = std::to_string(n);
-	char const *pchar = str.c_str();  //use char const* as target type
-	SDL_ShowSimpleMessageBox(0, "Debug", pchar, NULL);
 }
