@@ -26,10 +26,13 @@ This file is the top level object of the editor and handles some general purpose
 #include <algorithm>
 #include <cassert>
 #include <iostream>
+#include <filesystem>
 using namespace std;
+namespace fs = std::experimental::filesystem::v1;
 
-Editor::Editor(void)
+Editor::Editor(fs::path data)
 {
+	dataPath = data;
 }
 
 void Editor::resize(int w, int h)

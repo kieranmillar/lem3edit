@@ -117,7 +117,7 @@ int main(int argc, char *argv[])
 
 	g_currentMode = EDITORMODE;
 
-	Editor editor;
+	Editor editor (ini.getLem3cdPath().parent_path());
 	if (!fileToOpen)
 	{
 		editor.load(level_id, &window);
