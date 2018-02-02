@@ -44,7 +44,7 @@ bool Ini::load(void)
 	iniPath /= "lem3edit.ini";
 	if (fs::exists(iniPath))
 	{
-		std::ifstream iniFile("lem3edit.ini", std::ios::trunc);
+		std::ifstream iniFile(iniPath, std::ios::out);
 		
 		if (iniFile.is_open())
 		{
@@ -62,7 +62,7 @@ bool Ini::load(void)
 					if (key == "CD")
 						setLem3cdPath (value);
 					if (key == "INSTALL")
-						setLem3installPath (iniPath);
+						setLem3installPath (value);
 					if (key == "DOSBOX")
 						setDosBoxPath (value);
 					if (key == "LASTPACK")
@@ -74,13 +74,13 @@ bool Ini::load(void)
 		}
 		else
 		{
-			SDL_Log("Failed to open '%s'\n", iniPath);
+			SDL_Log("Failed to open ini file.");
 			return false;
 		}
 	}
 	else
 	{
-		SDL_Log("ini file doesn't exist at '%s'\n", iniPath);
+		SDL_Log("ini file doesn't exist.");
 		return false;
 	}
 	return true;
@@ -91,7 +91,7 @@ bool Ini::save(void)
 	fs::path iniPath = fs::current_path();
 	iniPath /= "lem3edit.ini";
 
-	std::ofstream iniFile("lem3edit.ini", std::ios::trunc);
+	std::ofstream iniFile(iniPath, std::ios::in | std::ios::trunc);
 	if (iniFile.is_open())
 	{
 		iniFile << "CD=" << getLem3cdPath() << "\n";
@@ -102,7 +102,7 @@ bool Ini::save(void)
 	}
 	else
 	{
-		SDL_Log("Failed to save '%s'\n", iniPath);
+		SDL_Log("Failed to save ini file.");
 		return false;
 	}
 	return true;
