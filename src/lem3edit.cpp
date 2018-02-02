@@ -128,6 +128,9 @@ int main(int argc, char *argv[])
 	}
 
 	SDL_Event event;
+	//prevent open file dialog mouse clicks from carrying over once level loaded
+	SDL_PumpEvents();
+	SDL_FlushEvents(SDL_MOUSEMOTION, SDL_MOUSEWHEEL);
 	while (SDL_WaitEvent(&event) && event.type != SDL_QUIT)
 	{
 		switch (g_currentMode)
