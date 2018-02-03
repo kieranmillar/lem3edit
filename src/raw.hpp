@@ -25,6 +25,9 @@
 #include <cassert>
 #include <string>
 #include <vector>
+#include <filesystem>
+
+namespace fs = std::experimental::filesystem::v1;
 
 class Raw
 {
@@ -35,17 +38,17 @@ public:
 
 	void blit(SDL_Surface *dest, signed int x, signed int y, unsigned int frame) const;
 
-	bool load(std::string name);
-	bool load_raw(std::string raw_filename);
+	bool load(fs::path basePath, std::string name);
+	bool load_raw(fs::path raw_filename);
 
 	void destroy();
 
 	Raw(unsigned int width, unsigned int height) : width(width), height(height), frame() { assert(width % 4 == 0); }
 	~Raw(void) { destroy(); }
 
-private:
-	Raw(const Raw &);
-	Raw & operator=(const Raw &);
+	/*private:
+		Raw(const Raw &);
+		Raw & operator=(const Raw &);*/
 };
 
 #endif // RAW_HPP

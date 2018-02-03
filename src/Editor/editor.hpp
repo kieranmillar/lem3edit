@@ -34,6 +34,9 @@
 #include "SDL.h"
 
 #include <set>
+#include <filesystem>
+
+namespace fs = std::experimental::filesystem::v1;
 
 class Editor
 {
@@ -50,6 +53,8 @@ public:
 	Level level;
 	Tribe tribe;
 	Style style;
+
+	fs::path dataPath;
 
 	typedef std::set<Level::Object::Index> Selection;
 	Selection selection;
@@ -82,18 +87,17 @@ public:
 	bool delete_selected(void);
 	bool move_selected(signed int delta_x, signed int delta_y);
 
-	bool load(int n, Window * w);
-	bool save(int n);
+	bool load(const fs::path filename, Window * w);
 
 	bool toggleCameraVisibility(void);
 	bool move_camera(signed int delta_x, signed int delta_y);
 
-	Editor(void);
+	Editor(fs::path data);
 	~Editor(void) { /* nothing to do */ }
 
-private:
-	Editor(const Editor &);
-	Editor & operator=(const Editor &);
+	/*private:
+		Editor(const Editor &);
+		Editor & operator=(const Editor &);*/
 };
 
 #endif // EDITOR_HPP

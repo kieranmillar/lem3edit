@@ -18,18 +18,21 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
-/*
-This file is the top level object of the editor and handles some general purpose functionality
-*/
+ /*
+ This file is the top level object of the editor and handles some general purpose functionality
+ */
 #include "editor.hpp"
 
 #include <algorithm>
 #include <cassert>
 #include <iostream>
+#include <filesystem>
 using namespace std;
+namespace fs = std::experimental::filesystem::v1;
 
-Editor::Editor(void)
+Editor::Editor(fs::path data)
 {
+	dataPath = data;
 }
 
 void Editor::resize(int w, int h)
@@ -38,7 +41,7 @@ void Editor::resize(int w, int h)
 	bar.resizeBarScrollRect(w, h);
 }
 
-bool Editor::load(int n, Window * w)
+bool Editor::load(const fs::path filename, Window * w)
 {
 	window_ptr = w;
 	bar.setReferences(window_ptr, this, &canvas, &style);
@@ -47,9 +50,9 @@ bool Editor::load(int n, Window * w)
 	levelProperties.setReferences(window_ptr, this, &bar, &canvas, &level);
 	level.setReferences(window_ptr, &canvas, &style);
 	font.setReferences(window_ptr, &style);
-	level.load(n);
-	tribe.load(level.tribe);
-	style.load(level.style, window_ptr, tribe.palette);
+	level.load(filename);
+	tribe.load(level.tribe, dataPath);
+	style.load(level.style, window_ptr, tribe.palette, dataPath);
 	//font.load("FONT"); //The in-game font. Not very practical for the editor so commented out
 	//font.createFont();
 	bar.load();
@@ -59,13 +62,6 @@ bool Editor::load(int n, Window * w)
 	gameFrameCount = 0;
 	gameFrameTick = SDL_GetTicks();
 	startCameraOn = false;
-
-	return canvas.redraw = true;
-}
-
-bool Editor::save(int n)
-{
-	level.save(n);
 
 	return canvas.redraw = true;
 }

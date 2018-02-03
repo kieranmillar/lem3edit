@@ -25,6 +25,9 @@
 
 #include <string>
 #include <algorithm>
+#include <filesystem>
+
+namespace fs = std::experimental::filesystem::v1;
 
 #define BETWEEN(min_, val, max_) (std::max((int)(min_), std::min((int)(max_), (int)(val))))
 
@@ -36,11 +39,12 @@ enum programMode { EDITORMODE, LEVELPROPERTIESMODE };
 
 extern programMode g_currentMode;
 
-std::string l3_filename(const std::string &path, const std::string &name, const std::string &ext);
-std::string l3_filename(const std::string &path, const std::string &name, int n, const std::string &ext);
+std::string l3_filename_number(const int n);
+fs::path l3_filename_data(const fs::path basePath, const std::string &folder, const std::string &name, const std::string &ext);
+fs::path l3_filename_data(const fs::path basePath, const std::string &folder, const std::string &name, int n, const std::string &ext);
+fs::path l3_filename_level(const fs::path parentPath, const std::string &name, const std::string &ext);
+fs::path l3_filename_level(const fs::path parentPath, const std::string &name, int n, const std::string &ext);
 
 void die(void);
-
-void printDebugNumber(int n);
 
 #endif // LEM3EDIT_HPP

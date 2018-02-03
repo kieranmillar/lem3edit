@@ -26,6 +26,9 @@
 #include "SDL.h"
 
 #include <string>
+#include <filesystem>
+
+namespace fs = std::experimental::filesystem::v1;
 
 class Tribe
 {
@@ -36,9 +39,9 @@ public:
 
 	SDL_Color palette[32];
 
-	bool load(unsigned int n);
-	bool load_palette(std::string path, std::string name, unsigned int n);
-	bool load_palette(std::string pal_filename);
+	bool load(unsigned int n, fs::path basePath);
+	bool load_palette(fs::path basePath, std::string folder, std::string name, unsigned int n);
+	bool load_palette(fs::path pal_filename);
 };
 
 #endif // TRIBE_HPP

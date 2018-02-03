@@ -126,7 +126,7 @@ void Editor_input::handleEditorEvents(SDL_Event event)
 		{
 			switch (resizingWhich)
 			{
-			case (top) :
+			case (top):
 			{
 				resizingNewPos = mouse_y - (mouse_y % 4);
 				if (level_ptr->height - resizingNewPos > 400)
@@ -135,7 +135,7 @@ void Editor_input::handleEditorEvents(SDL_Event event)
 					resizingNewPos = level_ptr->height - 160;
 				break;
 			}
-			case (bottom) :
+			case (bottom):
 			{
 				resizingNewPos = mouse_y - (mouse_y % 4);
 				if (resizingNewPos > 400)
@@ -144,7 +144,7 @@ void Editor_input::handleEditorEvents(SDL_Event event)
 					resizingNewPos = 160;
 				break;
 			}
-			case (left) :
+			case (left):
 			{
 				resizingNewPos = mouse_x - (mouse_x % 8);
 				if (level_ptr->width - resizingNewPos > 2048)
@@ -153,7 +153,7 @@ void Editor_input::handleEditorEvents(SDL_Event event)
 					resizingNewPos = level_ptr->width - 320;
 				break;
 			}
-			case (right) :
+			case (right):
 			{
 				resizingNewPos = mouse_x - (mouse_x % 8);
 				if (resizingNewPos > 2048)
@@ -270,7 +270,7 @@ void Editor_input::handleEditorEvents(SDL_Event event)
 					}
 					if (mouse_x_window > 111 && mouse_x_window < 143)
 					{
-						editor_ptr->save(level_ptr->level_id);
+						level_ptr->save();
 					}
 				}
 				if (mouse_y_window > window_ptr->height - BAR_HEIGHT + 39 && mouse_y_window < window_ptr->height - BAR_HEIGHT + 71)
@@ -413,24 +413,24 @@ void Editor_input::handleEditorEvents(SDL_Event event)
 			{
 				switch (resizingWhich)
 				{
-				case (top) :
+				case (top):
 				{
 					level_ptr->resizeLevel(0, -resizingNewPos, true);
 					canvas_ptr->scroll(0, -resizingNewPos * canvas_ptr->zoom, false);
 					break;
 				}
-				case (bottom) :
+				case (bottom):
 				{
 					level_ptr->resizeLevel(0, resizingNewPos - level_ptr->height, false);
 					break;
 				}
-				case (left) :
+				case (left):
 				{
 					level_ptr->resizeLevel(-resizingNewPos, 0, true);
 					canvas_ptr->scroll(-resizingNewPos * canvas_ptr->zoom, 0, false);
 					break;
 				}
-				case (right) :
+				case (right):
 				{
 					level_ptr->resizeLevel(resizingNewPos - level_ptr->width, 0, false);
 					break;
@@ -504,7 +504,7 @@ void Editor_input::handleEditorEvents(SDL_Event event)
 				bar_ptr->changeType(TOOL);
 			break;
 		case SDLK_s:
-			editor_ptr->save(level_ptr->level_id);
+			level_ptr->save();
 			break;
 		case SDLK_ESCAPE:
 			editor_ptr->select_none();
@@ -577,82 +577,82 @@ void Editor_input::handleEditorEvents(SDL_Event event)
 
 			canvas_ptr->scroll(delta_x, delta_y, dragging);
 		}
-			{ // bar scroll
-				const signed int left = key_state[SDL_GetScancodeFromKey(SDLK_z)] ? 20 : 0;
-				const signed int right = key_state[SDL_GetScancodeFromKey(SDLK_x)] ? 20 : 0;
-				signed int delta_x = (-left + right) * delta_multiplier;
+		{ // bar scroll
+			const signed int left = key_state[SDL_GetScancodeFromKey(SDLK_z)] ? 20 : 0;
+			const signed int right = key_state[SDL_GetScancodeFromKey(SDLK_x)] ? 20 : 0;
+			signed int delta_x = (-left + right) * delta_multiplier;
 
-				bar_ptr->scroll(delta_x);
-			}
-			if (mouse_state & SDL_BUTTON(SDL_BUTTON_LEFT))
+			bar_ptr->scroll(delta_x);
+		}
+		if (mouse_state & SDL_BUTTON(SDL_BUTTON_LEFT))
+		{
+			if (mouse_y_window > window_ptr->height - 16) // scroll bar area
 			{
-				if (mouse_y_window > window_ptr->height - 16) // scroll bar area
+				if (leftScrollButtonHolding
+					&& mouse_x_window > PANEL_WIDTH
+					&& mouse_x_window < PANEL_WIDTH + 16)
 				{
-					if (leftScrollButtonHolding
-						&& mouse_x_window > PANEL_WIDTH
-						&& mouse_x_window < PANEL_WIDTH + 16)
+					bar_ptr->scroll(-50);
+				}
+				if (rightScrollButtonHolding
+					&& mouse_x_window > window_ptr->width - 16)
+				{
+					bar_ptr->scroll(50);
+				}
+				if (scrollBarShifting
+					&& mouse_x_window < window_ptr->width - 16
+					&& mouse_x_window > PANEL_WIDTH + 16)
+				{
+					if (bar_ptr->barScrollRect.x > mouse_x_window)
 					{
-						bar_ptr->scroll(-50);
+						bar_ptr->moveScrollBar(bar_ptr->barScrollRect.x - (bar_ptr->barScrollRect.w / 2));
 					}
-					if (rightScrollButtonHolding
-						&& mouse_x_window > window_ptr->width - 16)
+					else if (bar_ptr->barScrollRect.x + bar_ptr->barScrollRect.w < mouse_x_window)
 					{
-						bar_ptr->scroll(50);
-					}
-					if (scrollBarShifting
-						&& mouse_x_window < window_ptr->width - 16
-						&& mouse_x_window > PANEL_WIDTH + 16)
-					{
-						if (bar_ptr->barScrollRect.x > mouse_x_window)
-						{
-							bar_ptr->moveScrollBar(bar_ptr->barScrollRect.x - (bar_ptr->barScrollRect.w / 2));
-						}
-						else if (bar_ptr->barScrollRect.x + bar_ptr->barScrollRect.w < mouse_x_window)
-						{
-							bar_ptr->moveScrollBar(bar_ptr->barScrollRect.x + (bar_ptr->barScrollRect.w / 2));
-						}
+						bar_ptr->moveScrollBar(bar_ptr->barScrollRect.x + (bar_ptr->barScrollRect.w / 2));
 					}
 				}
 			}
+		}
 
-			//Only draw if time between this frame and last was neither too long nor too short
-			Uint32 ticksSinceLastFrame = SDL_GetTicks() - editor_ptr->gameFrameTick;
-			editor_ptr->gameFrameTick = SDL_GetTicks();
-			if (ticksSinceLastFrame <= 36 && ticksSinceLastFrame >= 30)
-			{
-				canvas_ptr->draw();
-				bar_ptr->draw(mouse_x_window, mouse_y_window);
-			}
-			//SDL_Log("Frame: %d", ticksSinceLastFrame);
+		//Only draw if time between this frame and last was neither too long nor too short
+		Uint32 ticksSinceLastFrame = SDL_GetTicks() - editor_ptr->gameFrameTick;
+		editor_ptr->gameFrameTick = SDL_GetTicks();
+		if (ticksSinceLastFrame <= 36 && ticksSinceLastFrame >= 30)
+		{
+			canvas_ptr->draw();
+			bar_ptr->draw(mouse_x_window, mouse_y_window);
+		}
+		//SDL_Log("Frame: %d", ticksSinceLastFrame);
 
-			SDL_SetRenderTarget(window_ptr->screen_renderer, NULL);
-			SDL_RenderCopy(window_ptr->screen_renderer, window_ptr->screen_texture, NULL, NULL);
-			//Commented out code below to view the palette
-			/*SDL_Rect r;
-			r.x = 0;
-			r.y = 0;
-			r.w = 20;
-			r.h = 20;
-			for (int i = 0; i < 209; i++)
-			{
-			SDL_SetRenderDrawColor(window_ptr->screen_renderer, style_ptr->palette[i].r, style_ptr->palette[i].g, style_ptr->palette[i].b, 255);
-			SDL_RenderFillRect(window_ptr->screen_renderer, &r);
-			r.x += 20;
-			if (r.x > 500)
-			{
-			r.x = 0;
-			r.y += 20;
-			}
-			}*/
+		SDL_SetRenderTarget(window_ptr->screen_renderer, NULL);
+		SDL_RenderCopy(window_ptr->screen_renderer, window_ptr->screen_texture, NULL, NULL);
+		//Commented out code below to view the palette
+		/*SDL_Rect r;
+		r.x = 0;
+		r.y = 0;
+		r.w = 20;
+		r.h = 20;
+		for (int i = 0; i < 209; i++)
+		{
+		SDL_SetRenderDrawColor(window_ptr->screen_renderer, style_ptr->palette[i].r, style_ptr->palette[i].g, style_ptr->palette[i].b, 255);
+		SDL_RenderFillRect(window_ptr->screen_renderer, &r);
+		r.x += 20;
+		if (r.x > 500)
+		{
+		r.x = 0;
+		r.y += 20;
+		}
+		}*/
 
-			if (holdingType != -1 && holdingID != -1)
-				canvas_ptr->drawHeldObject(holdingType, holdingID, mouse_x_window, mouse_y_window);
+		if (holdingType != -1 && holdingID != -1)
+			canvas_ptr->drawHeldObject(holdingType, holdingID, mouse_x_window, mouse_y_window);
 
-			SDL_RenderPresent(window_ptr->screen_renderer);
+		SDL_RenderPresent(window_ptr->screen_renderer);
 
-			editor_ptr->gameFrameCount++;
+		editor_ptr->gameFrameCount++;
 
-			break;
+		break;
 	}
 	default:
 	{

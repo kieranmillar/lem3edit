@@ -1,4 +1,6 @@
-Lemmings 3 Level Editor (lem3edit SVN)
+Lemmings 3 Level Editor (lem3edit GIT)
+
+https://github.com/kieranmillar/lem3edit
 ================================================================================
 
 syntax: lem3edit <level_number>
@@ -44,3 +46,14 @@ shift         -- ... faster
 
 [             -- cycle object id down
 ]             -- cycle object id up
+
+== Credits =====================================================================
+
+Originally by Carl Reinke https://bitbucket.org/mindless/lemmings-tools
+Updating by Kieran Millar
+Thanks to Simon from Lemmings Forums for help and CMake support
+
+This program uses:
+SDL2 https://www.libsdl.org/index.php
+SDL_ttf https://www.libsdl.org/projects/SDL_ttf/
+Tiny File Dialogs https://sourceforge.net/projects/tinyfiledialogs/

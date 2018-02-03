@@ -18,9 +18,9 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
-/*
-This file contains code for reading from Lemmings 3's DEL files. These contain game fonts
-*/
+ /*
+ This file contains code for reading from Lemmings 3's DEL files. These contain game fonts
+ */
 
 #include "del.hpp"
 #include "lem3edit.hpp"
@@ -30,7 +30,10 @@ This file contains code for reading from Lemmings 3's DEL files. These contain g
 #include <cassert>
 #include <fstream>
 #include <iostream>
+#include <filesystem>
+
 using namespace std;
+namespace fs = std::experimental::filesystem::v1;
 
 void Del::setReferences(Window * w, Style * s)
 {
@@ -155,22 +158,22 @@ void Del::blit_text(SDL_Surface *surface, signed int x, signed int y, const stri
 	}
 }
 
-bool Del::load(const std::string &name)
+bool Del::load(const fs::path basePath, const std::string name)
 {
-	const string path = "GRAPHICS/";
+	const string folder = "GRAPHICS";
 	const string din = ".DIN", del = ".DEL";
 
-	return load(l3_filename(path, name, din), l3_filename(path, name, del));
+	return load(l3_filename_data(basePath, folder, name, din), l3_filename_data(basePath, folder, name, del));
 }
 
-bool Del::load(const std::string &path, const std::string &name, unsigned int n)
+bool Del::load(const fs::path basePath, const std::string &folder, const std::string &name, unsigned int n)
 {
 	const string din = ".DIN", del = ".DEL";
 
-	return load(l3_filename(path, name, n, din), l3_filename(path, name, n, del));
+	return load(l3_filename_data(basePath, folder, name, n, din), l3_filename_data(basePath, folder, name, n, del));
 }
 
-bool Del::load(const string &din_filename, const string &del_filename)
+bool Del::load(const fs::path din_filename, const fs::path del_filename)
 {
 	frame.clear();
 
@@ -207,7 +210,7 @@ bool Del::load(const string &din_filename, const string &del_filename)
 		frame.push_back(f);
 	}
 
-	SDL_Log("Loaded %d images from '%s'\n", frame.size(), del_filename.c_str());
+	SDL_Log("Loaded %d images from '%s'\n", frame.size(), del_filename);
 
 	return true;
 }

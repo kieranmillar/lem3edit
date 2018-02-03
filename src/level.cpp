@@ -24,9 +24,12 @@
 #include "style.hpp"
 
 #include <cassert>
+#include <filesystem>
 #include <fstream>
 #include <iostream>
+
 using namespace std;
+namespace fs = std::experimental::filesystem::v1;
 
 void Level::setReferences(Window * w, Canvas * c, Style * s)
 {
@@ -127,32 +130,34 @@ std::vector<int> Level::get_objects_in_area(int areaX, int areaY, int areaW, int
 	return tmp;
 }
 
-bool Level::load(unsigned int n)
+bool Level::load(const fs::path filename)
 {
-	const string path = "LEVELS/";
-	const string level = "LEVEL";
-	const string perm = "PERM", temp = "TEMP";
+	levelPath = filename.parent_path();
 
-	level_id = n;
+	string levelNum = filename.stem().generic_string();
+	levelNum = levelNum.substr(5, 8);
+	level_id = atoi(levelNum.c_str());
 
-	return load_level(path, level, n) &&
-		load_objects(PERM, path, perm, n) &&
-		load_objects(TEMP, path, temp, n);
+	string parentPathStr = levelPath.generic_string();
+
+	return load_level(filename) &&
+		load_objects(PERM, parentPathStr, "PERM", perm) &&
+		load_objects(TEMP, parentPathStr, "TEMP", temp);
 }
 
 bool Level::load_level(const std::string &path, const std::string &name, unsigned int n)
 {
 	const string dat = ".DAT";
 
-	return load_level(l3_filename(path, name, n, dat));
+	return load_level(l3_filename_level(path, name, n, dat));
 }
 
-bool Level::load_level(const string &filename)
+bool Level::load_level(const fs::path filename)
 {
-	ifstream f(filename.c_str(), ios::binary);
+	ifstream f(filename, ios::binary);
 	if (!f)
 	{
-		SDL_Log("Failed to open '%s'\n", filename.c_str());
+		SDL_Log("Failed to open '%s'\n", filename.generic_string().c_str());
 		return false;
 	}
 
@@ -173,22 +178,22 @@ bool Level::load_level(const string &filename)
 	f.read((char *)&release_delay, sizeof(release_delay));
 	f.read((char *)&enemies, sizeof(enemies));
 
-	SDL_Log("Loaded level from  '%s'\n", filename.c_str());
+	SDL_Log("Loaded level from  '%s'\n", filename.generic_string().c_str());
 
 	f.close();
 	return true;
 }
 
-bool Level::load_objects(int type, const string &path, const string &name, unsigned int n)
+bool Level::load_objects(int type, const fs::path parentPath, const string &name, unsigned int n)
 {
 	assert((unsigned)type < COUNTOF(this->object));
 
 	const string obs = ".OBS";
 
-	return load_objects(type, l3_filename(path, name, n, obs));
+	return load_objects(type, l3_filename_level(parentPath, name, n, obs));
 }
 
-bool Level::load_objects(int type, const string &filename)
+bool Level::load_objects(int type, const fs::path filename)
 {
 	assert((unsigned)type < COUNTOF(this->object));
 
@@ -196,10 +201,10 @@ bool Level::load_objects(int type, const string &filename)
 	if (type == PERM)
 		object[TOOL].clear();
 
-	ifstream f(filename.c_str(), ios::binary);
+	ifstream f(filename, ios::binary);
 	if (!f)
 	{
-		SDL_Log("Failed to open '%s'\n", filename.c_str());
+		SDL_Log("Failed to open '%s'\n", filename);
 		return false;
 	}
 
@@ -225,9 +230,9 @@ bool Level::load_objects(int type, const string &filename)
 	}
 
 	if (type == PERM)
-		SDL_Log("Loaded %d + %d objects from '%s'\n", object[type].size(), object[TOOL].size(), filename.c_str());
+		SDL_Log("Loaded %d + %d objects from '%s'\n", object[type].size(), object[TOOL].size(), filename);
 	if (type == TEMP)
-		SDL_Log("Loaded %d objects from '%s'\n", object[type].size(), filename.c_str());
+		SDL_Log("Loaded %d objects from '%s'\n", object[type].size(), filename);
 	f.close();
 	return true;
 }
@@ -264,18 +269,16 @@ bool Level::validate(const Object * o, const int type)
 	return true;
 }
 
-bool Level::save(unsigned int n)
+bool Level::save(void)
 {
-	const string path = "LEVELS/";
-	const string level = "LEVEL";
-	const string perm = "PERM", temp = "TEMP";
-
 	enemies = 0;
 	extra_lemmings = 0;
+	perm = level_id;
+	temp = level_id;
 
-	if (save_objects(PERM, path, perm, n) &&
-		save_objects(TEMP, path, temp, n) &&
-		save_level(path, level, n) == true)
+	if (save_objects(PERM, levelPath, level_id) &&
+		save_objects(TEMP, levelPath, level_id) &&
+		save_level(levelPath, level_id) == true)
 	{
 		SDL_ShowSimpleMessageBox(0, "Save Complete", "Level saved!", NULL);
 		return true;
@@ -287,19 +290,17 @@ bool Level::save(unsigned int n)
 	}
 }
 
-bool Level::save_level(const std::string &path, const std::string &name, unsigned int n)
+bool Level::save_level(const fs::path parentPath, unsigned int n)
 {
-	const string dat = ".DAT";
-
-	return save_level(l3_filename(path, name, n, dat));
+	return save_level(l3_filename_level(parentPath, "LEVEL", n, ".DAT"));
 }
 
-bool Level::save_level(const string &filename)
+bool Level::save_level(const fs::path filename)
 {
-	ofstream f(filename.c_str(), ios::binary | ios::trunc);
+	ofstream f(filename, ios::binary | ios::trunc);
 	if (!f)
 	{
-		SDL_Log("Failed to open '%s'\n", filename.c_str());
+		SDL_Log("Failed to open '%s'\n", filename);
 		return false;
 	}
 
@@ -320,28 +321,33 @@ bool Level::save_level(const string &filename)
 	f.write((char *)&release_delay, sizeof(release_delay));
 	f.write((char *)&enemies, sizeof(enemies));
 
-	SDL_Log("Wrote level to '%s'\n", filename.c_str());
+	SDL_Log("Wrote level to '%s'\n", filename);
 	f.close();
 	return true;
 }
 
-bool Level::save_objects(int type, const string &path, const string &name, unsigned int n)
+bool Level::save_objects(int type, fs::path parentPath, unsigned int n)
 {
 	assert((unsigned)type < COUNTOF(this->object));
 
 	const string obs = ".OBS";
+	string name;
 
-	return save_objects(type, l3_filename(path, name, n, obs));
+	if (type == PERM)
+		name = "PERM";
+	else
+		name = "TEMP";
+	return save_objects(type, l3_filename_level(parentPath, name, n, ".OBS"));
 }
 
-bool Level::save_objects(int type, const string &filename)
+bool Level::save_objects(int type, const fs::path filename)
 {
 	assert((unsigned)type < COUNTOF(this->object));
 
-	ofstream f(filename.c_str(), ios::binary | ios::trunc);
+	ofstream f(filename, ios::binary | ios::trunc);
 	if (!f)
 	{
-		SDL_Log("Failed to open '%s'\n", filename.c_str());
+		SDL_Log("Failed to open '%s'\n", filename);
 		return false;
 	}
 
@@ -370,7 +376,7 @@ bool Level::save_objects(int type, const string &filename)
 		savingType = TOOL;
 	}
 
-	SDL_Log("Wrote %d objects to '%s'\n", count, filename.c_str());
+	SDL_Log("Wrote %d objects to '%s'\n", count, filename);
 
 	f.close();
 	return true;
