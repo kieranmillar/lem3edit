@@ -82,7 +82,7 @@ int main(int argc, char *argv[])
 	{
 		tinyfd_messageBox(
 			"Welcome to Lem3edit!",
-			"Welcome to Lem3edit!\n\nBefore we begin, Lem3edit needs to know the location of L3CD.EXE so it can extract the game's graphics.\n\nIf you have not already done so, you need to extract the contents of your Lemmings 3 CD to your hard drive, and you will find L3CD there.\n\nYou will now be asked to browse to and select L3CD.EXE",
+			"Welcome to Lem3edit!\n\nBefore we begin, Lem3edit needs to know the location of L3CD.EXE so it can extract the game's graphics.\n\nIf you have not already done so, you need to extract the contents of your Lemmings 3 CD to your hard drive, and you will find L3CD.EXE there.\n\nYou will now be asked to browse to and select L3CD.EXE",
 			"ok",
 			"info",
 			0);
@@ -93,7 +93,7 @@ int main(int argc, char *argv[])
 		{
 			tinyfd_messageBox(
 				"Fatal Error!",
-				"Without a link to L3CD, Lem3Edit cannot run. Sorry!",
+				"Without a link to L3CD.EXE, Lem3Edit cannot run. Sorry!",
 				"ok",
 				"error",
 				0);
@@ -101,6 +101,12 @@ int main(int argc, char *argv[])
 		}
 		ini.setLem3cdPath(lem3cd);
 		ini.save();
+		tinyfd_messageBox(
+			"Welcome to Lem3edit!",
+			"Excellent! You've successfully set up Lem3edit!\n\nThis was one-time installation. From now on, you'll be asked to open a level file when you load the program.",
+			"ok",
+			"info",
+			0);
 	}
 
 	char const * fileToOpen = NULL;
