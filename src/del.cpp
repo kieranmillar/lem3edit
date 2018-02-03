@@ -18,9 +18,9 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
-/*
-This file contains code for reading from Lemmings 3's DEL files. These contain game fonts
-*/
+ /*
+ This file contains code for reading from Lemmings 3's DEL files. These contain game fonts
+ */
 
 #include "del.hpp"
 #include "lem3edit.hpp"

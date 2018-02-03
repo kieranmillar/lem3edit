@@ -18,10 +18,10 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
-/*
-This file contains code for reading from Lemmings 3's TRIBE and TPANL files
-These contain palette and animation information
-*/
+ /*
+ This file contains code for reading from Lemmings 3's TRIBE and TPANL files
+ These contain palette and animation information
+ */
 
 #include "lem3edit.hpp"
 #include "tribe.hpp"

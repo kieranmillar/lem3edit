@@ -27,6 +27,8 @@
 #include <algorithm>
 #include <filesystem>
 
+namespace fs = std::experimental::filesystem::v1;
+
 #define BETWEEN(min_, val, max_) (std::max((int)(min_), std::min((int)(max_), (int)(val))))
 
 #define COUNTOF( x ) (sizeof(x) / sizeof(*(x)))
@@ -38,8 +40,10 @@ enum programMode { EDITORMODE, LEVELPROPERTIESMODE };
 extern programMode g_currentMode;
 
 std::string l3_filename_number(const int n);
-std::string l3_filename(const std::string &path, const std::string &name, const std::string &ext);
-std::string l3_filename(const std::string &path, const std::string &name, int n, const std::string &ext);
+fs::path l3_filename_data(const std::string &basePath, const std::string &folder, const std::string &name, const std::string &ext);
+fs::path l3_filename_data(const std::string &basePath, const std::string &folder, const std::string &name, int n, const std::string &ext);
+fs::path l3_filename_level(const std::string &basePath, const std::string &name, const std::string &ext);
+fs::path l3_filename_level(const std::string &basePath, const std::string &name, int n, const std::string &ext);
 
 void die(void);
 

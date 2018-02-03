@@ -40,6 +40,7 @@
 #include <sstream>
 #include <string>
 using namespace std;
+namespace fs = std::experimental::filesystem::v1;
 
 const char *prog_name = "lem3edit";
 const char *prog_ver = "1.1";
@@ -174,18 +175,47 @@ string l3_filename_number(const int n)
 	return filename.str();
 }
 
-string l3_filename(const string &path, const string &name, const string &ext)
+fs::path l3_filename_data(const string &basePath, const std::string &folder, const string &name, const string &ext)
 {
-	ostringstream filename;
-	filename << path << name << ext;
-	return filename.str();
+	fs::path filePath;
+	filePath = basePath;
+	filePath /= folder;
+	filePath /= name;
+	filePath += ext;
+
+	return filePath;
 }
 
-string l3_filename(const string &path, const string &name, int n, const string &ext)
+fs::path l3_filename_data(const string &basePath, const std::string &folder, const string &name, int n, const string &ext)
 {
-	ostringstream filename;
-	filename << path << name << l3_filename_number(n) << ext;
-	return filename.str();
+	fs::path filePath;
+	filePath = basePath;
+	filePath /= name;
+	filePath += l3_filename_number(n);
+	filePath += ext;
+
+	return filePath;
+}
+
+fs::path l3_filename_level(const string &basePath, const string &name, const string &ext)
+{
+	fs::path filePath;
+	filePath = basePath;
+	filePath /= name;
+	filePath += ext;
+
+	return filePath;
+}
+
+fs::path l3_filename_level(const string &basePath, const string &name, int n, const string &ext)
+{
+	fs::path filePath;
+	filePath = basePath;
+	filePath /= name;
+	filePath += l3_filename_number(n);
+	filePath += ext;
+
+	return filePath;
 }
 
 void version(void)
