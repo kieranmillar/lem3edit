@@ -204,7 +204,7 @@ bool Level::load_objects(int type, const fs::path filename)
 	ifstream f(filename, ios::binary);
 	if (!f)
 	{
-		SDL_Log("Failed to open '%s'\n", filename);
+		SDL_Log("Failed to open '%s'\n", filename.generic_string().c_str());
 		return false;
 	}
 
@@ -230,9 +230,9 @@ bool Level::load_objects(int type, const fs::path filename)
 	}
 
 	if (type == PERM)
-		SDL_Log("Loaded %d + %d objects from '%s'\n", object[type].size(), object[TOOL].size(), filename);
+		SDL_Log("Loaded %d + %d objects from '%s'\n", object[type].size(), object[TOOL].size(), filename.generic_string().c_str());
 	if (type == TEMP)
-		SDL_Log("Loaded %d objects from '%s'\n", object[type].size(), filename);
+		SDL_Log("Loaded %d objects from '%s'\n", object[type].size(), filename.generic_string().c_str());
 	f.close();
 	return true;
 }
@@ -300,7 +300,7 @@ bool Level::save_level(const fs::path filename)
 	ofstream f(filename, ios::binary | ios::trunc);
 	if (!f)
 	{
-		SDL_Log("Failed to open '%s'\n", filename);
+		SDL_Log("Failed to open '%s'\n", filename.generic_string().c_str());
 		return false;
 	}
 
@@ -321,7 +321,7 @@ bool Level::save_level(const fs::path filename)
 	f.write((char *)&release_delay, sizeof(release_delay));
 	f.write((char *)&enemies, sizeof(enemies));
 
-	SDL_Log("Wrote level to '%s'\n", filename);
+	SDL_Log("Wrote level to '%s'\n", filename.generic_string().c_str());
 	f.close();
 	return true;
 }
@@ -347,7 +347,7 @@ bool Level::save_objects(int type, const fs::path filename)
 	ofstream f(filename, ios::binary | ios::trunc);
 	if (!f)
 	{
-		SDL_Log("Failed to open '%s'\n", filename);
+		SDL_Log("Failed to open '%s'\n", filename.generic_string().c_str());
 		return false;
 	}
 
@@ -376,7 +376,7 @@ bool Level::save_objects(int type, const fs::path filename)
 		savingType = TOOL;
 	}
 
-	SDL_Log("Wrote %d objects to '%s'\n", count, filename);
+	SDL_Log("Wrote %d objects to '%s'\n", count, filename.generic_string().c_str());
 
 	f.close();
 	return true;

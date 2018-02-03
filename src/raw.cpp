@@ -95,7 +95,7 @@ bool Raw::load_raw(fs::path raw_filename)
 
 	delete[] temp;
 
-	SDL_Log("Loaded %d images from '%s'\n", frame.size(), raw_filename);
+	SDL_Log("Loaded %d images from '%s'\n", frame.size(), raw_filename.generic_string().c_str());
 	return true;
 }
 

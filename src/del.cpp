@@ -210,7 +210,7 @@ bool Del::load(const fs::path din_filename, const fs::path del_filename)
 		frame.push_back(f);
 	}
 
-	SDL_Log("Loaded %d images from '%s'\n", frame.size(), del_filename);
+	SDL_Log("Loaded %d images from '%s'\n", frame.size(), del_filename.generic_string().c_str());
 
 	return true;
 }

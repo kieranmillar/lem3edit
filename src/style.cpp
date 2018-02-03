@@ -388,9 +388,9 @@ bool Style::load_objects(int type, const fs::path obj_filename, const fs::path f
 		}
 	}
 	if (type == PERM)
-		SDL_Log("Loaded %d + %d objects from '%s'\n", object[type].size(), object[TOOL].size(), obj_filename.c_str());
+		SDL_Log("Loaded %d + %d objects from '%s'\n", object[type].size(), object[TOOL].size(), obj_filename.generic_string().c_str());
 	if (type == TEMP)
-		SDL_Log("Loaded %d objects from '%s'\n", object[type].size(), obj_filename.c_str());
+		SDL_Log("Loaded %d objects from '%s'\n", object[type].size(), obj_filename.generic_string().c_str());
 	return true;
 }
 
@@ -412,7 +412,7 @@ bool Style::load_blocks(int type, fs::path blk_filename)
 	ifstream blk_f(blk_filename.c_str(), ios::binary);
 	if (!blk_f)
 	{
-		SDL_Log("Failed to open '%s'\n", blk_filename.c_str());
+		SDL_Log("Failed to open '%s'\n", blk_filename.generic_string().c_str());
 		return false;
 	}
 
@@ -430,7 +430,7 @@ bool Style::load_blocks(int type, fs::path blk_filename)
 
 		block[type].push_back(b);
 	}
-	SDL_Log("Loaded %d blocks from '%s'\n", block[type].size(), blk_filename.c_str());
+	SDL_Log("Loaded %d blocks from '%s'\n", block[type].size(), blk_filename.generic_string().c_str());
 	return true;
 }
 

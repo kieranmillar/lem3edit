@@ -73,6 +73,5 @@ bool Tribe::load_palette(fs::path pal_filename)
 		palette[i].b = (255.0f / 63.0f) * b;
 	}
 
-	SDL_Log("1\n");
 	return true;
 }

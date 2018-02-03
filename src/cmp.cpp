@@ -214,6 +214,6 @@ bool Cmp::load(const fs::path ind_filename, const fs::path cmp_filename)
 		animation.push_back(a);
 	}
 
-	SDL_Log("Loaded %d animations from '%s'\n", animation.size(), cmp_filename.c_str());
+	SDL_Log("Loaded %d animations from '%s'\n", animation.size(), cmp_filename.generic_string().c_str());
 	return true;
 }
