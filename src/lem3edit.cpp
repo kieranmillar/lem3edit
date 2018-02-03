@@ -78,7 +78,7 @@ int main(int argc, char *argv[])
 	//load ini file
 	Ini ini;
 
-	if (! ini.load())
+	if (!ini.load())
 	{
 		tinyfd_messageBox(
 			"Welcome to Lem3edit!",
@@ -118,7 +118,7 @@ int main(int argc, char *argv[])
 
 	g_currentMode = EDITORMODE;
 
-	Editor editor (ini.getLem3cdPath().parent_path());
+	Editor editor(ini.getLem3cdPath().parent_path());
 	if (!fileToOpen)
 	{
 		editor.load(level_id, &window);

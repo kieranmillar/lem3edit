@@ -18,9 +18,9 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
-/*
-This file is the top level object of the editor and handles some general purpose functionality
-*/
+ /*
+ This file is the top level object of the editor and handles some general purpose functionality
+ */
 #include "editor.hpp"
 
 #include <algorithm>

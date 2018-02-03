@@ -45,7 +45,7 @@ bool Ini::load(void)
 	if (fs::exists(iniPath))
 	{
 		std::ifstream iniFile(iniPath, std::ios::out);
-		
+
 		if (iniFile.is_open())
 		{
 			std::string line;
@@ -60,13 +60,13 @@ bool Ini::load(void)
 					key = line.substr(0, pos);
 					value = line.substr(pos + 1);
 					if (key == "CD")
-						setLem3cdPath (value);
+						setLem3cdPath(value);
 					if (key == "INSTALL")
-						setLem3installPath (value);
+						setLem3installPath(value);
 					if (key == "DOSBOX")
-						setDosBoxPath (value);
+						setDosBoxPath(value);
 					if (key == "LASTPACK")
-						setLastLoadedPack (value);
+						setLastLoadedPack(value);
 				}
 			}
 

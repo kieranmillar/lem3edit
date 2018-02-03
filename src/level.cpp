@@ -148,7 +148,7 @@ bool Level::load(const std::string &filename)
 	fs::path pathToUse(filename);
 
 	string parentPathStr = pathToUse.parent_path().generic_string() + "/";
-	
+
 	return load_level(filename) &&
 		load_objects(PERM, parentPathStr, "PERM", perm) &&
 		load_objects(TEMP, parentPathStr, "TEMP", temp);
@@ -158,15 +158,15 @@ bool Level::load_level(const std::string &path, const std::string &name, unsigne
 {
 	const string dat = ".DAT";
 
-	return load_level(l3_filename(path, name, n, dat));
+	return load_level(l3_filename_level(path, name, n, dat));
 }
 
-bool Level::load_level(const string &filename)
+bool Level::load_level(const fs::path filename)
 {
 	ifstream f(filename, ios::binary);
 	if (!f)
 	{
-		SDL_Log("Failed to open '%s'\n", filename.c_str());
+		SDL_Log("Failed to open '%s'\n", filename.generic_string().c_str);
 		return false;
 	}
 
@@ -187,7 +187,7 @@ bool Level::load_level(const string &filename)
 	f.read((char *)&release_delay, sizeof(release_delay));
 	f.read((char *)&enemies, sizeof(enemies));
 
-	SDL_Log("Loaded level from  '%s'\n", filename.c_str());
+	SDL_Log("Loaded level from  '%s'\n", filename.generic_string().c_str);
 
 	f.close();
 	return true;
@@ -199,10 +199,10 @@ bool Level::load_objects(int type, const string &path, const string &name, unsig
 
 	const string obs = ".OBS";
 
-	return load_objects(type, l3_filename(path, name, n, obs));
+	return load_objects(type, l3_filename_level(path, name, n, obs));
 }
 
-bool Level::load_objects(int type, const string &filename)
+bool Level::load_objects(int type, const fs::path filename)
 {
 	assert((unsigned)type < COUNTOF(this->object));
 
@@ -305,15 +305,15 @@ bool Level::save_level(const std::string &path, const std::string &name, unsigne
 {
 	const string dat = ".DAT";
 
-	return save_level(l3_filename(path, name, n, dat));
+	return save_level(l3_filename_level(path, name, n, dat));
 }
 
-bool Level::save_level(const string &filename)
+bool Level::save_level(const fs::path filename)
 {
 	ofstream f(filename, ios::binary | ios::trunc);
 	if (!f)
 	{
-		SDL_Log("Failed to open '%s'\n", filename.c_str());
+		SDL_Log("Failed to open '%s'\n", filename.generic_string().c_str);
 		return false;
 	}
 
@@ -334,7 +334,7 @@ bool Level::save_level(const string &filename)
 	f.write((char *)&release_delay, sizeof(release_delay));
 	f.write((char *)&enemies, sizeof(enemies));
 
-	SDL_Log("Wrote level to '%s'\n", filename.c_str());
+	SDL_Log("Wrote level to '%s'\n", filename.generic_string().c_str);
 	f.close();
 	return true;
 }
@@ -345,10 +345,10 @@ bool Level::save_objects(int type, const string &path, const string &name, unsig
 
 	const string obs = ".OBS";
 
-	return save_objects(type, l3_filename(path, name, n, obs));
+	return save_objects(type, l3_filename_level(path, name, n, obs));
 }
 
-bool Level::save_objects(int type, const string &filename)
+bool Level::save_objects(int type, const fs::path filename)
 {
 	assert((unsigned)type < COUNTOF(this->object));
 
