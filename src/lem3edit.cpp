@@ -103,25 +103,17 @@ int main(int argc, char *argv[])
 		ini.save();
 	}
 
-	int level_id = 1;
 	char const * fileToOpen = NULL;
 
-	if (argc > 1)
-	{
-		level_id = atoi(argv[1]);
-	}
-	else
-	{
-		char const * filterPatterns[1] = { "LEVEL*.DAT" };
-		fileToOpen = tinyfd_openFileDialog("Open level", NULL, 1, filterPatterns, "Lemmings 3 Level File (LEVEL###.DAT)", 0);
-	}
+	char const * filterPatterns[1] = { "LEVEL*.DAT" };
+	fileToOpen = tinyfd_openFileDialog("Open level", NULL, 1, filterPatterns, "Lemmings 3 Level File (LEVEL###.DAT)", 0);
 
 	g_currentMode = EDITORMODE;
 
 	Editor editor(ini.getLem3cdPath().parent_path());
 	if (!fileToOpen)
 	{
-		editor.load(level_id, &window);
+		return EXIT_FAILURE;
 	}
 	else
 	{
@@ -198,20 +190,20 @@ fs::path l3_filename_data(const fs::path basePath, const std::string &folder, co
 	return filePath;
 }
 
-fs::path l3_filename_level(const string &basePath, const string &name, const string &ext)
+fs::path l3_filename_level(const fs::path parentPath, const string &name, const string &ext)
 {
 	fs::path filePath;
-	filePath = basePath;
+	filePath = parentPath;
 	filePath /= name;
 	filePath += ext;
 
 	return filePath;
 }
 
-fs::path l3_filename_level(const string &basePath, const string &name, int n, const string &ext)
+fs::path l3_filename_level(const fs::path parentPath, const string &name, int n, const string &ext)
 {
 	fs::path filePath;
-	filePath = basePath;
+	filePath = parentPath;
 	filePath /= name;
 	filePath += l3_filename_number(n);
 	filePath += ext;

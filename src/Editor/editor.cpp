@@ -41,16 +41,6 @@ void Editor::resize(int w, int h)
 	bar.resizeBarScrollRect(w, h);
 }
 
-bool Editor::load(int n, Window * w)
-{
-	fs::path levelFolder = dataPath / "LEVELS";
-	const string path = dataPath.generic_string();
-	const string level = "LEVEL";
-	const string dat = ".DAT";
-
-	return load(l3_filename_level(path, level, n, dat), w);
-}
-
 bool Editor::load(const fs::path filename, Window * w)
 {
 	window_ptr = w;
@@ -72,13 +62,6 @@ bool Editor::load(const fs::path filename, Window * w)
 	gameFrameCount = 0;
 	gameFrameTick = SDL_GetTicks();
 	startCameraOn = false;
-
-	return canvas.redraw = true;
-}
-
-bool Editor::save(int n)
-{
-	level.save(n);
 
 	return canvas.redraw = true;
 }

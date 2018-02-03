@@ -270,7 +270,7 @@ void Editor_input::handleEditorEvents(SDL_Event event)
 					}
 					if (mouse_x_window > 111 && mouse_x_window < 143)
 					{
-						editor_ptr->save(level_ptr->level_id);
+						level_ptr->save();
 					}
 				}
 				if (mouse_y_window > window_ptr->height - BAR_HEIGHT + 39 && mouse_y_window < window_ptr->height - BAR_HEIGHT + 71)
@@ -504,7 +504,7 @@ void Editor_input::handleEditorEvents(SDL_Event event)
 				bar_ptr->changeType(TOOL);
 			break;
 		case SDLK_s:
-			editor_ptr->save(level_ptr->level_id);
+			level_ptr->save();
 			break;
 		case SDLK_ESCAPE:
 			editor_ptr->select_none();

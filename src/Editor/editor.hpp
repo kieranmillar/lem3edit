@@ -87,9 +87,7 @@ public:
 	bool delete_selected(void);
 	bool move_selected(signed int delta_x, signed int delta_y);
 
-	bool load(int n, Window * w);
 	bool load(const fs::path filename, Window * w);
-	bool save(int n);
 
 	bool toggleCameraVisibility(void);
 	bool move_camera(signed int delta_x, signed int delta_y);

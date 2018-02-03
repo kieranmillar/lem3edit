@@ -42,8 +42,8 @@ extern programMode g_currentMode;
 std::string l3_filename_number(const int n);
 fs::path l3_filename_data(const fs::path basePath, const std::string &folder, const std::string &name, const std::string &ext);
 fs::path l3_filename_data(const fs::path basePath, const std::string &folder, const std::string &name, int n, const std::string &ext);
-fs::path l3_filename_level(const std::string &basePath, const std::string &name, const std::string &ext);
-fs::path l3_filename_level(const std::string &basePath, const std::string &name, int n, const std::string &ext);
+fs::path l3_filename_level(const fs::path parentPath, const std::string &name, const std::string &ext);
+fs::path l3_filename_level(const fs::path parentPath, const std::string &name, int n, const std::string &ext);
 
 void die(void);
 
