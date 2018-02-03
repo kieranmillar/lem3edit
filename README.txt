@@ -3,15 +3,16 @@ Lemmings 3 Level Editor (lem3edit GIT)
 https://github.com/kieranmillar/lem3edit
 ================================================================================
 
-syntax: lem3edit <level_number>
+On first run of this program, follow the instructions it will provide to point the
+program at your L3CD.EXE file. This is part of the files found on the Lemmings 3 CD,
+these files you will need to extract onto your harddrive before running this program.
 
-place the binary in the same directory as L3CD.EXE
-on case-sensitive filesystems, all the data files must have upper case filenames
+On case-sensitive filesystems, all the data files must have upper case filenames.
 
 Use the left mouse button to select and place objects from the object bar.
 Click on objects in the level to select them, and then drag selected objects to move them.
 
-Drag with the right mouse button to scroll the view
+Drag with the right mouse button to scroll the view.
 
 == Keys ========================================================================
 s             -- save level
