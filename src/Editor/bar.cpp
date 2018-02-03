@@ -71,7 +71,7 @@ void Bar::load(void)
 	loadButtonGraphic(button_delete, "./gfx/delete_up.bmp", NULL);
 	loadButtonGraphic(button_quit, "./gfx/quit_up.bmp", NULL);
 
-	tooltipFont = TTF_OpenFont("./gfx/DejaVuSansMono.ttf", 12);
+	tooltipFont = TTF_OpenFont("./gfx/DejaVuSansMono.ttf", 14);
 
 	setButtonTooltip(button_layerBackground, "Select Background Layer (1)");
 	setButtonTooltip(button_layerTerrain, "Select Terrain Layer (2)");
@@ -468,7 +468,7 @@ void Bar::drawTooltip(const buttonInfo & button, int x, int y)
 	tooltipRect.w = tooltipW + 2;
 	tooltipRect.h = tooltipH + 2;
 
-	SDL_SetRenderDrawColor(window_ptr->screen_renderer, 100, 100, 100, 255);
+	SDL_SetRenderDrawColor(window_ptr->screen_renderer, 200, 200, 200, 255);
 	SDL_RenderFillRect(window_ptr->screen_renderer, &tooltipRect);
 	SDL_SetRenderDrawColor(window_ptr->screen_renderer, 0, 0, 0, 255);
 	SDL_RenderDrawRect(window_ptr->screen_renderer, &tooltipRect);
