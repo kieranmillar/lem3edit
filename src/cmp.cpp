@@ -28,7 +28,10 @@
 #include <cassert>
 #include <fstream>
 #include <iostream>
+#include <filesystem>
+
 using namespace std;
+namespace fs = std::experimental::filesystem::v1;
 
 void Cmp::Animation::copy(const Cmp::Animation &that)
 {
@@ -130,25 +133,24 @@ void Cmp::blit(SDL_Surface *surface, signed int x, signed int y, unsigned int an
 	}
 }
 
-bool Cmp::load(const std::string &path, const std::string &name, unsigned int n)
+bool Cmp::load(fs::path basePath, std::string folder, const std::string name, unsigned int n)
 {
 	const string ind = ".IND", cmp = ".CMP";
 
-	return load(l3_filename(path, name, n, ind), l3_filename(path, name, n, cmp));
+	return load(l3_filename_data(basePath, folder, name, n, ind), l3_filename_data(basePath, folder, name, n, cmp));
 }
 
-bool Cmp::load(const string &ind_filename, const string &cmp_filename)
+bool Cmp::load(const fs::path ind_filename, const fs::path cmp_filename)
 {
 	animation.clear();
-
-	ifstream ind_f(ind_filename.c_str(), ios::binary);
+	ifstream ind_f(ind_filename, ios::binary);
 	if (!ind_f)
 	{
 		cerr << "failed to open '" << ind_filename << "'" << endl;
 		return false;
 	}
 
-	ifstream cmp_f(cmp_filename.c_str(), ios::binary);
+	ifstream cmp_f(cmp_filename, ios::binary);
 	if (!cmp_f)
 	{
 		cerr << " failed to open '" << cmp_filename << "'" << endl;

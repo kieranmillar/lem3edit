@@ -24,6 +24,9 @@
 
 #include <string>
 #include <vector>
+#include <filesystem>
+
+namespace fs = std::experimental::filesystem::v1;
 
 class Cmp
 {
@@ -48,14 +51,14 @@ public:
 
 	void blit(SDL_Surface *dest, signed int x, signed int y, unsigned int animation, unsigned int frame) const;
 
-	bool load(const std::string &path, const std::string &name, unsigned int n);
-	bool load(const std::string &ind_filename, const std::string &cmp_filename);
+	bool load(fs::path basePath, std::string folder, const std::string name, unsigned int n);
+	bool load(const fs::path ind_filename, const fs::path cmp_filename);
 
 	Cmp() {}
 
-private:
-	Cmp(const Cmp &);
-	Cmp & operator=(const Cmp &);
+	/*private:
+		Cmp(const Cmp &);
+		Cmp & operator=(const Cmp &);*/
 };
 
 #endif // CMP_HPP

@@ -24,6 +24,9 @@
 
 #include <string>
 #include <vector>
+#include <filesystem>
+
+namespace fs = std::experimental::filesystem::v1;
 
 class Window;
 class Style;
@@ -64,9 +67,9 @@ public:
 	void blit(SDL_Surface *surface, signed int x, signed int y, unsigned int frame, unsigned int width, unsigned int height) const;
 	void blit_text(SDL_Surface *surface, signed int x, signed int y, const std::string &text) const;
 
-	bool load(const std::string &name);
-	bool load(const std::string &path, const std::string &name, unsigned int n);
-	bool load(const std::string &din_filename, const std::string &del_filename);
+	bool load(const fs::path basePath, const std::string name);
+	bool load(fs::path basePath, const std::string &folder, const std::string &name, unsigned int n);
+	bool load(const fs::path din_filename, const fs::path del_filename);
 
 	Del() {}
 

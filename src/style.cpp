@@ -26,7 +26,10 @@
 #include <iostream>
 #include <sstream>
 #include <stdlib.h>
+#include <filesystem>
+
 using namespace std;
+namespace fs = std::experimental::filesystem::v1;
 
 Style::Object & Style::Object::operator=(const Style::Object &that)
 {
@@ -209,34 +212,34 @@ void Style::draw_object_texture(Window * window, signed int x, signed int y, int
 	SDL_RenderCopy(window->screen_renderer, o->objTex, NULL, &rdest);
 }
 
-bool Style::load(unsigned int n, Window * window, SDL_Color *pal2)
+bool Style::load(unsigned int n, Window * window, SDL_Color *pal2, fs::path basePath)
 {
-	const string path = "STYLES/";
+	const string folder = "STYLES";
 	const string data = "DATA";
 	const string perm = "PERM", temp = "TEMP";
 	const string objec = "OBJEC";
 
-	return load_palette(path, data, n) &&
-		load_objects(PERM, path, perm, n) &&
-		load_blocks(PERM, path, perm, n) &&
-		load_objects(TEMP, path, temp, n) &&
-		load_blocks(TEMP, path, temp, n) &&
-		skill.load(path, objec, n) &&
+	return load_palette(basePath, folder, data, n) &&
+		load_objects(PERM, basePath, folder, perm, n) &&
+		load_blocks(PERM, basePath, folder, perm, n) &&
+		load_objects(TEMP, basePath, folder, temp, n) &&
+		load_blocks(TEMP, basePath, folder, temp, n) &&
+		skill.load(basePath, folder, objec, n) &&
 		create_object_textures(PERM, window, pal2) &&
 		create_object_textures(TEMP, window, pal2) &&
 		create_object_textures(TOOL, window, pal2);
 }
 
-bool Style::load_palette(string path, string name, unsigned int n)
+bool Style::load_palette(fs::path basePath, string folder, string name, unsigned int n)
 {
 	const string pal = ".PAL";
 
-	return load_palette(l3_filename(path, name, n, pal));
+	return load_palette(l3_filename_data(basePath.generic_string(), folder, name, n, pal));
 }
 
-bool Style::load_palette(string pal_filename)
+bool Style::load_palette(fs::path pal_filename)
 {
-	ifstream pal_f(pal_filename.c_str(), ios::binary);
+	ifstream pal_f(pal_filename, ios::binary);
 	if (!pal_f)
 	{
 		cerr << " failed to open '" << pal_filename << "'" << endl;
@@ -262,16 +265,16 @@ bool Style::load_palette(string pal_filename)
 	return true;
 }
 
-bool Style::load_objects(int type, const string &path, const string &name, unsigned int n)
+bool Style::load_objects(int type, fs::path basePath, const string &folder, const string &name, unsigned int n)
 {
 	assert((unsigned)type < COUNTOF(this->object));
 
 	const string obj = ".OBJ", frl = ".FRL";
 
-	return load_objects(type, l3_filename(path, name, n, obj), l3_filename(path, name, n, frl));
+	return load_objects(type, l3_filename_data(basePath.generic_string(), folder, name, n, obj), l3_filename_data(basePath.generic_string(), folder, name, n, frl));
 }
 
-bool Style::load_objects(int type, const string &obj_filename, const string &frl_filename)
+bool Style::load_objects(int type, const fs::path obj_filename, const fs::path frl_filename)
 {
 	assert((unsigned)type < COUNTOF(this->object));
 
@@ -391,16 +394,16 @@ bool Style::load_objects(int type, const string &obj_filename, const string &frl
 	return true;
 }
 
-bool Style::load_blocks(int type, const string &path, const string &name, unsigned int n)
+bool Style::load_blocks(int type, fs::path basePath, const string &folder, const string &name, unsigned int n)
 {
 	assert((unsigned)type < COUNTOF(this->object));
 
 	const string blk = ".BLK";
 
-	return load_blocks(type, l3_filename(path, name, n, blk));
+	return load_blocks(type, l3_filename_data(basePath.generic_string(), folder, name, n, blk));
 }
 
-bool Style::load_blocks(int type, const string &blk_filename)
+bool Style::load_blocks(int type, fs::path blk_filename)
 {
 	assert((unsigned)type < COUNTOF(this->object));
 

@@ -28,29 +28,32 @@
 
 #include <fstream>
 #include <iostream>
-using namespace std;
+#include <filesystem>
 
-bool Tribe::load(unsigned int n)
+using namespace std;
+namespace fs = std::experimental::filesystem::v1;
+
+bool Tribe::load(unsigned int n, fs::path basePath)
 {
-	const string path = "GRAPHICS/";
+	const string folder = "GRAPHICS";
 	const string tribe = "TRIBE";
 	const string tpanl = "TPANL";
 
-	return load_palette(path, tribe, n) &&
-		cmp.load(path, tribe, n) &&
-		panel.load(path, tpanl, n);
+	return load_palette(basePath, folder, tribe, n) &&
+		cmp.load(basePath, folder, tribe, n) &&
+		panel.load(basePath, folder, tpanl, n);
 }
 
-bool Tribe::load_palette(string path, string name, unsigned int n)
+bool Tribe::load_palette(fs::path basePath, string folder, string name, unsigned int n)
 {
 	const string pal = ".PAL";
 
-	return load_palette(l3_filename(path, name, n, pal));
+	return load_palette(l3_filename_data(basePath, folder, name, n, pal));
 }
 
-bool Tribe::load_palette(string pal_filename)
+bool Tribe::load_palette(fs::path pal_filename)
 {
-	ifstream pal_f(pal_filename.c_str(), ios::binary);
+	ifstream pal_f(pal_filename, ios::binary);
 	if (!pal_f)
 	{
 		cerr << "failed to open '" << pal_filename << "'" << endl;
@@ -70,5 +73,6 @@ bool Tribe::load_palette(string pal_filename)
 		palette[i].b = (255.0f / 63.0f) * b;
 	}
 
+	SDL_Log("1\n");
 	return true;
 }

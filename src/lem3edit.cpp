@@ -175,7 +175,7 @@ string l3_filename_number(const int n)
 	return filename.str();
 }
 
-fs::path l3_filename_data(const string &basePath, const std::string &folder, const string &name, const string &ext)
+fs::path l3_filename_data(const fs::path basePath, const std::string &folder, const string &name, const string &ext)
 {
 	fs::path filePath;
 	filePath = basePath;
@@ -186,10 +186,11 @@ fs::path l3_filename_data(const string &basePath, const std::string &folder, con
 	return filePath;
 }
 
-fs::path l3_filename_data(const string &basePath, const std::string &folder, const string &name, int n, const string &ext)
+fs::path l3_filename_data(const fs::path basePath, const std::string &folder, const string &name, int n, const string &ext)
 {
 	fs::path filePath;
 	filePath = basePath;
+	filePath /= folder;
 	filePath /= name;
 	filePath += l3_filename_number(n);
 	filePath += ext;

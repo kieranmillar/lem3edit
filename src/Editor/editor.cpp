@@ -43,14 +43,15 @@ void Editor::resize(int w, int h)
 
 bool Editor::load(int n, Window * w)
 {
-	const string path = "LEVELS/";
+	fs::path levelFolder = dataPath / "LEVELS";
+	const string path = dataPath.generic_string();
 	const string level = "LEVEL";
 	const string dat = ".DAT";
 
-	return load(l3_filename(path, level, n, dat), w);
+	return load(l3_filename_level(path, level, n, dat), w);
 }
 
-bool Editor::load(const std::string &filename, Window * w)
+bool Editor::load(const fs::path filename, Window * w)
 {
 	window_ptr = w;
 	bar.setReferences(window_ptr, this, &canvas, &style);
@@ -60,8 +61,8 @@ bool Editor::load(const std::string &filename, Window * w)
 	level.setReferences(window_ptr, &canvas, &style);
 	font.setReferences(window_ptr, &style);
 	level.load(filename);
-	tribe.load(level.tribe);
-	style.load(level.style, window_ptr, tribe.palette);
+	tribe.load(level.tribe, dataPath);
+	style.load(level.style, window_ptr, tribe.palette, dataPath);
 	//font.load("FONT"); //The in-game font. Not very practical for the editor so commented out
 	//font.createFont();
 	bar.load();

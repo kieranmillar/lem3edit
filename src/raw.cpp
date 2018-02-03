@@ -29,7 +29,10 @@
 #include <cassert>
 #include <fstream>
 #include <iostream>
+#include <filesystem>
+
 using namespace std;
+namespace fs = std::experimental::filesystem::v1;
 
 void Raw::blit(SDL_Surface *dest, signed int x, signed int y, unsigned int frame) const
 {
@@ -53,15 +56,15 @@ void Raw::blit(SDL_Surface *dest, signed int x, signed int y, unsigned int frame
 	}
 }
 
-bool Raw::load(string name)
+bool Raw::load(fs::path basePath, string name)
 {
-	const string path = "GRAPHICS/";
+	const string folder = "GRAPHICS";
 	const string raw = ".RAW";
 
-	return load_raw(l3_filename(path, name, raw));
+	return load_raw(l3_filename_data(basePath, folder, name, raw));
 }
 
-bool Raw::load_raw(string raw_filename)
+bool Raw::load_raw(fs::path raw_filename)
 {
 	destroy();
 
@@ -92,7 +95,7 @@ bool Raw::load_raw(string raw_filename)
 
 	delete[] temp;
 
-	SDL_Log("Loaded %d images from '%s'\n", frame.size(), raw_filename.c_str());
+	SDL_Log("Loaded %d images from '%s'\n", frame.size(), raw_filename);
 	return true;
 }
 

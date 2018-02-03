@@ -88,7 +88,7 @@ public:
 	bool move_selected(signed int delta_x, signed int delta_y);
 
 	bool load(int n, Window * w);
-	bool load(const std::string &filename, Window * w);
+	bool load(const fs::path filename, Window * w);
 	bool save(int n);
 
 	bool toggleCameraVisibility(void);
@@ -97,9 +97,9 @@ public:
 	Editor(fs::path data);
 	~Editor(void) { /* nothing to do */ }
 
-private:
-	Editor(const Editor &);
-	Editor & operator=(const Editor &);
+	/*private:
+		Editor(const Editor &);
+		Editor & operator=(const Editor &);*/
 };
 
 #endif // EDITOR_HPP
