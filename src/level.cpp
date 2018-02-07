@@ -273,11 +273,9 @@ bool Level::save(void)
 {
 	enemies = 0;
 	extra_lemmings = 0;
-	perm = level_id;
-	temp = level_id;
 
-	if (save_objects(PERM, levelPath, level_id) &&
-		save_objects(TEMP, levelPath, level_id) &&
+	if (save_objects(PERM, levelPath, perm) &&
+		save_objects(TEMP, levelPath, temp) &&
 		save_level(levelPath, level_id) == true)
 	{
 		SDL_ShowSimpleMessageBox(0, "Save Complete", "Level saved!", NULL);
