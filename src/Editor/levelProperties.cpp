@@ -38,9 +38,8 @@ It also includes the event handling / user inputs for this menu.
 
 #include <string>
 
-void LevelProperties::setReferences(Window * w, Editor * e, Bar * b, Canvas * c, Level * l)
+void LevelProperties::setReferences(Editor * e, Bar * b, Canvas * c, Level * l)
 {
-	window_ptr = w;
 	bar_ptr = b;
 	editor_ptr = e;
 	canvas_ptr = c;
@@ -51,26 +50,26 @@ void LevelProperties::setup(void)
 {
 	TTF_Font * bigFont = TTF_OpenFont("./gfx/DejaVuSansMono.ttf", 30);
 	TTF_Font * smallFont = TTF_OpenFont("./gfx/DejaVuSansMono.ttf", 20);
-	titleText = Font::createTextureFromString(window_ptr, bigFont, "LEVEL PROPERTIES");
-	releaseRateText = Font::createTextureFromString(window_ptr, smallFont, "Release Rate:");
-	spawnDelayText = Font::createTextureFromString(window_ptr, smallFont, "Spawn Delay:");
-	timeLimitText = Font::createTextureFromString(window_ptr, smallFont, "Time Limit:");
-	timeLimitMinsText = Font::createTextureFromString(window_ptr, smallFont, "m");
-	timeLimitSecsText = Font::createTextureFromString(window_ptr, smallFont, "s");
-	OKButtonText = Font::createTextureFromString(window_ptr, smallFont, "OK");
-	cancelButtonText = Font::createTextureFromString(window_ptr, smallFont, "Cancel");
+	titleText = Font::createTextureFromString(bigFont, "LEVEL PROPERTIES");
+	releaseRateText = Font::createTextureFromString(smallFont, "Release Rate:");
+	spawnDelayText = Font::createTextureFromString(smallFont, "Spawn Delay:");
+	timeLimitText = Font::createTextureFromString(smallFont, "Time Limit:");
+	timeLimitMinsText = Font::createTextureFromString(smallFont, "m");
+	timeLimitSecsText = Font::createTextureFromString(smallFont, "s");
+	OKButtonText = Font::createTextureFromString(smallFont, "OK");
+	cancelButtonText = Font::createTextureFromString(smallFont, "Cancel");
 	for (int i = 0; i < 10; i++)
 	{
 		char digit[2] = "0";
 		digit[0] += i;
-		numbers[i] = Font::createTextureFromString(window_ptr, smallFont, digit);
+		numbers[i] = Font::createTextureFromString(smallFont, digit);
 	}
 }
 
 void LevelProperties::resize(void)
 {
-	dialogX = (window_ptr->width / 2) - 150;
-	dialogY = (window_ptr->height / 2) - 85;
+	dialogX = (g_window.width / 2) - 150;
+	dialogY = (g_window.height / 2) - 85;
 	redraw = true;
 }
 
@@ -122,7 +121,7 @@ void LevelProperties::handleLevelPropertiesEvents(SDL_Event event)
 
 		if (e.event == SDL_WINDOWEVENT_RESIZED)
 		{
-			window_ptr->resize(e.data1, e.data2);
+			g_window.resize(e.data1, e.data2);
 			editor_ptr->resize(e.data1, e.data2);
 			canvas_ptr->redraw = true;
 			canvas_ptr->draw();
@@ -396,8 +395,8 @@ void LevelProperties::draw(void)
 {
 	if (redraw)
 	{
-		SDL_SetRenderDrawBlendMode(window_ptr->screen_renderer, SDL_BLENDMODE_BLEND);
-		SDL_SetRenderTarget(window_ptr->screen_renderer, window_ptr->screen_texture);
+		SDL_SetRenderDrawBlendMode(g_window.screen_renderer, SDL_BLENDMODE_BLEND);
+		SDL_SetRenderTarget(g_window.screen_renderer, g_window.screen_texture);
 
 		{
 			//draw dialog background
@@ -407,10 +406,10 @@ void LevelProperties::draw(void)
 			dialogArea.w = 300;
 			dialogArea.h = 170;
 
-			SDL_SetRenderDrawColor(window_ptr->screen_renderer, 150, 150, 150, 255);
-			SDL_RenderFillRect(window_ptr->screen_renderer, &dialogArea);
-			SDL_SetRenderDrawColor(window_ptr->screen_renderer, 0, 0, 0, 255);
-			SDL_RenderDrawRect(window_ptr->screen_renderer, &dialogArea);
+			SDL_SetRenderDrawColor(g_window.screen_renderer, 150, 150, 150, 255);
+			SDL_RenderFillRect(g_window.screen_renderer, &dialogArea);
+			SDL_SetRenderDrawColor(g_window.screen_renderer, 0, 0, 0, 255);
+			SDL_RenderDrawRect(g_window.screen_renderer, &dialogArea);
 		}
 
 		{
@@ -433,12 +432,12 @@ void LevelProperties::draw(void)
 			r.w = 40;
 			r.h = 24;
 			if (highlighting == RELEASERATE)
-				SDL_SetRenderDrawColor(window_ptr->screen_renderer, 255, 255, 255, 255);
+				SDL_SetRenderDrawColor(g_window.screen_renderer, 255, 255, 255, 255);
 			else
-				SDL_SetRenderDrawColor(window_ptr->screen_renderer, 200, 200, 200, 255);
-			SDL_RenderFillRect(window_ptr->screen_renderer, &r);
-			SDL_SetRenderDrawColor(window_ptr->screen_renderer, 0, 0, 0, 255);
-			SDL_RenderDrawRect(window_ptr->screen_renderer, &r);
+				SDL_SetRenderDrawColor(g_window.screen_renderer, 200, 200, 200, 255);
+			SDL_RenderFillRect(g_window.screen_renderer, &r);
+			SDL_SetRenderDrawColor(g_window.screen_renderer, 0, 0, 0, 255);
+			SDL_RenderDrawRect(g_window.screen_renderer, &r);
 			renderNumbers(releaseRate, dialogX + 196, dialogY + 40);
 
 			//Spawn Delay
@@ -447,12 +446,12 @@ void LevelProperties::draw(void)
 			r.w = 40;
 			r.h = 24;
 			if (highlighting == SPAWNDELAY)
-				SDL_SetRenderDrawColor(window_ptr->screen_renderer, 255, 255, 255, 255);
+				SDL_SetRenderDrawColor(g_window.screen_renderer, 255, 255, 255, 255);
 			else
-				SDL_SetRenderDrawColor(window_ptr->screen_renderer, 200, 200, 200, 255);
-			SDL_RenderFillRect(window_ptr->screen_renderer, &r);
-			SDL_SetRenderDrawColor(window_ptr->screen_renderer, 0, 0, 0, 255);
-			SDL_RenderDrawRect(window_ptr->screen_renderer, &r);
+				SDL_SetRenderDrawColor(g_window.screen_renderer, 200, 200, 200, 255);
+			SDL_RenderFillRect(g_window.screen_renderer, &r);
+			SDL_SetRenderDrawColor(g_window.screen_renderer, 0, 0, 0, 255);
+			SDL_RenderDrawRect(g_window.screen_renderer, &r);
 			renderNumbers(spawnDelay, dialogX + 186, dialogY + 70);
 
 			//Time Limit Mins
@@ -461,12 +460,12 @@ void LevelProperties::draw(void)
 			r.w = 16;
 			r.h = 24;
 			if (highlighting == TIMELIMITMINS)
-				SDL_SetRenderDrawColor(window_ptr->screen_renderer, 255, 255, 255, 255);
+				SDL_SetRenderDrawColor(g_window.screen_renderer, 255, 255, 255, 255);
 			else
-				SDL_SetRenderDrawColor(window_ptr->screen_renderer, 200, 200, 200, 255);
-			SDL_RenderFillRect(window_ptr->screen_renderer, &r);
-			SDL_SetRenderDrawColor(window_ptr->screen_renderer, 0, 0, 0, 255);
-			SDL_RenderDrawRect(window_ptr->screen_renderer, &r);
+				SDL_SetRenderDrawColor(g_window.screen_renderer, 200, 200, 200, 255);
+			SDL_RenderFillRect(g_window.screen_renderer, &r);
+			SDL_SetRenderDrawColor(g_window.screen_renderer, 0, 0, 0, 255);
+			SDL_RenderDrawRect(g_window.screen_renderer, &r);
 			renderNumbers(timeLimitMins, dialogX + 152, dialogY + 100);
 
 			//Time Limit Secs
@@ -475,12 +474,12 @@ void LevelProperties::draw(void)
 			r.w = 28;
 			r.h = 24;
 			if (highlighting == TIMELIMITSECS)
-				SDL_SetRenderDrawColor(window_ptr->screen_renderer, 255, 255, 255, 255);
+				SDL_SetRenderDrawColor(g_window.screen_renderer, 255, 255, 255, 255);
 			else
-				SDL_SetRenderDrawColor(window_ptr->screen_renderer, 200, 200, 200, 255);
-			SDL_RenderFillRect(window_ptr->screen_renderer, &r);
-			SDL_SetRenderDrawColor(window_ptr->screen_renderer, 0, 0, 0, 255);
-			SDL_RenderDrawRect(window_ptr->screen_renderer, &r);
+				SDL_SetRenderDrawColor(g_window.screen_renderer, 200, 200, 200, 255);
+			SDL_RenderFillRect(g_window.screen_renderer, &r);
+			SDL_SetRenderDrawColor(g_window.screen_renderer, 0, 0, 0, 255);
+			SDL_RenderDrawRect(g_window.screen_renderer, &r);
 			renderNumbers(timeLimitSecs, dialogX + 214, dialogY + 100);
 		}
 
@@ -494,10 +493,10 @@ void LevelProperties::draw(void)
 			r.y = dialogY + 128;
 			r.w = 100;
 			r.h = 30;
-			SDL_SetRenderDrawColor(window_ptr->screen_renderer, 200, 200, 200, 255);
-			SDL_RenderFillRect(window_ptr->screen_renderer, &r);
-			SDL_SetRenderDrawColor(window_ptr->screen_renderer, 0, 0, 0, 255);
-			SDL_RenderDrawRect(window_ptr->screen_renderer, &r);
+			SDL_SetRenderDrawColor(g_window.screen_renderer, 200, 200, 200, 255);
+			SDL_RenderFillRect(g_window.screen_renderer, &r);
+			SDL_SetRenderDrawColor(g_window.screen_renderer, 0, 0, 0, 255);
+			SDL_RenderDrawRect(g_window.screen_renderer, &r);
 			SDL_QueryTexture(OKButtonText, NULL, NULL, &textW, NULL);
 			renderText(OKButtonText, dialogX + 83 - (textW / 2), dialogY + 132);
 
@@ -506,19 +505,19 @@ void LevelProperties::draw(void)
 			r.y = dialogY + 128;
 			r.w = 100;
 			r.h = 30;
-			SDL_SetRenderDrawColor(window_ptr->screen_renderer, 200, 200, 200, 200);
-			SDL_RenderFillRect(window_ptr->screen_renderer, &r);
-			SDL_SetRenderDrawColor(window_ptr->screen_renderer, 0, 0, 0, 255);
-			SDL_RenderDrawRect(window_ptr->screen_renderer, &r);
+			SDL_SetRenderDrawColor(g_window.screen_renderer, 200, 200, 200, 200);
+			SDL_RenderFillRect(g_window.screen_renderer, &r);
+			SDL_SetRenderDrawColor(g_window.screen_renderer, 0, 0, 0, 255);
+			SDL_RenderDrawRect(g_window.screen_renderer, &r);
 			SDL_QueryTexture(cancelButtonText, NULL, NULL, &textW, NULL);
 			renderText(cancelButtonText, dialogX + 216 - (textW / 2), dialogY + 132);
 		}
 
 		{
 			//draw all to screen
-			SDL_SetRenderTarget(window_ptr->screen_renderer, NULL);
-			SDL_RenderCopy(window_ptr->screen_renderer, window_ptr->screen_texture, NULL, NULL);
-			SDL_RenderPresent(window_ptr->screen_renderer);
+			SDL_SetRenderTarget(g_window.screen_renderer, NULL);
+			SDL_RenderCopy(g_window.screen_renderer, g_window.screen_texture, NULL, NULL);
+			SDL_RenderPresent(g_window.screen_renderer);
 		}
 		redraw = false;
 	}
@@ -534,7 +533,7 @@ void LevelProperties::renderText(SDL_Texture * tex, int x, int y)
 	textRect.y = y;
 	textRect.w = textW;
 	textRect.h = textH;
-	SDL_RenderCopy(window_ptr->screen_renderer, tex, NULL, &textRect);
+	SDL_RenderCopy(g_window.screen_renderer, tex, NULL, &textRect);
 }
 
 void LevelProperties::renderNumbers(int num, const int rightX, const int y)
@@ -568,6 +567,6 @@ void LevelProperties::renderNumbers(int num, const int rightX, const int y)
 		textRect.y = y;
 		textRect.w = textW;
 		textRect.h = textH;
-		SDL_RenderCopy(window_ptr->screen_renderer, numbers[numChars[i]], NULL, &textRect);
+		SDL_RenderCopy(g_window.screen_renderer, numbers[numChars[i]], NULL, &textRect);
 	}
 }

@@ -41,18 +41,17 @@ void Editor::resize(int w, int h)
 	bar.resizeBarScrollRect(w, h);
 }
 
-bool Editor::load(const fs::path filename, Window * w)
+bool Editor::load(const fs::path filename)
 {
-	window_ptr = w;
-	bar.setReferences(window_ptr, this, &canvas, &style);
-	canvas.setReferences(window_ptr, this, &editor_input, &bar, &style, &level);
-	editor_input.setReferences(window_ptr, this, &bar, &canvas, &style, &level);
-	levelProperties.setReferences(window_ptr, this, &bar, &canvas, &level);
-	level.setReferences(window_ptr, &canvas, &style);
-	font.setReferences(window_ptr, &style);
+	bar.setReferences(this, &canvas, &style);
+	canvas.setReferences(this, &editor_input, &bar, &style, &level);
+	editor_input.setReferences(this, &bar, &canvas, &style, &level);
+	levelProperties.setReferences(this, &bar, &canvas, &level);
+	level.setReferences(&canvas, &style);
+	font.setReferences(&style);
 	level.load(filename);
 	tribe.load(level.tribe, dataPath);
-	style.load(level.style, window_ptr, tribe.palette, dataPath);
+	style.load(level.style, tribe.palette, dataPath);
 	//font.load("FONT"); //The in-game font. Not very practical for the editor so commented out
 	//font.createFont();
 	bar.load();

@@ -28,7 +28,6 @@
 
 namespace fs = std::experimental::filesystem::v1;
 
-class Window;
 class Canvas;
 class Style;
 
@@ -36,7 +35,6 @@ class Level
 {
 public:
 
-	Window * window_ptr;
 	Canvas * canvas_ptr;
 	Style * style_ptr;
 
@@ -75,7 +73,7 @@ public:
 
 	std::vector<Object> object[3];
 
-	void setReferences(Window * w, Canvas * c, Style * s);
+	void setReferences(Canvas * c, Style * s);
 
 	void draw(signed int x, signed int xOffset, signed int y, signed int yOffset, int zoom) const;
 	void draw_objects(signed int x, signed int xOffset, signed int y, signed int yOffset, int type, int zoom) const;

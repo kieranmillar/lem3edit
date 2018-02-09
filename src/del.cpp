@@ -35,15 +35,14 @@
 using namespace std;
 namespace fs = std::experimental::filesystem::v1;
 
-void Del::setReferences(Window * w, Style * s)
+void Del::setReferences(Style * s)
 {
-	window_ptr = w;
 	style_ptr = s;
 }
 
 void Del::createFont(void)
 {
-	fontTex = SDL_CreateTexture(window_ptr->screen_renderer, SDL_PIXELFORMAT_RGB888, SDL_TEXTUREACCESS_TARGET, 64, 64);
+	fontTex = SDL_CreateTexture(g_window.screen_renderer, SDL_PIXELFORMAT_RGB888, SDL_TEXTUREACCESS_TARGET, 64, 64);
 	SDL_SetTextureBlendMode(fontTex, SDL_BLENDMODE_BLEND);
 	SDL_SetTextureAlphaMod(fontTex, 255);
 	fontTexAddX = 0;
@@ -64,7 +63,7 @@ void Del::createFont(void)
 		SDL_SetColorKey(tempSurface2, SDL_TRUE, SDL_MapRGB(tempSurface2->format, 0, 0, 0));//Convert dummy white into transparency
 
 		SDL_Texture *tempTexture;//Need to turn surface into a texture so can draw it with transparency onto our font texture
-		tempTexture = SDL_CreateTextureFromSurface(window_ptr->screen_renderer, tempSurface2);
+		tempTexture = SDL_CreateTextureFromSurface(g_window.screen_renderer, tempSurface2);
 
 		if (fontTexAddX + 8 > 64) {
 			fontTexAddX = 0;
@@ -77,9 +76,9 @@ void Del::createFont(void)
 		r.w = 8;
 		r.h = 8;
 
-		SDL_SetRenderTarget(window_ptr->screen_renderer, fontTex);
-		SDL_RenderCopy(window_ptr->screen_renderer, tempTexture, NULL, &r);
-		SDL_SetRenderTarget(window_ptr->screen_renderer, NULL);
+		SDL_SetRenderTarget(g_window.screen_renderer, fontTex);
+		SDL_RenderCopy(g_window.screen_renderer, tempTexture, NULL, &r);
+		SDL_SetRenderTarget(g_window.screen_renderer, NULL);
 
 		fontTexAddX += 8;
 		SDL_FreeSurface(tempSurface);

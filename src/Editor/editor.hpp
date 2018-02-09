@@ -41,8 +41,6 @@ namespace fs = std::experimental::filesystem::v1;
 class Editor
 {
 public:
-	Window * window_ptr;
-
 	Bar bar;
 	Canvas canvas;
 	Editor_input editor_input;
@@ -87,7 +85,7 @@ public:
 	bool delete_selected(void);
 	bool move_selected(signed int delta_x, signed int delta_y);
 
-	bool load(const fs::path filename, Window * w);
+	bool load(const fs::path filename);
 
 	bool toggleCameraVisibility(void);
 	bool move_camera(signed int delta_x, signed int delta_y);

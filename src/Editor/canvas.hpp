@@ -23,7 +23,6 @@
 
 #include "SDL.h"
 
-class Window;
 class Editor;
 class Editor_input;
 class Bar;
@@ -34,7 +33,6 @@ class Canvas
 {
 public:
 
-	Window * window_ptr;
 	Editor * editor_ptr;
 	Editor_input * input_ptr;
 	Bar * bar_ptr;
@@ -51,7 +49,7 @@ public:
 	Sint32 mouse_remainder_x, mouse_remainder_y;
 	bool layerVisible[3];
 
-	void setReferences(Window * w, Editor * e, Editor_input * i, Bar * b, Style * s, Level * l);
+	void setReferences(Editor * e, Editor_input * i, Bar * b, Style * s, Level * l);
 	void load(void);
 	void resize(int h);
 

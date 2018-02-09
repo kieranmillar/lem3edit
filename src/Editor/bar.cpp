@@ -34,9 +34,8 @@ This file includes code to deal with the object bar at the bottom of the editor 
 #include <stdlib.h>
 #include <string>
 
-void Bar::setReferences(Window * w, Editor * e, Canvas * c, Style * s)
+void Bar::setReferences(Editor * e, Canvas * c, Style * s)
 {
-	window_ptr = w;
 	editor_ptr = e;
 	canvas_ptr = c;
 	style_ptr = s;
@@ -52,7 +51,7 @@ void Bar::load(void)
 	barScrollX = 0;
 	type = PERM;
 
-	resizeBarScrollRect(window_ptr->width, window_ptr->height);
+	resizeBarScrollRect(g_window.width, g_window.height);
 	barScrollRect.h = 13;
 
 	loadButtonGraphic(button_layerBackground, "./gfx/layerBackground_off.bmp", "./gfx/layerBackground_on.bmp");
@@ -92,7 +91,7 @@ void Bar::load(void)
 
 bool Bar::loadButtonGraphic(buttonInfo & button, const char * filePathUp, const char * filePathDown)
 {
-	SDL_SetRenderDrawColor(window_ptr->screen_renderer, 255, 255, 255, 255);
+	SDL_SetRenderDrawColor(g_window.screen_renderer, 255, 255, 255, 255);
 	SDL_Surface* graphic = NULL;
 	//first load the botton's up graphic
 	graphic = SDL_LoadBMP(filePathUp);
@@ -103,7 +102,7 @@ bool Bar::loadButtonGraphic(buttonInfo & button, const char * filePathUp, const 
 	}
 	SDL_ConvertSurfaceFormat(graphic, SDL_PIXELFORMAT_RGBA8888, 0);
 
-	button.buttonTexUp = SDL_CreateTextureFromSurface(window_ptr->screen_renderer, graphic);
+	button.buttonTexUp = SDL_CreateTextureFromSurface(g_window.screen_renderer, graphic);
 
 	SDL_FreeSurface(graphic);
 	graphic = NULL;
@@ -118,7 +117,7 @@ bool Bar::loadButtonGraphic(buttonInfo & button, const char * filePathUp, const 
 			return false;
 		}
 
-		button.buttonTexDown = SDL_CreateTextureFromSurface(window_ptr->screen_renderer, graphic);
+		button.buttonTexDown = SDL_CreateTextureFromSurface(g_window.screen_renderer, graphic);
 
 		SDL_FreeSurface(graphic);
 		graphic = NULL;
@@ -129,15 +128,15 @@ bool Bar::loadButtonGraphic(buttonInfo & button, const char * filePathUp, const 
 
 bool Bar::setButtonTooltip(buttonInfo & button, const char * text)
 {
-	button.tooltip = Font::createTextureFromString(window_ptr, tooltipFont, text);
+	button.tooltip = Font::createTextureFromString(tooltipFont, text);
 	return true;
 }
 
 void Bar::resizeBarScrollRect(int windowWidth, int windowHeight)
 {
 	barScrollRect.y = windowHeight - 14;
-	barScrollRect.w = (window_ptr->width - PANEL_WIDTH - 33) * 1000 / barTypeMax[type];
-	barScrollRect.w *= (window_ptr->width - PANEL_WIDTH - 33);
+	barScrollRect.w = (g_window.width - PANEL_WIDTH - 33) * 1000 / barTypeMax[type];
+	barScrollRect.w *= (g_window.width - PANEL_WIDTH - 33);
 	barScrollRect.w /= 1000;
 	barScrollRect.w += 1;
 	scroll(0);
@@ -148,15 +147,15 @@ void Bar::scroll(signed int moveAmount)
 	barScrollX += moveAmount;
 	if (barScrollX < 0)
 		barScrollX = 0;
-	if (barScrollX > barTypeMax[type] - (window_ptr->width - PANEL_WIDTH))
-		barScrollX = barTypeMax[type] - (window_ptr->width - PANEL_WIDTH);
+	if (barScrollX > barTypeMax[type] - (g_window.width - PANEL_WIDTH))
+		barScrollX = barTypeMax[type] - (g_window.width - PANEL_WIDTH);
 	updateBarScrollPos(barScrollX);
 }
 
 void Bar::updateBarScrollPos(int xPos)
 {
 	barScrollRect.x = (xPos * 1000) / barTypeMax[type];
-	barScrollRect.x *= (window_ptr->width - PANEL_WIDTH - 33);
+	barScrollRect.x *= (g_window.width - PANEL_WIDTH - 33);
 	barScrollRect.x /= 1000;
 	barScrollRect.x += PANEL_WIDTH + 18;
 }
@@ -164,7 +163,7 @@ void Bar::updateBarScrollPos(int xPos)
 void Bar::moveScrollBar(int moveLocationInWindow)
 {
 	int x = moveLocationInWindow - PANEL_WIDTH - 18;
-	int xMax = window_ptr->width - PANEL_WIDTH - 33;
+	int xMax = g_window.width - PANEL_WIDTH - 33;
 	if (x < 0)
 		x = 0;
 	if (x > xMax - barScrollRect.w)
@@ -182,7 +181,7 @@ void Bar::changeType(int t)
 		return;
 	type = t;
 	barScrollX = 0;
-	resizeBarScrollRect(window_ptr->width, window_ptr->height);
+	resizeBarScrollRect(g_window.width, g_window.height);
 }
 
 int Bar::getPieceIDByScreenPos(int mousePos)
@@ -199,20 +198,20 @@ int Bar::getPieceIDByScreenPos(int mousePos)
 void Bar::draw(int mouseX, int mouseY)
 {
 	{ // bar background in the absense of a proper graphic
-		SDL_SetRenderDrawBlendMode(window_ptr->screen_renderer, SDL_BLENDMODE_BLEND);
-		SDL_SetRenderTarget(window_ptr->screen_renderer, window_ptr->screen_texture);
+		SDL_SetRenderDrawBlendMode(g_window.screen_renderer, SDL_BLENDMODE_BLEND);
+		SDL_SetRenderTarget(g_window.screen_renderer, g_window.screen_texture);
 
-		SDL_SetRenderDrawColor(window_ptr->screen_renderer, 150, 150, 150, 255);
+		SDL_SetRenderDrawColor(g_window.screen_renderer, 150, 150, 150, 255);
 		SDL_Rect rPieceSelector;
 		rPieceSelector.x = PANEL_WIDTH;
 		rPieceSelector.y = canvas_ptr->height;
-		rPieceSelector.w = window_ptr->width - PANEL_WIDTH;
-		rPieceSelector.h = window_ptr->height;
-		SDL_RenderFillRect(window_ptr->screen_renderer, &rPieceSelector);
+		rPieceSelector.w = g_window.width - PANEL_WIDTH;
+		rPieceSelector.h = g_window.height;
+		SDL_RenderFillRect(g_window.screen_renderer, &rPieceSelector);
 	}
 
 	{ // draw the pieces
-		SDL_SetRenderDrawColor(window_ptr->screen_renderer, 0, 0, 0, 255);
+		SDL_SetRenderDrawColor(g_window.screen_renderer, 0, 0, 0, 255);
 		int pieceStart = barScrollX / PIECESIZE;
 		int x = PANEL_WIDTH + 1 - (barScrollX % PIECESIZE);
 		assert((unsigned)type < COUNTOF(style_ptr->object));
@@ -224,7 +223,7 @@ void Bar::draw(int mouseX, int mouseY)
 			rPieceBox.y = canvas_ptr->height + 2;
 			rPieceBox.w = PIECESIZE - 1;
 			rPieceBox.h = PIECESIZE - 1;
-			SDL_RenderDrawRect(window_ptr->screen_renderer, &rPieceBox);
+			SDL_RenderDrawRect(g_window.screen_renderer, &rPieceBox);
 
 			int pieceZoom = 1;
 			int pieceVectorPosition = i - style_ptr->object[type].begin();
@@ -244,45 +243,45 @@ void Bar::draw(int mouseX, int mouseY)
 			if (pieceHeight > 128)
 				pieceYOffset = 0;
 
-			style_ptr->draw_object_texture(window_ptr, x + 4 + pieceXOffset, canvas_ptr->height + 4 + pieceYOffset, type, pieceVectorPosition, pieceZoom, 128);
+			style_ptr->draw_object_texture(x + 4 + pieceXOffset, canvas_ptr->height + 4 + pieceYOffset, type, pieceVectorPosition, pieceZoom, 128);
 			x += PIECESIZE;
 
-			if (x > window_ptr->width)
+			if (x > g_window.width)
 				break;
 		}
 	}
 
 	{ // draw the scroll bar area
-		SDL_SetRenderDrawColor(window_ptr->screen_renderer, 0, 0, 0, 255);
+		SDL_SetRenderDrawColor(g_window.screen_renderer, 0, 0, 0, 255);
 		//button boxes
-		SDL_RenderDrawLine(window_ptr->screen_renderer, PANEL_WIDTH, window_ptr->height - 16, window_ptr->width, window_ptr->height - 16);
-		SDL_RenderDrawLine(window_ptr->screen_renderer, PANEL_WIDTH + 16, window_ptr->height - 16, PANEL_WIDTH + 16, window_ptr->height);
-		SDL_RenderDrawLine(window_ptr->screen_renderer, window_ptr->width - 16, window_ptr->height - 16, window_ptr->width - 16, window_ptr->height);
+		SDL_RenderDrawLine(g_window.screen_renderer, PANEL_WIDTH, g_window.height - 16, g_window.width, g_window.height - 16);
+		SDL_RenderDrawLine(g_window.screen_renderer, PANEL_WIDTH + 16, g_window.height - 16, PANEL_WIDTH + 16, g_window.height);
+		SDL_RenderDrawLine(g_window.screen_renderer, g_window.width - 16, g_window.height - 16, g_window.width - 16, g_window.height);
 		//left button arrow
-		SDL_RenderDrawLine(window_ptr->screen_renderer, PANEL_WIDTH + 11, window_ptr->height - 14, PANEL_WIDTH + 5, window_ptr->height - 8);
-		SDL_RenderDrawLine(window_ptr->screen_renderer, PANEL_WIDTH + 5, window_ptr->height - 8, PANEL_WIDTH + 11, window_ptr->height - 2);
-		SDL_RenderDrawLine(window_ptr->screen_renderer, PANEL_WIDTH + 11, window_ptr->height - 14, PANEL_WIDTH + 11, window_ptr->height - 2);
+		SDL_RenderDrawLine(g_window.screen_renderer, PANEL_WIDTH + 11, g_window.height - 14, PANEL_WIDTH + 5, g_window.height - 8);
+		SDL_RenderDrawLine(g_window.screen_renderer, PANEL_WIDTH + 5, g_window.height - 8, PANEL_WIDTH + 11, g_window.height - 2);
+		SDL_RenderDrawLine(g_window.screen_renderer, PANEL_WIDTH + 11, g_window.height - 14, PANEL_WIDTH + 11, g_window.height - 2);
 		//right button arrow
-		SDL_RenderDrawLine(window_ptr->screen_renderer, window_ptr->width - 11, window_ptr->height - 14, window_ptr->width - 5, window_ptr->height - 8);
-		SDL_RenderDrawLine(window_ptr->screen_renderer, window_ptr->width - 5, window_ptr->height - 8, window_ptr->width - 11, window_ptr->height - 2);
-		SDL_RenderDrawLine(window_ptr->screen_renderer, window_ptr->width - 11, window_ptr->height - 14, window_ptr->width - 11, window_ptr->height - 2);
+		SDL_RenderDrawLine(g_window.screen_renderer, g_window.width - 11, g_window.height - 14, g_window.width - 5, g_window.height - 8);
+		SDL_RenderDrawLine(g_window.screen_renderer, g_window.width - 5, g_window.height - 8, g_window.width - 11, g_window.height - 2);
+		SDL_RenderDrawLine(g_window.screen_renderer, g_window.width - 11, g_window.height - 14, g_window.width - 11, g_window.height - 2);
 		//the scroll bar
-		SDL_SetRenderDrawColor(window_ptr->screen_renderer, 100, 100, 100, 255);
-		SDL_RenderFillRect(window_ptr->screen_renderer, &barScrollRect);
+		SDL_SetRenderDrawColor(g_window.screen_renderer, 100, 100, 100, 255);
+		SDL_RenderFillRect(g_window.screen_renderer, &barScrollRect);
 	}
 
 	{ // draw the options panel
-		SDL_SetRenderDrawColor(window_ptr->screen_renderer, 130, 130, 130, 255);
+		SDL_SetRenderDrawColor(g_window.screen_renderer, 130, 130, 130, 255);
 		SDL_Rect rOptionsBox;
 		rOptionsBox.x = 0;
 		rOptionsBox.y = canvas_ptr->height;
 		rOptionsBox.w = PANEL_WIDTH;
-		rOptionsBox.h = window_ptr->height;
-		SDL_RenderFillRect(window_ptr->screen_renderer, &rOptionsBox);
+		rOptionsBox.h = g_window.height;
+		SDL_RenderFillRect(g_window.screen_renderer, &rOptionsBox);
 
-		SDL_SetRenderDrawColor(window_ptr->screen_renderer, 0, 0, 0, 255);
-		SDL_RenderDrawLine(window_ptr->screen_renderer, 0, canvas_ptr->height, window_ptr->width, canvas_ptr->height);
-		SDL_RenderDrawLine(window_ptr->screen_renderer, PANEL_WIDTH, canvas_ptr->height, PANEL_WIDTH, window_ptr->height);
+		SDL_SetRenderDrawColor(g_window.screen_renderer, 0, 0, 0, 255);
+		SDL_RenderDrawLine(g_window.screen_renderer, 0, canvas_ptr->height, g_window.width, canvas_ptr->height);
+		SDL_RenderDrawLine(g_window.screen_renderer, PANEL_WIDTH, canvas_ptr->height, PANEL_WIDTH, g_window.height);
 
 		{
 			//draw background layer buttons
@@ -299,7 +298,7 @@ void Bar::draw(int mouseX, int mouseY)
 			rect.y = canvas_ptr->height + 1;
 			rect.w = 36;
 			rect.h = 72;
-			SDL_RenderDrawRect(window_ptr->screen_renderer, &rect);
+			SDL_RenderDrawRect(g_window.screen_renderer, &rect);
 		}
 		{
 			//draw terrain layer buttons
@@ -316,7 +315,7 @@ void Bar::draw(int mouseX, int mouseY)
 			rect.y = canvas_ptr->height + 1;
 			rect.w = 36;
 			rect.h = 72;
-			SDL_RenderDrawRect(window_ptr->screen_renderer, &rect);
+			SDL_RenderDrawRect(g_window.screen_renderer, &rect);
 		}
 		{
 			//draw tool layer buttons
@@ -333,7 +332,7 @@ void Bar::draw(int mouseX, int mouseY)
 			rect.y = canvas_ptr->height + 1;
 			rect.w = 36;
 			rect.h = 72;
-			SDL_RenderDrawRect(window_ptr->screen_renderer, &rect);
+			SDL_RenderDrawRect(g_window.screen_renderer, &rect);
 		}
 		{
 			//draw all the other buttons
@@ -375,7 +374,7 @@ void Bar::draw(int mouseX, int mouseY)
 					drawTooltip(button_save, mouseX, mouseY);
 				}
 			}
-			if (mouseY > window_ptr->height - BAR_HEIGHT + 39 && mouseY < window_ptr->height - BAR_HEIGHT + 71)
+			if (mouseY > g_window.height - BAR_HEIGHT + 39 && mouseY < g_window.height - BAR_HEIGHT + 71)
 				//second row of buttons
 			{
 				if (mouseX > 3 && mouseX < 35)
@@ -394,7 +393,7 @@ void Bar::draw(int mouseX, int mouseY)
 				{
 				}*/
 			}
-			if (mouseY > window_ptr->height - BAR_HEIGHT + 75 && mouseY < window_ptr->height - BAR_HEIGHT + 107)
+			if (mouseY > g_window.height - BAR_HEIGHT + 75 && mouseY < g_window.height - BAR_HEIGHT + 107)
 				//third row of buttons
 			{
 				if (mouseX > 3 && mouseX < 35)
@@ -414,7 +413,7 @@ void Bar::draw(int mouseX, int mouseY)
 					drawTooltip(button_levelProperties, mouseX, mouseY);
 				}
 			}
-			if (mouseY > window_ptr->height - BAR_HEIGHT + 111 && mouseY < window_ptr->height - BAR_HEIGHT + 143)
+			if (mouseY > g_window.height - BAR_HEIGHT + 111 && mouseY < g_window.height - BAR_HEIGHT + 143)
 				//fourth row of buttons
 			{
 				if (mouseX > 3 && mouseX < 35)
@@ -437,7 +436,7 @@ void Bar::draw(int mouseX, int mouseY)
 		}
 	}
 
-	SDL_SetRenderTarget(window_ptr->screen_renderer, NULL);
+	SDL_SetRenderTarget(g_window.screen_renderer, NULL);
 }
 
 void Bar::drawButton(const buttonInfo & button, buttonState state, int x, int y)
@@ -449,11 +448,11 @@ void Bar::drawButton(const buttonInfo & button, buttonState state, int x, int y)
 	destRect.h = 32;
 	if (state == off)
 	{
-		SDL_RenderCopy(window_ptr->screen_renderer, button.buttonTexUp, NULL, &destRect);
+		SDL_RenderCopy(g_window.screen_renderer, button.buttonTexUp, NULL, &destRect);
 	}
 	if (state == on)
 	{
-		SDL_RenderCopy(window_ptr->screen_renderer, button.buttonTexDown, NULL, &destRect);
+		SDL_RenderCopy(g_window.screen_renderer, button.buttonTexDown, NULL, &destRect);
 	}
 }
 
@@ -468,17 +467,17 @@ void Bar::drawTooltip(const buttonInfo & button, int x, int y)
 	tooltipRect.w = tooltipW + 2;
 	tooltipRect.h = tooltipH + 2;
 
-	SDL_SetRenderDrawColor(window_ptr->screen_renderer, 200, 200, 200, 255);
-	SDL_RenderFillRect(window_ptr->screen_renderer, &tooltipRect);
-	SDL_SetRenderDrawColor(window_ptr->screen_renderer, 0, 0, 0, 255);
-	SDL_RenderDrawRect(window_ptr->screen_renderer, &tooltipRect);
+	SDL_SetRenderDrawColor(g_window.screen_renderer, 200, 200, 200, 255);
+	SDL_RenderFillRect(g_window.screen_renderer, &tooltipRect);
+	SDL_SetRenderDrawColor(g_window.screen_renderer, 0, 0, 0, 255);
+	SDL_RenderDrawRect(g_window.screen_renderer, &tooltipRect);
 
 	tooltipRect.x++;
 	tooltipRect.y++;
 	tooltipRect.w -= 2;
 	tooltipRect.h -= 2;
 
-	SDL_RenderCopy(window_ptr->screen_renderer, button.tooltip, NULL, &tooltipRect);
+	SDL_RenderCopy(g_window.screen_renderer, button.tooltip, NULL, &tooltipRect);
 }
 
 void Bar::destroy(void)

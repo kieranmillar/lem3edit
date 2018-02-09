@@ -84,16 +84,16 @@ public:
 	void blit_object(SDL_Surface * surface, signed int x, signed int y, int type, unsigned int object, unsigned int frame) const;
 
 	// Pass 0 for maxSize to allow any size.
-	void draw_object_texture(Window * window, signed int x, signed int y, int type, unsigned int object, int zoom, int maxSize) const;
+	void draw_object_texture(signed int x, signed int y, int type, unsigned int object, int zoom, int maxSize) const;
 
-	bool load(unsigned int n, Window * window, SDL_Color *pal2, fs::path basePath);
+	bool load(unsigned int n, SDL_Color *pal2, fs::path basePath);
 	bool load_palette(fs::path basePath, std::string folder, std::string name, unsigned int n);
 	bool load_palette(fs::path pal_filename);
 	bool load_objects(int type, fs::path basePath, const std::string &folder, const std::string &name, unsigned int n);
 	bool load_objects(int type, const fs::path obj_filename, const fs::path frl_filename);
 	bool load_blocks(int type, fs::path basePath, const std::string &folder, const std::string &name, unsigned int n);
 	bool load_blocks(int type, const fs::path blk_filename);
-	bool create_object_textures(int type, Window * window, SDL_Color *pal2);
+	bool create_object_textures(int type, SDL_Color *pal2);
 	bool destroy_all_objects(int type);
 
 	Style(void) { /* nothing to do */ }

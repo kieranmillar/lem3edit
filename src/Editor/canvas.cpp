@@ -32,9 +32,8 @@ where the level is displayed
 #include "../style.hpp"
 #include "../window.hpp"
 
-void Canvas::setReferences(Window * w, Editor * e, Editor_input * i, Bar * b, Style * s, Level * l)
+void Canvas::setReferences(Editor * e, Editor_input * i, Bar * b, Style * s, Level * l)
 {
-	window_ptr = w;
 	editor_ptr = e;
 	input_ptr = i;
 	bar_ptr = b;
@@ -53,7 +52,7 @@ void Canvas::load(void)
 	}
 	mouse_remainder_x = 0;
 	mouse_remainder_y = 0;
-	resize(window_ptr->height);
+	resize(g_window.height);
 }
 
 void Canvas::resize(int h)
@@ -87,15 +86,15 @@ bool Canvas::scroll(signed int delta_x, signed int delta_y, bool drag)
 	scrollOffset_x %= zoom;
 	scrollOffset_y %= zoom;
 
-	if (scroll_x <= 0 - window_ptr->width && left)
+	if (scroll_x <= 0 - g_window.width && left)
 	{
-		scroll_x = 0 - window_ptr->width;
+		scroll_x = 0 - g_window.width;
 		scrollOffset_x = 0;
 		delta_x = 0;
 	}
-	if (scroll_x >= level_ptr->width + ((window_ptr->width / zoom) * (zoom - 1)) && right)
+	if (scroll_x >= level_ptr->width + ((g_window.width / zoom) * (zoom - 1)) && right)
 	{
-		scroll_x = level_ptr->width + ((window_ptr->width / zoom) * (zoom - 1));
+		scroll_x = level_ptr->width + ((g_window.width / zoom) * (zoom - 1));
 		scrollOffset_x = 0;
 		delta_x = 0;
 	}
@@ -162,13 +161,13 @@ void Canvas::draw()
 
 	if (redraw)
 	{
-		SDL_SetRenderDrawBlendMode(window_ptr->screen_renderer, SDL_BLENDMODE_BLEND);
-		SDL_SetRenderTarget(window_ptr->screen_renderer, window_ptr->screen_texture);
-		SDL_SetRenderDrawColor(window_ptr->screen_renderer, 100, 100, 100, 255);
-		SDL_RenderFillRect(window_ptr->screen_renderer, NULL);
+		SDL_SetRenderDrawBlendMode(g_window.screen_renderer, SDL_BLENDMODE_BLEND);
+		SDL_SetRenderTarget(g_window.screen_renderer, g_window.screen_texture);
+		SDL_SetRenderDrawColor(g_window.screen_renderer, 100, 100, 100, 255);
+		SDL_RenderFillRect(g_window.screen_renderer, NULL);
 
-		SDL_SetRenderDrawColor(window_ptr->screen_renderer, 0, 0, 0, 255);
-		SDL_RenderFillRect(window_ptr->screen_renderer, &level_area);
+		SDL_SetRenderDrawColor(g_window.screen_renderer, 0, 0, 0, 255);
+		SDL_RenderFillRect(g_window.screen_renderer, &level_area);
 
 		level_ptr->draw(scroll_x, scrollOffset_x, scroll_y, scrollOffset_y, zoom);
 
@@ -179,7 +178,7 @@ void Canvas::draw()
 			draw_selection_box((o.x - scroll_x)*zoom - scrollOffset_x, (o.y - scroll_y)*zoom - scrollOffset_y, style_ptr->object[i->type][so].width * 8 * zoom, style_ptr->object[i->type][so].height * 2 * zoom);
 		}
 
-		SDL_SetRenderDrawColor(window_ptr->screen_renderer, 0, 0, 0, 255);
+		SDL_SetRenderDrawColor(g_window.screen_renderer, 0, 0, 0, 255);
 
 		//START - Draw dotted lines on the level border
 		enum whichBorder { none, top, bottom, left, right };
@@ -204,7 +203,7 @@ void Canvas::draw()
 			}
 		}
 		bool highlight = false;
-		if (scroll_x <= 0 && (scroll_x * zoom) + window_ptr->width - 1 >= 0)
+		if (scroll_x <= 0 && (scroll_x * zoom) + g_window.width - 1 >= 0)
 		{
 			if (input_ptr->resizingLevel == false || input_ptr->resizingWhich != Editor_input::whichBorder::left)
 			{
@@ -214,7 +213,7 @@ void Canvas::draw()
 				highlight = false;
 			}
 		}
-		if (scroll_x <= level_ptr->width && scroll_x + (window_ptr->width / zoom) - 1 >= level_ptr->width)
+		if (scroll_x <= level_ptr->width && scroll_x + (g_window.width / zoom) - 1 >= level_ptr->width)
 		{
 			if (input_ptr->resizingLevel == false || input_ptr->resizingWhich != Editor_input::whichBorder::right)
 			{
@@ -224,7 +223,7 @@ void Canvas::draw()
 				highlight = false;
 			}
 		}
-		if (scroll_y <= 0 && (scroll_y * zoom) + window_ptr->height - 1 >= 0)
+		if (scroll_y <= 0 && (scroll_y * zoom) + g_window.height - 1 >= 0)
 		{
 			if (input_ptr->resizingLevel == false || input_ptr->resizingWhich != Editor_input::whichBorder::top)
 			{
@@ -234,7 +233,7 @@ void Canvas::draw()
 				highlight = false;
 			}
 		}
-		if (scroll_y <= level_ptr->height && scroll_y + (window_ptr->height / zoom) - 1 >= level_ptr->height)
+		if (scroll_y <= level_ptr->height && scroll_y + (g_window.height / zoom) - 1 >= level_ptr->height)
 		{
 			if (input_ptr->resizingLevel == false || input_ptr->resizingWhich != Editor_input::whichBorder::bottom)
 			{
@@ -279,10 +278,10 @@ void Canvas::draw()
 			select_area.w += zoom;
 			select_area.h += zoom;
 
-			SDL_SetRenderDrawColor(window_ptr->screen_renderer, 0, 0, 255, 255 / 2);
-			SDL_RenderFillRect(window_ptr->screen_renderer, &select_area);
-			SDL_SetRenderDrawColor(window_ptr->screen_renderer, 0, 0, 255, 255);
-			SDL_RenderDrawRect(window_ptr->screen_renderer, &select_area);
+			SDL_SetRenderDrawColor(g_window.screen_renderer, 0, 0, 255, 255 / 2);
+			SDL_RenderFillRect(g_window.screen_renderer, &select_area);
+			SDL_SetRenderDrawColor(g_window.screen_renderer, 0, 0, 255, 255);
+			SDL_RenderDrawRect(g_window.screen_renderer, &select_area);
 		}
 
 		if (editor_ptr->startCameraOn == true) // draw start camera box
@@ -293,13 +292,13 @@ void Canvas::draw()
 			camera_area.w = 320 * zoom;
 			camera_area.h = 160 * zoom;
 
-			SDL_SetRenderDrawColor(window_ptr->screen_renderer, 255, 0, 0, 255 / 2);
-			SDL_RenderFillRect(window_ptr->screen_renderer, &camera_area);
-			SDL_SetRenderDrawColor(window_ptr->screen_renderer, 255, 0, 0, 255);
-			SDL_RenderDrawRect(window_ptr->screen_renderer, &camera_area);
+			SDL_SetRenderDrawColor(g_window.screen_renderer, 255, 0, 0, 255 / 2);
+			SDL_RenderFillRect(g_window.screen_renderer, &camera_area);
+			SDL_SetRenderDrawColor(g_window.screen_renderer, 255, 0, 0, 255);
+			SDL_RenderDrawRect(g_window.screen_renderer, &camera_area);
 		}
 
-		SDL_SetRenderTarget(window_ptr->screen_renderer, NULL);
+		SDL_SetRenderTarget(g_window.screen_renderer, NULL);
 
 		redraw = false;
 	}
@@ -307,17 +306,17 @@ void Canvas::draw()
 
 void Canvas::draw_selection_box(int x, int y, int w, int h)
 {
-	if (x > window_ptr->width || y > height || (x + w) < 0 || (y + h) < 0)
+	if (x > g_window.width || y > height || (x + w) < 0 || (y + h) < 0)
 		return;
-	SDL_SetRenderDrawColor(window_ptr->screen_renderer, 255, 0, 255, 255 / 8);
+	SDL_SetRenderDrawColor(g_window.screen_renderer, 255, 0, 255, 255 / 8);
 	SDL_Rect r;
 	r.x = x - 1;
 	r.y = y - 1;
 	r.w = w + 1;
 	r.h = h + 1;
-	SDL_RenderFillRect(window_ptr->screen_renderer, &r);
-	SDL_SetRenderDrawColor(window_ptr->screen_renderer, 255, 0, 255, 255);
-	SDL_RenderDrawRect(window_ptr->screen_renderer, &r);
+	SDL_RenderFillRect(g_window.screen_renderer, &r);
+	SDL_SetRenderDrawColor(g_window.screen_renderer, 255, 0, 255, 255);
+	SDL_RenderDrawRect(g_window.screen_renderer, &r);
 }
 
 void Canvas::drawHeldObject(int holdingType, int holdingID, int x, int y)
@@ -338,7 +337,7 @@ void Canvas::drawHeldObject(int holdingType, int holdingID, int x, int y)
 		drawY = y;
 	}
 	int drawID = style_ptr->object_by_id(holdingType, holdingID);
-	style_ptr->draw_object_texture(window_ptr, drawX, drawY, holdingType, drawID, zoom, 0);
+	style_ptr->draw_object_texture(drawX, drawY, holdingType, drawID, zoom, 0);
 }
 
 void Canvas::draw_dashed_level_border(borderType type, int pos, int offset, bool highlight)
@@ -348,18 +347,18 @@ void Canvas::draw_dashed_level_border(borderType type, int pos, int offset, bool
 	int rendColour = 200;
 	if (highlight)
 		rendColour = 250;
-	SDL_SetRenderDrawColor(window_ptr->screen_renderer, rendColour, rendColour, rendColour, 255);
+	SDL_SetRenderDrawColor(g_window.screen_renderer, rendColour, rendColour, rendColour, 255);
 	int end, x1, y1, x2, y2;
 	if (type == horizontal)
 	{
-		end = window_ptr->width;
+		end = g_window.width;
 		x1 = 0 - initialOffset;
 		x2 = 10 - initialOffset;
 		y1 = pos;
 		y2 = pos;
 		for (x1; x1 < end; x1 += 20)
 		{
-			SDL_RenderDrawLine(window_ptr->screen_renderer, x1, y1, x2, y2);
+			SDL_RenderDrawLine(g_window.screen_renderer, x1, y1, x2, y2);
 			x2 += 20;
 		}
 	}
@@ -372,7 +371,7 @@ void Canvas::draw_dashed_level_border(borderType type, int pos, int offset, bool
 		y2 = 10 - initialOffset;
 		for (y1; y1 < end; y1 += 20)
 		{
-			SDL_RenderDrawLine(window_ptr->screen_renderer, x1, y1, x2, y2);
+			SDL_RenderDrawLine(g_window.screen_renderer, x1, y1, x2, y2);
 			y2 += 20;
 		}
 	}

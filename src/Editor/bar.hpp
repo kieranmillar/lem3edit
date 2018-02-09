@@ -28,7 +28,6 @@
 #include "SDL.h"
 #include "SDL_ttf.h"
 
-class Window;
 class Editor;
 class Canvas;
 class Style;
@@ -36,8 +35,6 @@ class Style;
 class Bar
 {
 public:
-
-	Window * window_ptr;
 	Editor * editor_ptr;
 	Canvas * canvas_ptr;
 	Style * style_ptr;
@@ -69,7 +66,7 @@ public:
 
 	TTF_Font * tooltipFont;
 
-	void setReferences(Window * w, Editor * e, Canvas * c, Style * s);
+	void setReferences(Editor * e, Canvas * c, Style * s);
 	void load(void);
 	bool loadButtonGraphic(buttonInfo & button, const char * filePathUp, const char * filePathDown);
 	bool setButtonTooltip(buttonInfo & button, const char * text);

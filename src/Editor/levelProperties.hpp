@@ -24,7 +24,6 @@
 #include "SDL.h"
 #include "SDL_ttf.h"
 
-class Window;
 class Editor;
 class Bar;
 class Canvas;
@@ -34,7 +33,6 @@ class LevelProperties
 {
 public:
 
-	Window * window_ptr;
 	Editor * editor_ptr;
 	Bar * bar_ptr;
 	Canvas * canvas_ptr;
@@ -62,7 +60,7 @@ public:
 
 	inputBox highlighting;
 
-	void setReferences(Window * w, Editor * e, Bar * b, Canvas * c, Level * l);
+	void setReferences(Editor * e, Bar * b, Canvas * c, Level * l);
 	void setup(void);
 	void resize(void);
 

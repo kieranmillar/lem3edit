@@ -180,9 +180,9 @@ void Style::blit_object(SDL_Surface *surface, signed int x, signed int y, int ty
 }
 
 // NOTE TO SELF: Have this return the rectangle, not do the drawing itself! Put Get in the title
-void Style::draw_object_texture(Window * window, signed int x, signed int y, int type, unsigned int object, int zoom, int maxSize) const
+void Style::draw_object_texture(signed int x, signed int y, int type, unsigned int object, int zoom, int maxSize) const
 {
-	if (x > window->width || y > window->height)
+	if (x > g_window.width || y > g_window.height)
 		return;
 
 	assert((unsigned)type < COUNTOF(this->object));
@@ -209,10 +209,10 @@ void Style::draw_object_texture(Window * window, signed int x, signed int y, int
 	if (x + rdest.w < 0 || y + rdest.h < 0)
 		return;
 
-	SDL_RenderCopy(window->screen_renderer, o->objTex, NULL, &rdest);
+	SDL_RenderCopy(g_window.screen_renderer, o->objTex, NULL, &rdest);
 }
 
-bool Style::load(unsigned int n, Window * window, SDL_Color *pal2, fs::path basePath)
+bool Style::load(unsigned int n, SDL_Color *pal2, fs::path basePath)
 {
 	const string folder = "STYLES";
 	const string data = "DATA";
@@ -225,9 +225,9 @@ bool Style::load(unsigned int n, Window * window, SDL_Color *pal2, fs::path base
 		load_objects(TEMP, basePath, folder, temp, n) &&
 		load_blocks(TEMP, basePath, folder, temp, n) &&
 		skill.load(basePath, folder, objec, n) &&
-		create_object_textures(PERM, window, pal2) &&
-		create_object_textures(TEMP, window, pal2) &&
-		create_object_textures(TOOL, window, pal2);
+		create_object_textures(PERM, pal2) &&
+		create_object_textures(TEMP, pal2) &&
+		create_object_textures(TOOL, pal2);
 }
 
 bool Style::load_palette(fs::path basePath, string folder, string name, unsigned int n)
@@ -434,7 +434,7 @@ bool Style::load_blocks(int type, fs::path blk_filename)
 	return true;
 }
 
-bool Style::create_object_textures(int type, Window * window, SDL_Color *pal2)
+bool Style::create_object_textures(int type, SDL_Color *pal2)
 {
 	assert((unsigned)type < COUNTOF(this->object));
 
@@ -458,7 +458,7 @@ bool Style::create_object_textures(int type, Window * window, SDL_Color *pal2)
 		tempSurface2 = SDL_ConvertSurfaceFormat(tempSurface, SDL_PIXELFORMAT_RGB888, 0);//We need a surface format with higher colour depth that can handle transparency
 		SDL_SetColorKey(tempSurface2, SDL_TRUE, SDL_MapRGB(tempSurface2->format, 255, 0, 255));//Convert dummy magenta into transparency
 
-		object[type][so].objTex = SDL_CreateTextureFromSurface(window->screen_renderer, tempSurface2);
+		object[type][so].objTex = SDL_CreateTextureFromSurface(g_window.screen_renderer, tempSurface2);
 
 		SDL_FreeSurface(tempSurface);
 		SDL_FreeSurface(tempSurface2);

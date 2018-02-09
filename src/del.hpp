@@ -28,7 +28,6 @@
 
 namespace fs = std::experimental::filesystem::v1;
 
-class Window;
 class Style;
 
 class Del
@@ -51,7 +50,6 @@ public:
 		Frame & operator=(const Frame &);
 	};
 
-	Window * window_ptr;
 	Style * style_ptr;
 
 	std::vector<Frame> frame;
@@ -60,7 +58,7 @@ public:
 
 	Uint16 fontTexAddX, fontTexAddY;
 
-	void setReferences(Window * w, Style * s);
+	void setReferences(Style * s);
 
 	void createFont(void);
 

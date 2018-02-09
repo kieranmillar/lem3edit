@@ -20,6 +20,8 @@
 #ifndef LEM3EDIT_HPP
 #define LEM3EDIT_HPP
 
+#include "window.hpp"
+
 #include "SDL.h"
 #include "SDL_ttf.h"
 
@@ -38,6 +40,8 @@ static const int PERM = 0, TEMP = 1, TOOL = 2;
 enum programMode { EDITORMODE, LEVELPROPERTIESMODE };
 
 extern programMode g_currentMode;
+
+extern Window g_window;
 
 std::string l3_filename_number(const int n);
 fs::path l3_filename_data(const fs::path basePath, const std::string &folder, const std::string &name, const std::string &ext);

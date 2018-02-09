@@ -24,7 +24,6 @@
 #include "SDL.h"
 #include "SDL_ttf.h"
 
-class Window;
 class Editor;
 class Bar;
 class Canvas;
@@ -35,7 +34,6 @@ class Editor_input
 {
 public:
 
-	Window * window_ptr;
 	Editor * editor_ptr;
 	Bar * bar_ptr;
 	Canvas * canvas_ptr;
@@ -69,7 +67,7 @@ public:
 	int creatingSelectionBoxStartX, creatingSelectionBoxStartY;
 	int creatingSelectionBoxCurrentX, creatingSelectionBoxCurrentY;
 
-	void setReferences(Window * w, Editor * e, Bar * b, Canvas * c, Style * s, Level * l);
+	void setReferences(Editor * e, Bar * b, Canvas * c, Style * s, Level * l);
 	void load(void);
 
 	void handleEditorEvents(SDL_Event event);

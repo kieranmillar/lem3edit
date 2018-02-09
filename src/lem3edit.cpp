@@ -50,6 +50,8 @@ void version(void);
 
 programMode g_currentMode;
 
+Window g_window;
+
 int main(int argc, char *argv[])
 {
 	version();
@@ -66,9 +68,7 @@ int main(int argc, char *argv[])
 		return false;
 	}
 
-	Window window;
-
-	if (window.initialise(DEFAULT_WINDOW_WIDTH, DEFAULT_WINDOW_HEIGHT) == false) // Initialise the main program window
+	if (g_window.initialise(DEFAULT_WINDOW_WIDTH, DEFAULT_WINDOW_HEIGHT) == false) // Initialise the main program window
 	{
 		return EXIT_FAILURE;
 	}
@@ -123,7 +123,7 @@ int main(int argc, char *argv[])
 	}
 	else
 	{
-		editor.load(fileToOpen, &window);
+		editor.load(fileToOpen);
 	}
 
 	SDL_Event event;
@@ -147,7 +147,7 @@ int main(int argc, char *argv[])
 	//calling Quit functions below or else will crash on exit
 
 	editor.bar.destroy();
-	window.destroy();
+	g_window.destroy();
 
 	TTF_Quit();
 	SDL_Quit();

@@ -35,9 +35,8 @@ the levelProperties file.
 #include "../style.hpp"
 #include "../window.hpp"
 
-void Editor_input::setReferences(Window * w, Editor * e, Bar * b, Canvas * c, Style * s, Level * l)
+void Editor_input::setReferences(Editor * e, Bar * b, Canvas * c, Style * s, Level * l)
 {
-	window_ptr = w;
 	editor_ptr = e;
 	bar_ptr = b;
 	canvas_ptr = c;
@@ -94,7 +93,7 @@ void Editor_input::handleEditorEvents(SDL_Event event)
 
 		if (e.event == SDL_WINDOWEVENT_RESIZED)
 		{
-			window_ptr->resize(e.data1, e.data2);
+			g_window.resize(e.data1, e.data2);
 			editor_ptr->resize(e.data1, e.data2);
 			canvas_ptr->redraw = true;
 		}
@@ -253,7 +252,7 @@ void Editor_input::handleEditorEvents(SDL_Event event)
 			{
 				holdingType = -1;
 				holdingID = -1;
-				if (mouse_y_window > window_ptr->height - BAR_HEIGHT + 3 && mouse_y_window < window_ptr->height - BAR_HEIGHT + 35)
+				if (mouse_y_window > g_window.height - BAR_HEIGHT + 3 && mouse_y_window < g_window.height - BAR_HEIGHT + 35)
 					//first row of buttons
 				{
 					if (mouse_x_window > 3 && mouse_x_window < 35)
@@ -273,7 +272,7 @@ void Editor_input::handleEditorEvents(SDL_Event event)
 						level_ptr->save();
 					}
 				}
-				if (mouse_y_window > window_ptr->height - BAR_HEIGHT + 39 && mouse_y_window < window_ptr->height - BAR_HEIGHT + 71)
+				if (mouse_y_window > g_window.height - BAR_HEIGHT + 39 && mouse_y_window < g_window.height - BAR_HEIGHT + 71)
 					//second row of buttons
 				{
 					if (mouse_x_window > 3 && mouse_x_window < 35)
@@ -292,7 +291,7 @@ void Editor_input::handleEditorEvents(SDL_Event event)
 					{
 					}*/
 				}
-				if (mouse_y_window > window_ptr->height - BAR_HEIGHT + 75 && mouse_y_window < window_ptr->height - BAR_HEIGHT + 107)
+				if (mouse_y_window > g_window.height - BAR_HEIGHT + 75 && mouse_y_window < g_window.height - BAR_HEIGHT + 107)
 					//third row of buttons
 				{
 					if (mouse_x_window > 3 && mouse_x_window < 35)
@@ -312,7 +311,7 @@ void Editor_input::handleEditorEvents(SDL_Event event)
 						editor_ptr->levelProperties.openDialog();
 					}
 				}
-				if (mouse_y_window > window_ptr->height - BAR_HEIGHT + 111 && mouse_y_window < window_ptr->height - BAR_HEIGHT + 143)
+				if (mouse_y_window > g_window.height - BAR_HEIGHT + 111 && mouse_y_window < g_window.height - BAR_HEIGHT + 143)
 					//fourth row of buttons
 				{
 					if (mouse_x_window > 3 && mouse_x_window < 35)
@@ -333,7 +332,7 @@ void Editor_input::handleEditorEvents(SDL_Event event)
 					}
 				}
 			}
-			else if (mouse_y_window < window_ptr->height - 16)
+			else if (mouse_y_window < g_window.height - 16)
 				// piece browser
 			{
 				if (holdingType == -1 && holdingID == -1)
@@ -357,7 +356,7 @@ void Editor_input::handleEditorEvents(SDL_Event event)
 			{
 				leftScrollButtonHolding = true;
 			}
-			else if (mouse_x_window > window_ptr->width - 16)
+			else if (mouse_x_window > g_window.width - 16)
 				// piece browser scroll bar right button
 			{
 				rightScrollButtonHolding = true;
@@ -586,7 +585,7 @@ void Editor_input::handleEditorEvents(SDL_Event event)
 		}
 		if (mouse_state & SDL_BUTTON(SDL_BUTTON_LEFT))
 		{
-			if (mouse_y_window > window_ptr->height - 16) // scroll bar area
+			if (mouse_y_window > g_window.height - 16) // scroll bar area
 			{
 				if (leftScrollButtonHolding
 					&& mouse_x_window > PANEL_WIDTH
@@ -595,12 +594,12 @@ void Editor_input::handleEditorEvents(SDL_Event event)
 					bar_ptr->scroll(-50);
 				}
 				if (rightScrollButtonHolding
-					&& mouse_x_window > window_ptr->width - 16)
+					&& mouse_x_window > g_window.width - 16)
 				{
 					bar_ptr->scroll(50);
 				}
 				if (scrollBarShifting
-					&& mouse_x_window < window_ptr->width - 16
+					&& mouse_x_window < g_window.width - 16
 					&& mouse_x_window > PANEL_WIDTH + 16)
 				{
 					if (bar_ptr->barScrollRect.x > mouse_x_window)
@@ -625,8 +624,8 @@ void Editor_input::handleEditorEvents(SDL_Event event)
 		}
 		//SDL_Log("Frame: %d", ticksSinceLastFrame);
 
-		SDL_SetRenderTarget(window_ptr->screen_renderer, NULL);
-		SDL_RenderCopy(window_ptr->screen_renderer, window_ptr->screen_texture, NULL, NULL);
+		SDL_SetRenderTarget(g_window.screen_renderer, NULL);
+		SDL_RenderCopy(g_window.screen_renderer, g_window.screen_texture, NULL, NULL);
 		//Commented out code below to view the palette
 		/*SDL_Rect r;
 		r.x = 0;
@@ -635,8 +634,8 @@ void Editor_input::handleEditorEvents(SDL_Event event)
 		r.h = 20;
 		for (int i = 0; i < 209; i++)
 		{
-		SDL_SetRenderDrawColor(window_ptr->screen_renderer, style_ptr->palette[i].r, style_ptr->palette[i].g, style_ptr->palette[i].b, 255);
-		SDL_RenderFillRect(window_ptr->screen_renderer, &r);
+		SDL_SetRenderDrawColor(g_window.screen_renderer, style_ptr->palette[i].r, style_ptr->palette[i].g, style_ptr->palette[i].b, 255);
+		SDL_RenderFillRect(g_window.screen_renderer, &r);
 		r.x += 20;
 		if (r.x > 500)
 		{
@@ -648,7 +647,7 @@ void Editor_input::handleEditorEvents(SDL_Event event)
 		if (holdingType != -1 && holdingID != -1)
 			canvas_ptr->drawHeldObject(holdingType, holdingID, mouse_x_window, mouse_y_window);
 
-		SDL_RenderPresent(window_ptr->screen_renderer);
+		SDL_RenderPresent(g_window.screen_renderer);
 
 		editor_ptr->gameFrameCount++;
 

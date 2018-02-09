@@ -31,9 +31,8 @@
 using namespace std;
 namespace fs = std::experimental::filesystem::v1;
 
-void Level::setReferences(Window * w, Canvas * c, Style * s)
+void Level::setReferences(Canvas * c, Style * s)
 {
-	window_ptr = w;
 	canvas_ptr = c;
 	style_ptr = s;
 }
@@ -61,9 +60,9 @@ void Level::draw_objects(signed int x, signed int xOffset, signed int y, signed 
 
 		int onScreenX = (o.x - x)*zoom - xOffset;
 		int onScreenY = (o.y - y)*zoom - yOffset;
-		if (onScreenY < window_ptr->height - BAR_HEIGHT)
+		if (onScreenY < g_window.height - BAR_HEIGHT)
 		{
-			style_ptr->draw_object_texture(window_ptr, onScreenX, onScreenY, type, so, zoom, 0);
+			style_ptr->draw_object_texture(onScreenX, onScreenY, type, so, zoom, 0);
 		}
 	}
 }
