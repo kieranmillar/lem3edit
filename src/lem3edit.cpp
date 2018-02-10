@@ -123,7 +123,7 @@ int main(int argc, char *argv[])
 		if (!ini.validateData())
 			tinyfd_messageBox(
 				"Fatal Error!",
-				"Oh no! Lem3edit could not find all of the data it will need to run. If you have changed any of the files or locations of your CD contents, please delete lem3edit.ini to restrat first-time setup.",
+				"Oh no! Lem3edit could not find all of the data it will need to run. If you have changed any of the files or locations of your CD contents, please delete lem3edit.ini to restart first-time setup.",
 				"ok",
 				"error",
 				0);
