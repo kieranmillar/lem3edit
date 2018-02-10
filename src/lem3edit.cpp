@@ -100,6 +100,16 @@ int main(int argc, char *argv[])
 			return EXIT_FAILURE;
 		}
 		ini.setLem3cdPath(lem3cd);
+		if (!ini.validateData())
+		{
+			tinyfd_messageBox(
+				"Fatal Error!",
+				"Oh no! Lem3edit could not find all of the data it will need to run. Are you sure you extracted all of the contents off of your CD?",
+				"ok",
+				"error",
+				0);
+			return EXIT_FAILURE;
+		}
 		ini.save();
 		tinyfd_messageBox(
 			"Welcome to Lem3edit!",
@@ -107,6 +117,16 @@ int main(int argc, char *argv[])
 			"ok",
 			"info",
 			0);
+	}
+	else
+	{
+		if (!ini.validateData())
+			tinyfd_messageBox(
+				"Fatal Error!",
+				"Oh no! Lem3edit could not find all of the data it will need to run. If you have changed any of the files or locations of your CD contents, please delete lem3edit.ini to restrat first-time setup.",
+				"ok",
+				"error",
+				0);
 	}
 
 	char const * fileToOpen = NULL;
@@ -179,6 +199,7 @@ fs::path l3_filename_data(const fs::path basePath, const std::string &folder, co
 	filePath = basePath;
 	filePath /= folder;
 	filePath /= name;
+	filePath += ".";
 	filePath += ext;
 
 	return filePath;
@@ -191,6 +212,7 @@ fs::path l3_filename_data(const fs::path basePath, const std::string &folder, co
 	filePath /= folder;
 	filePath /= name;
 	filePath += l3_filename_number(n);
+	filePath += ".";
 	filePath += ext;
 
 	return filePath;
@@ -201,6 +223,7 @@ fs::path l3_filename_level(const fs::path parentPath, const string &name, const 
 	fs::path filePath;
 	filePath = parentPath;
 	filePath /= name;
+	filePath += ".";
 	filePath += ext;
 
 	return filePath;
@@ -212,6 +235,7 @@ fs::path l3_filename_level(const fs::path parentPath, const string &name, int n,
 	filePath = parentPath;
 	filePath /= name;
 	filePath += l3_filename_number(n);
+	filePath += ".";
 	filePath += ext;
 
 	return filePath;

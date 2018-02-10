@@ -31,6 +31,8 @@ public:
 	bool load(void);
 	bool save(void);
 
+	bool validateData(void);
+
 	fs::path getLem3cdPath(void);
 	fs::path getLem3installPath(void);
 	fs::path getDosBoxPath(void);

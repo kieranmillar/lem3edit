@@ -23,6 +23,7 @@ This file contains code for reading from and writing to the ini file
 */
 
 #include "ini.hpp"
+#include "lem3edit.hpp"
 
 #include "SDL.h"
 
@@ -106,6 +107,107 @@ bool Ini::save(void)
 		return false;
 	}
 	return true;
+}
+
+//check that every data file the program might need exists and return if successful
+bool Ini::validateData(void) {
+	fs::path parentPath = getLem3cdPath().parent_path();
+	bool success = true;
+
+	if (!fs::exists(getLem3cdPath()))
+		success = false;
+	if (!fs::exists(l3_filename_data(parentPath, "GRAPHICS", "TRIBE", 4, "PAL")))
+		success = false;
+	if (!fs::exists(l3_filename_data(parentPath, "GRAPHICS", "TRIBE", 5, "PAL")))
+		success = false;
+	if (!fs::exists(l3_filename_data(parentPath, "GRAPHICS", "TRIBE", 10, "PAL")))
+		success = false;
+	if (!fs::exists(l3_filename_data(parentPath, "GRAPHICS", "TRIBE", 4, "IND")))
+		success = false;
+	if (!fs::exists(l3_filename_data(parentPath, "GRAPHICS", "TRIBE", 5, "IND")))
+		success = false;
+	if (!fs::exists(l3_filename_data(parentPath, "GRAPHICS", "TRIBE", 10, "IND")))
+		success = false;
+	if (!fs::exists(l3_filename_data(parentPath, "GRAPHICS", "TRIBE", 4, "CMP")))
+		success = false;
+	if (!fs::exists(l3_filename_data(parentPath, "GRAPHICS", "TRIBE", 5, "CMP")))
+		success = false;
+	if (!fs::exists(l3_filename_data(parentPath, "GRAPHICS", "TRIBE", 10, "CMP")))
+		success = false;
+	if (!fs::exists(l3_filename_data(parentPath, "GRAPHICS", "TPANL", 4, "DIN")))
+		success = false;
+	if (!fs::exists(l3_filename_data(parentPath, "GRAPHICS", "TPANL", 5, "DIN")))
+		success = false;
+	if (!fs::exists(l3_filename_data(parentPath, "GRAPHICS", "TPANL", 10, "DIN")))
+		success = false;
+	if (!fs::exists(l3_filename_data(parentPath, "GRAPHICS", "TPANL", 4, "DEL")))
+		success = false;
+	if (!fs::exists(l3_filename_data(parentPath, "GRAPHICS", "TPANL", 5, "DEL")))
+		success = false;
+	if (!fs::exists(l3_filename_data(parentPath, "GRAPHICS", "TPANL", 10, "DEL")))
+		success = false;
+	if (!fs::exists(l3_filename_data(parentPath, "STYLES", "DATA", 1, "PAL")))
+		success = false;
+	if (!fs::exists(l3_filename_data(parentPath, "STYLES", "DATA", 2, "PAL")))
+		success = false;
+	if (!fs::exists(l3_filename_data(parentPath, "STYLES", "DATA", 3, "PAL")))
+		success = false;
+	if (!fs::exists(l3_filename_data(parentPath, "STYLES", "DATA", 1, "PAL")))
+		success = false;
+	if (!fs::exists(l3_filename_data(parentPath, "STYLES", "DATA", 2, "PAL")))
+		success = false;
+	if (!fs::exists(l3_filename_data(parentPath, "STYLES", "DATA", 3, "PAL")))
+		success = false;
+	if (!fs::exists(l3_filename_data(parentPath, "STYLES", "PERM", 1, "OBJ")))
+		success = false;
+	if (!fs::exists(l3_filename_data(parentPath, "STYLES", "PERM", 2, "OBJ")))
+		success = false;
+	if (!fs::exists(l3_filename_data(parentPath, "STYLES", "PERM", 3, "OBJ")))
+		success = false;
+	if (!fs::exists(l3_filename_data(parentPath, "STYLES", "PERM", 1, "BLK")))
+		success = false;
+	if (!fs::exists(l3_filename_data(parentPath, "STYLES", "PERM", 2, "BLK")))
+		success = false;
+	if (!fs::exists(l3_filename_data(parentPath, "STYLES", "PERM", 3, "BLK")))
+		success = false;
+	if (!fs::exists(l3_filename_data(parentPath, "STYLES", "PERM", 1, "FRL")))
+		success = false;
+	if (!fs::exists(l3_filename_data(parentPath, "STYLES", "PERM", 2, "FRL")))
+		success = false;
+	if (!fs::exists(l3_filename_data(parentPath, "STYLES", "PERM", 3, "FRL")))
+		success = false;
+	if (!fs::exists(l3_filename_data(parentPath, "STYLES", "TEMP", 1, "OBJ")))
+		success = false;
+	if (!fs::exists(l3_filename_data(parentPath, "STYLES", "TEMP", 2, "OBJ")))
+		success = false;
+	if (!fs::exists(l3_filename_data(parentPath, "STYLES", "TEMP", 3, "OBJ")))
+		success = false;
+	if (!fs::exists(l3_filename_data(parentPath, "STYLES", "TEMP", 1, "BLK")))
+		success = false;
+	if (!fs::exists(l3_filename_data(parentPath, "STYLES", "TEMP", 2, "BLK")))
+		success = false;
+	if (!fs::exists(l3_filename_data(parentPath, "STYLES", "TEMP", 3, "BLK")))
+		success = false;
+	if (!fs::exists(l3_filename_data(parentPath, "STYLES", "TEMP", 1, "FRL")))
+		success = false;
+	if (!fs::exists(l3_filename_data(parentPath, "STYLES", "TEMP", 2, "FRL")))
+		success = false;
+	if (!fs::exists(l3_filename_data(parentPath, "STYLES", "TEMP", 3, "FRL")))
+		success = false;
+	if (!fs::exists(l3_filename_data(parentPath, "STYLES", "OBJEC", 1, "CMP")))
+		success = false;
+	if (!fs::exists(l3_filename_data(parentPath, "STYLES", "OBJEC", 2, "CMP")))
+		success = false;
+	if (!fs::exists(l3_filename_data(parentPath, "STYLES", "OBJEC", 3, "CMP")))
+		success = false;
+	if (!fs::exists(l3_filename_data(parentPath, "STYLES", "OBJEC", 1, "IND")))
+		success = false;
+	if (!fs::exists(l3_filename_data(parentPath, "STYLES", "OBJEC", 2, "IND")))
+		success = false;
+	if (!fs::exists(l3_filename_data(parentPath, "STYLES", "OBJEC", 3, "IND")))
+		success = false;
+
+	return success;
 }
 
 fs::path Ini::getLem3cdPath(void) {

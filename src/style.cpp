@@ -232,7 +232,7 @@ bool Style::load(unsigned int n, SDL_Color *pal2, fs::path basePath)
 
 bool Style::load_palette(fs::path basePath, string folder, string name, unsigned int n)
 {
-	const string pal = ".PAL";
+	const string pal = "PAL";
 
 	return load_palette(l3_filename_data(basePath.generic_string(), folder, name, n, pal));
 }
@@ -269,7 +269,7 @@ bool Style::load_objects(int type, fs::path basePath, const string &folder, cons
 {
 	assert((unsigned)type < COUNTOF(this->object));
 
-	const string obj = ".OBJ", frl = ".FRL";
+	const string obj = "OBJ", frl = "FRL";
 
 	return load_objects(type, l3_filename_data(basePath.generic_string(), folder, name, n, obj), l3_filename_data(basePath.generic_string(), folder, name, n, frl));
 }
@@ -398,7 +398,7 @@ bool Style::load_blocks(int type, fs::path basePath, const string &folder, const
 {
 	assert((unsigned)type < COUNTOF(this->object));
 
-	const string blk = ".BLK";
+	const string blk = "BLK";
 
 	return load_blocks(type, l3_filename_data(basePath.generic_string(), folder, name, n, blk));
 }

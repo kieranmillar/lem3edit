@@ -46,7 +46,7 @@ bool Tribe::load(unsigned int n, fs::path basePath)
 
 bool Tribe::load_palette(fs::path basePath, string folder, string name, unsigned int n)
 {
-	const string pal = ".PAL";
+	const string pal = "PAL";
 
 	return load_palette(l3_filename_data(basePath, folder, name, n, pal));
 }

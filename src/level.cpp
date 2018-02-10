@@ -146,7 +146,7 @@ bool Level::load(const fs::path filename)
 
 bool Level::load_level(const std::string &path, const std::string &name, unsigned int n)
 {
-	const string dat = ".DAT";
+	const string dat = "DAT";
 
 	return load_level(l3_filename_level(path, name, n, dat));
 }
@@ -187,7 +187,7 @@ bool Level::load_objects(int type, const fs::path parentPath, const string &name
 {
 	assert((unsigned)type < COUNTOF(this->object));
 
-	const string obs = ".OBS";
+	const string obs = "OBS";
 
 	return load_objects(type, l3_filename_level(parentPath, name, n, obs));
 }
@@ -289,7 +289,7 @@ bool Level::save(void)
 
 bool Level::save_level(const fs::path parentPath, unsigned int n)
 {
-	return save_level(l3_filename_level(parentPath, "LEVEL", n, ".DAT"));
+	return save_level(l3_filename_level(parentPath, "LEVEL", n, "DAT"));
 }
 
 bool Level::save_level(const fs::path filename)
@@ -327,14 +327,14 @@ bool Level::save_objects(int type, fs::path parentPath, unsigned int n)
 {
 	assert((unsigned)type < COUNTOF(this->object));
 
-	const string obs = ".OBS";
+	const string obs = "OBS";
 	string name;
 
 	if (type == PERM)
 		name = "PERM";
 	else
 		name = "TEMP";
-	return save_objects(type, l3_filename_level(parentPath, name, n, ".OBS"));
+	return save_objects(type, l3_filename_level(parentPath, name, n, "OBS"));
 }
 
 bool Level::save_objects(int type, const fs::path filename)

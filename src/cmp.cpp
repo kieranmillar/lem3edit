@@ -135,7 +135,7 @@ void Cmp::blit(SDL_Surface *surface, signed int x, signed int y, unsigned int an
 
 bool Cmp::load(fs::path basePath, std::string folder, const std::string name, unsigned int n)
 {
-	const string ind = ".IND", cmp = ".CMP";
+	const string ind = "IND", cmp = "CMP";
 
 	return load(l3_filename_data(basePath, folder, name, n, ind), l3_filename_data(basePath, folder, name, n, cmp));
 }

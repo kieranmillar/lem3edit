@@ -59,7 +59,7 @@ void Raw::blit(SDL_Surface *dest, signed int x, signed int y, unsigned int frame
 bool Raw::load(fs::path basePath, string name)
 {
 	const string folder = "GRAPHICS";
-	const string raw = ".RAW";
+	const string raw = "RAW";
 
 	return load_raw(l3_filename_data(basePath, folder, name, raw));
 }

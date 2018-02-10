@@ -160,14 +160,14 @@ void Del::blit_text(SDL_Surface *surface, signed int x, signed int y, const stri
 bool Del::load(const fs::path basePath, const std::string name)
 {
 	const string folder = "GRAPHICS";
-	const string din = ".DIN", del = ".DEL";
+	const string din = "DIN", del = "DEL";
 
 	return load(l3_filename_data(basePath, folder, name, din), l3_filename_data(basePath, folder, name, del));
 }
 
 bool Del::load(const fs::path basePath, const std::string &folder, const std::string &name, unsigned int n)
 {
-	const string din = ".DIN", del = ".DEL";
+	const string din = "DIN", del = "DEL";
 
 	return load(l3_filename_data(basePath, folder, name, n, din), l3_filename_data(basePath, folder, name, n, del));
 }
