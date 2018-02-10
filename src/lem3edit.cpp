@@ -121,12 +121,15 @@ int main(int argc, char *argv[])
 	else
 	{
 		if (!ini.validateData())
+		{
 			tinyfd_messageBox(
 				"Fatal Error!",
 				"Oh no! Lem3edit could not find all of the data it will need to run. If you have changed any of the files or locations of your CD contents, please delete lem3edit.ini to restart first-time setup.",
 				"ok",
 				"error",
 				0);
+			return EXIT_FAILURE;
+		}
 	}
 
 	char const * fileToOpen = NULL;
@@ -139,7 +142,7 @@ int main(int argc, char *argv[])
 	Editor editor(ini.getLem3cdPath().parent_path());
 	if (!fileToOpen)
 	{
-		return EXIT_FAILURE;
+		return EXIT_SUCCESS;
 	}
 	else
 	{
