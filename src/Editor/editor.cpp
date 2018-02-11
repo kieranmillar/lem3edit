@@ -62,6 +62,10 @@ bool Editor::load(const fs::path filename)
 	gameFrameTick = SDL_GetTicks();
 	startCameraOn = false;
 
+	//prevent open file dialog mouse clicks from carrying over once level loaded
+	SDL_PumpEvents();
+	SDL_FlushEvents(SDL_MOUSEMOTION, SDL_MOUSEWHEEL);
+
 	return canvas.redraw = true;
 }
 
