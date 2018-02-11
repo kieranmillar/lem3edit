@@ -44,6 +44,8 @@ private:
 	Ini * ini_ptr;
 	Editor * editor_ptr;
 
+	Uint32 lastFrameTick;
+
 	enum menuBox {
 		NONE, NEWLEVEL, LOADLEVEL, COPYLEVEL, DELETELEVEL,
 		NEWPACK, LOADPACK, PREVIOUSPACK, OPTIONS, QUIT
@@ -53,6 +55,9 @@ private:
 	enum menuMode { NODIALOG, NEWLEVELDIALOG, COPYLEVELDIALOG, OPTIONSDIALOG };
 	menuMode menuDialog;
 
+	bool selectedCopy;
+
+	// main menu text textures
 	SDL_Texture * titleText;
 	SDL_Texture * loadingText;
 	SDL_Texture * NewLevelText;
@@ -65,11 +70,34 @@ private:
 	SDL_Texture * OptionsText;
 	SDL_Texture * QuitText;
 
+	//dialog text textures
+	SDL_Texture * numbers[10];
+	SDL_Texture * OKText;
+	SDL_Texture * CancelText;
+	SDL_Texture * selectTribeText;
+	SDL_Texture * classicTribeText;
+	SDL_Texture * shadowTribeText;
+	SDL_Texture * egyptTribeText;
+	SDL_Texture * newLevelIDText;
+	SDL_Texture * levelIDClassicText;
+	SDL_Texture * levelIDShadowText;
+	SDL_Texture * levelIDEgyptText;
+	SDL_Texture * levelIDPracticeText;
+	SDL_Texture * levelIDDemoText;
+	SDL_Texture * copyText;
+	SDL_Texture * renumberText;
+
 	void refreshPreviousPackText(void);
 
-	void renderText(SDL_Texture * tex, const int centreX, const int topY);
-	void renderButton(SDL_Texture * tex, const int centreX, const int topY, const bool highlight);
+	void Mainmenu::typedNumber(const unsigned int value);
 
+	enum renderAlign { LEFT, CENTRE };
+
+	void renderText(SDL_Texture * tex, const int centreX, const int topY, const renderAlign align);
+	void renderButton(SDL_Texture * tex, const int centreX, const int topY, const bool highlight);
+	void renderNumbers(int num, const int rightX, const int y);
+
+	int level_id;
 	struct OBSValues {
 		Uint16 perm;
 		Uint16 temp;
@@ -80,6 +108,14 @@ private:
 
 	//opens a DAT file and returns the values that reference the OBS files;
 	OBSValues loadOBSValues(fs::path DATfilepath);
+	bool updateOBSValues(fs::path DATfilepath, const int id);
+
+	bool confirmOverwrite(fs::path parentPath, int id);
+
+	void loadLevel(void);
+	void copyLevelDialog(void);
+	void copyLevel(void);
+	void deleteLevel(void);
 };
 
 #endif // MAINMENU_HPP
