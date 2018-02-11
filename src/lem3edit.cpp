@@ -133,24 +133,10 @@ int main(int argc, char *argv[])
 		}
 	}
 
-	char const * fileToOpen = NULL;
-
-	char const * filterPatterns[1] = { "LEVEL*.DAT" };
-	fileToOpen = tinyfd_openFileDialog("Open level", NULL, 1, filterPatterns, "Lemmings 3 Level File (LEVEL###.DAT)", 0);
-
-	g_currentMode = MAINMENU;
-
-	Mainmenu mainmenu(&ini);
+	g_currentMode = MAINMENUMODE;
 
 	Editor editor(ini.getLem3cdPath().parent_path());
-	if (!fileToOpen)
-	{
-		return EXIT_SUCCESS;
-	}
-	else
-	{
-		//editor.load(fileToOpen);
-	}
+	Mainmenu mainmenu(&ini, &editor);
 
 	SDL_Event event;
 	//prevent open file dialog mouse clicks from carrying over once level loaded
@@ -160,8 +146,8 @@ int main(int argc, char *argv[])
 	{
 		switch (g_currentMode)
 		{
-		case MAINMENU:
-
+		case MAINMENUMODE:
+			mainmenu.handleMainMenuEvents(event);
 			break;
 		case EDITORMODE:
 			editor.editor_input.handleEditorEvents(event);

@@ -37,7 +37,7 @@ namespace fs = std::experimental::filesystem::v1;
 
 static const int PERM = 0, TEMP = 1, TOOL = 2;
 
-enum programMode { MAINMENU, EDITORMODE, LEVELPROPERTIESMODE };
+enum programMode { MAINMENUMODE, EDITORMODE, LEVELPROPERTIESMODE };
 
 extern programMode g_currentMode;
 

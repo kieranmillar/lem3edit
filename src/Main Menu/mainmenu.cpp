@@ -23,9 +23,11 @@ This file handles the main menu
 */
 
 #include "mainmenu.hpp"
+#include "../Editor/editor.hpp"
 #include "../font.hpp"
 #include "../ini.hpp"
 #include "../lem3edit.hpp"
+#include "../tinyfiledialogs.h"
 #include "../window.hpp"
 
 #include "SDL.h"
@@ -33,10 +35,11 @@ This file handles the main menu
 
 #include <string>
 
-Mainmenu::Mainmenu(Ini * i)
+Mainmenu::Mainmenu(Ini * i, Editor * e)
 {
 	ini_ptr = i;
-	redraw = true;
+	editor_ptr = e;
+	highlighting = NONE;
 
 	TTF_Font * titleFont = TTF_OpenFont("./gfx/DejaVuSansMono.ttf", 70);
 	titleText = Font::createTextureFromString(titleFont, "Lem3edit");
@@ -76,11 +79,150 @@ void Mainmenu::refreshPreviousPackText(void)
 	TTF_CloseFont(buttonFont);
 }
 
+void Mainmenu::handleMainMenuEvents(SDL_Event event)
+{
+	Sint32 mouse_x_window, mouse_y_window;
+	Uint8 mouse_state = SDL_GetMouseState(&mouse_x_window, &mouse_y_window);
+
+	switch (event.type)
+	{
+	case SDL_WINDOWEVENT:
+	{
+		SDL_WindowEvent &e = event.window;
+
+		if (e.event == SDL_WINDOWEVENT_RESIZED)
+		{
+			g_window.resize(e.data1, e.data2);
+		}
+		break;
+	}
+	case SDL_MOUSEMOTION:
+	{
+		SDL_MouseMotionEvent &e = event.motion;
+
+		highlighting = NONE;
+
+		if (mouse_y_window > 90
+			&& mouse_y_window < 130)
+		{
+			highlighting = NEWLEVEL;
+		}
+		if (mouse_y_window > 140
+			&& mouse_y_window < 180)
+		{
+			highlighting = LOADLEVEL;
+		}
+		if (mouse_y_window > 190
+			&& mouse_y_window < 230)
+		{
+			highlighting = COPYLEVEL;
+		}
+		if (mouse_y_window > 240
+			&& mouse_y_window < 270)
+		{
+			highlighting = DELETELEVEL;
+		}
+		if (mouse_y_window > 310
+			&& mouse_y_window < 350)
+		{
+			highlighting = NEWPACK;
+		}
+		if (mouse_y_window > 360
+			&& mouse_y_window < 400)
+		{
+			highlighting = LOADPACK;
+		}
+		if (mouse_y_window > 410
+			&& mouse_y_window < 450)
+		{
+			highlighting = PREVIOUSPACK;
+		}
+		if (mouse_y_window > 480
+			&& mouse_y_window < 520)
+		{
+			highlighting = OPTIONS;
+		}
+		if (mouse_y_window > 530
+			&& mouse_y_window < 570)
+		{
+			highlighting = QUIT;
+		}
+		break;
+	}
+	case SDL_MOUSEBUTTONDOWN://when pressed
+	{
+		SDL_MouseButtonEvent &e = event.button;
+
+		if (e.button == SDL_BUTTON_LEFT)
+		{
+			switch (highlighting)
+			{
+			case NEWLEVEL:
+
+				break;
+
+			case LOADLEVEL:
+			{
+				char const * fileToOpen = NULL;
+				char const * filterPatterns[1] = { "LEVEL*.DAT" };
+				fileToOpen = tinyfd_openFileDialog("Open level", NULL, 1, filterPatterns, "Lemmings 3 Level File (LEVEL###.DAT)", 0);
+				if (fileToOpen)
+				{
+					editor_ptr->load(fileToOpen);
+					g_currentMode = EDITORMODE;
+				}
+			}
+			break;
+
+			case COPYLEVEL:
+
+				break;
+
+			case DELETELEVEL:
+
+				break;
+
+			case NEWPACK:
+
+				break;
+
+			case LOADPACK:
+
+				break;
+
+			case PREVIOUSPACK:
+
+				break;
+
+			case OPTIONS:
+
+				break;
+
+			case QUIT:
+				die();
+				break;
+
+			default:
+
+				break;
+			}
+		}
+		break;
+	}
+	case SDL_USEREVENT:// stuff here happens every frame. Watch out, timer produces events on a separate thread to rest of program!
+	{
+		draw();
+		break;
+	}
+	default:
+	{
+		break;
+	}
+	}
+}
+
 void Mainmenu::draw(void)
 {
-	if (!redraw)
-		return;
-
 	int centreX = g_window.width / 2;
 
 	SDL_SetRenderDrawBlendMode(g_window.screen_renderer, SDL_BLENDMODE_BLEND);
@@ -95,33 +237,31 @@ void Mainmenu::draw(void)
 
 	//single level buttons
 	{
-		renderButton(NewLevelText, centreX, 90);
-		renderButton(LoadLevelText, centreX, 140);
-		renderButton(CopyLevelText, centreX, 190);
-		renderButton(DeleteLevelText, centreX, 240);
+		renderButton(NewLevelText, centreX, 90, highlighting == NEWLEVEL);
+		renderButton(LoadLevelText, centreX, 140, highlighting == LOADLEVEL);
+		renderButton(CopyLevelText, centreX, 190, highlighting == COPYLEVEL);
+		renderButton(DeleteLevelText, centreX, 240, highlighting == DELETELEVEL);
 	}
 
 	//level pack buttons
 	{
-		renderButton(NewPackText, centreX, 310);
-		renderButton(LoadPackText, centreX, 360);
-		renderButton(PreviousPackText, centreX, 410);
+		renderButton(NewPackText, centreX, 310, highlighting == NEWPACK);
+		renderButton(LoadPackText, centreX, 360, highlighting == LOADPACK);
+		renderButton(PreviousPackText, centreX, 410, highlighting == PREVIOUSPACK);
 	}
 
 	//other buttons
 	{
-		renderButton(OptionsText, centreX, 480);
-		renderButton(QuitText, centreX, 530);
+		renderButton(OptionsText, centreX, 480, highlighting == OPTIONS);
+		renderButton(QuitText, centreX, 530, highlighting == QUIT);
 	}
 
 	SDL_SetRenderTarget(g_window.screen_renderer, NULL);
 	SDL_RenderCopy(g_window.screen_renderer, g_window.screen_texture, NULL, NULL);
 	SDL_RenderPresent(g_window.screen_renderer);
-
-	redraw = false;
 }
 
-void Mainmenu::renderText(SDL_Texture * tex, int centreX, int topY)
+void Mainmenu::renderText(SDL_Texture * tex, const int centreX, const int topY)
 {
 	int textW, textH;
 	SDL_Rect textRect;
@@ -134,7 +274,7 @@ void Mainmenu::renderText(SDL_Texture * tex, int centreX, int topY)
 	SDL_RenderCopy(g_window.screen_renderer, tex, NULL, &textRect);
 }
 
-void Mainmenu::renderButton(SDL_Texture * tex, int centreX, int topY)
+void Mainmenu::renderButton(SDL_Texture * tex, const int centreX, const int topY, const bool highlight)
 {
 	int textW, textH;
 	SDL_Rect buttonRect;
@@ -145,7 +285,10 @@ void Mainmenu::renderButton(SDL_Texture * tex, int centreX, int topY)
 	buttonRect.w = textW + 4;
 	buttonRect.h = textH + 4;
 
-	SDL_SetRenderDrawColor(g_window.screen_renderer, 200, 200, 200, 255);
+	if (highlight)
+		SDL_SetRenderDrawColor(g_window.screen_renderer, 255, 255, 255, 255);
+	else
+		SDL_SetRenderDrawColor(g_window.screen_renderer, 200, 200, 200, 255);
 	SDL_RenderFillRect(g_window.screen_renderer, &buttonRect);
 	SDL_SetRenderDrawColor(g_window.screen_renderer, 0, 0, 0, 255);
 	SDL_RenderDrawRect(g_window.screen_renderer, &buttonRect);

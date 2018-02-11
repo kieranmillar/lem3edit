@@ -24,19 +24,27 @@
 #include "SDL.h"
 
 class Ini;
+class Editor;
 
 class Mainmenu
 {
 public:
 
-	Mainmenu(Ini * i);
+	Mainmenu(Ini * i, Editor * e);
 
-	bool redraw;
+	void handleMainMenuEvents(SDL_Event event);
 
 	void draw(void);
 
 private:
 	Ini * ini_ptr;
+	Editor * editor_ptr;
+
+	enum menuBox {
+		NONE, NEWLEVEL, LOADLEVEL, COPYLEVEL, DELETELEVEL,
+		NEWPACK, LOADPACK, PREVIOUSPACK, OPTIONS, QUIT
+	};
+	menuBox highlighting;
 
 	SDL_Texture * titleText;
 	SDL_Texture * NewLevelText;
@@ -51,8 +59,8 @@ private:
 
 	void refreshPreviousPackText(void);
 
-	void renderText(SDL_Texture * tex, int centreX, int topY);
-	void renderButton(SDL_Texture * tex, int centreX, int topY);
+	void renderText(SDL_Texture * tex, const int centreX, const int topY);
+	void renderButton(SDL_Texture * tex, const int centreX, const int topY, const bool highlight);
 };
 
 #endif // MAINMENU_HPP
