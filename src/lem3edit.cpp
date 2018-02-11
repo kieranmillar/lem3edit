@@ -59,13 +59,13 @@ int main(int argc, char *argv[])
 	if (SDL_Init(SDL_INIT_TIMER | SDL_INIT_VIDEO))
 	{
 		SDL_Log("failed to initialize SDL: %s\n", SDL_GetError());
-		return false;
+		return EXIT_FAILURE;
 	}
 
 	if (TTF_Init() == -1)
 	{
 		SDL_Log("failed to initialize SDL_ttf: %s\n", TTF_GetError());
-		return false;
+		return EXIT_FAILURE;
 	}
 
 	if (g_window.initialise(DEFAULT_WINDOW_WIDTH, DEFAULT_WINDOW_HEIGHT) == false) // Initialise the main program window
