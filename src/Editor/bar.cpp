@@ -86,7 +86,7 @@ void Bar::load(void)
 	setButtonTooltip(button_copy, "Copy Selected Objects (Ctrl+c)");
 	setButtonTooltip(button_paste, "Paste Copied Objects (Ctrl+v)");
 	setButtonTooltip(button_delete, "Delete Selected Objects (delete)");
-	setButtonTooltip(button_quit, "Quit. ALL UNSAVED CHANGES WILL BE LOST! (q)");
+	setButtonTooltip(button_quit, "Quit and return to main menu. ALL UNSAVED CHANGES WILL BE LOST! (q)");
 
 	TTF_CloseFont(tooltipFont);
 }
