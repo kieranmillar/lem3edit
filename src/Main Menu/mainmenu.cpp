@@ -171,6 +171,8 @@ void Mainmenu::handleMainMenuEvents(SDL_Event event)
 				{
 					//draw loading banner to provide feedback that something is happening
 					SDL_SetRenderTarget(g_window.screen_renderer, g_window.screen_texture);
+					SDL_SetRenderDrawColor(g_window.screen_renderer, 0, 0, 0, 255);
+					SDL_RenderClear(g_window.screen_renderer);
 					renderButton(loadingText, g_window.width / 2, 260, true);
 					SDL_SetRenderTarget(g_window.screen_renderer, NULL);
 					SDL_RenderCopy(g_window.screen_renderer, g_window.screen_texture, NULL, NULL);
