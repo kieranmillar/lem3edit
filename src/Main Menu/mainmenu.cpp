@@ -33,6 +33,8 @@ This file handles the main menu
 #include "SDL.h"
 #include "SDL_ttf.h"
 
+#include <fstream>
+#include <iostream>
 #include <string>
 
 Mainmenu::Mainmenu(Ini * i, Editor * e)
@@ -57,6 +59,10 @@ Mainmenu::Mainmenu(Ini * i, Editor * e)
 	OptionsText = Font::createTextureFromString(buttonFont, "Set Testing Paths and Options");
 	QuitText = Font::createTextureFromString(buttonFont, "Quit");
 	TTF_CloseFont(buttonFont);
+
+	menuDialog = NODIALOG;
+
+	fileOBS = { 1000, 1000 };
 
 	draw();
 }
@@ -106,7 +112,7 @@ void Mainmenu::handleMainMenuEvents(SDL_Event event)
 		if (mouse_y_window > 90
 			&& mouse_y_window < 130)
 		{
-			highlighting = NEWLEVEL;
+			//highlighting = NEWLEVEL;
 		}
 		if (mouse_y_window > 140
 			&& mouse_y_window < 180)
@@ -126,22 +132,23 @@ void Mainmenu::handleMainMenuEvents(SDL_Event event)
 		if (mouse_y_window > 310
 			&& mouse_y_window < 350)
 		{
-			highlighting = NEWPACK;
+			//highlighting = NEWPACK;
 		}
 		if (mouse_y_window > 360
 			&& mouse_y_window < 400)
 		{
-			highlighting = LOADPACK;
+			//highlighting = LOADPACK;
 		}
 		if (mouse_y_window > 410
 			&& mouse_y_window < 450)
 		{
-			highlighting = PREVIOUSPACK;
+			//if (ini_ptr->getLastLoadedPack() != "")
+				//highlighting = PREVIOUSPACK;
 		}
 		if (mouse_y_window > 480
 			&& mouse_y_window < 520)
 		{
-			highlighting = OPTIONS;
+			//highlighting = OPTIONS;
 		}
 		if (mouse_y_window > 530
 			&& mouse_y_window < 570)
@@ -167,31 +174,105 @@ void Mainmenu::handleMainMenuEvents(SDL_Event event)
 				char const * fileToOpen = NULL;
 				char const * filterPatterns[1] = { "LEVEL*.DAT" };
 				fileToOpen = tinyfd_openFileDialog("Open level", NULL, 1, filterPatterns, "Lemmings 3 Level File (LEVEL###.DAT)", 0);
-				if (fileToOpen)
-				{
-					//draw loading banner to provide feedback that something is happening
-					SDL_SetRenderTarget(g_window.screen_renderer, g_window.screen_texture);
-					SDL_SetRenderDrawColor(g_window.screen_renderer, 0, 0, 0, 255);
-					SDL_RenderClear(g_window.screen_renderer);
-					renderButton(loadingText, g_window.width / 2, 260, true);
-					SDL_SetRenderTarget(g_window.screen_renderer, NULL);
-					SDL_RenderCopy(g_window.screen_renderer, g_window.screen_texture, NULL, NULL);
-					SDL_RenderPresent(g_window.screen_renderer);
+				if (!fileToOpen)
+					break;
+				//draw loading banner to provide feedback that something is happening
+				SDL_SetRenderTarget(g_window.screen_renderer, g_window.screen_texture);
+				SDL_SetRenderDrawColor(g_window.screen_renderer, 0, 0, 0, 255);
+				SDL_RenderClear(g_window.screen_renderer);
+				renderButton(loadingText, g_window.width / 2, 260, true);
+				SDL_SetRenderTarget(g_window.screen_renderer, NULL);
+				SDL_RenderCopy(g_window.screen_renderer, g_window.screen_texture, NULL, NULL);
+				SDL_RenderPresent(g_window.screen_renderer);
 
-					highlighting = NONE;
-					g_currentMode = EDITORMODE;
-					editor_ptr->load(fileToOpen);
-				}
+				highlighting = NONE;
+				g_currentMode = EDITORMODE;
+				editor_ptr->load(fileToOpen);
 			}
 			break;
 
 			case COPYLEVEL:
+			{
+				char const * fileToCopy = NULL;
+				char const * filterPatterns[1] = { "LEVEL*.DAT" };
+				fileToCopy = tinyfd_openFileDialog("Select level to Copy or Renumber", NULL, 1, filterPatterns, "Lemmings 3 Level File (LEVEL###.DAT)", 0);
 
-				break;
+				if (!fileToCopy)
+					break;
+
+				filePath = fileToCopy;
+				if (!fs::exists(filePath))
+					break;
+
+				fileOBS = loadOBSValues(filePath);
+				if (fileOBS.temp >= 1000 && fileOBS.perm >= 1000)
+					break;
+
+				highlighting = NONE;
+				menuDialog = COPYLEVELDIALOG;
+			}
+			break;
 
 			case DELETELEVEL:
+			{
+				char const * fileToDelete = NULL;
+				char const * filterPatterns[1] = { "LEVEL*.DAT" };
+				fileToDelete = tinyfd_openFileDialog("Select level to Delete", NULL, 1, filterPatterns, "Lemmings 3 Level File (LEVEL###.DAT)", 0);
 
-				break;
+				if (!fileToDelete)
+					break;
+
+				filePath = fileToDelete;
+				if (!fs::exists(filePath))
+					break;
+
+				fileOBS = loadOBSValues(filePath);
+				if (fileOBS.temp >= 1000 || fileOBS.perm >= 1000)
+					break;
+
+				std::string title = "Deleting ";
+				title += filePath.stem().generic_string();
+
+				std::string message = "You will also delete the following files:\nTEMP";
+				message += l3_filename_number(fileOBS.temp);
+				message += ".OBS\nPERM";
+				message += l3_filename_number(fileOBS.perm);
+				message += ".OBS\nAre you sure you want to do this?";
+
+				if (tinyfd_messageBox(
+					title.c_str(),
+					message.c_str(),
+					"okcancel",
+					"warning",
+					0
+				) == 0)
+					break;
+
+				bool success = true;
+
+				if (!fs::remove(filePath))
+					success = false;
+
+				fs::path tempPath = filePath.parent_path();
+				tempPath /= "TEMP";
+				tempPath += l3_filename_number(fileOBS.temp);
+				tempPath += ".OBS";
+				if (!fs::remove(tempPath))
+					success = false;
+
+				fs::path permPath = filePath.parent_path();
+				permPath /= "PERM";
+				permPath += l3_filename_number(fileOBS.perm);
+				permPath += ".OBS";
+				if (!fs::remove(permPath))
+					success = false;
+
+				if (success)
+					tinyfd_messageBox("Level Deleted", "Level deleted!", "ok", "info", 1);
+				else
+					tinyfd_messageBox("Oh No!", "Lem3edit could not delete one or more of these files!", "ok", "error", 1);
+			}
+			break;
 
 			case NEWPACK:
 
@@ -267,6 +348,16 @@ void Mainmenu::draw(void)
 		renderButton(QuitText, centreX, 530, highlighting == QUIT);
 	}
 
+	//draw strikes through all unimplemented features
+	{
+		SDL_SetRenderDrawColor(g_window.screen_renderer, 0, 0, 0, 255);
+		SDL_RenderDrawLine(g_window.screen_renderer, 100, 110, 700, 110);//new level
+		SDL_RenderDrawLine(g_window.screen_renderer, 100, 330, 700, 330);//new pack
+		SDL_RenderDrawLine(g_window.screen_renderer, 100, 380, 700, 380);//load pack
+		SDL_RenderDrawLine(g_window.screen_renderer, 100, 430, 700, 430);//previous pack
+		SDL_RenderDrawLine(g_window.screen_renderer, 100, 500, 700, 500);//options
+	}
+
 	SDL_SetRenderTarget(g_window.screen_renderer, NULL);
 	SDL_RenderCopy(g_window.screen_renderer, g_window.screen_texture, NULL, NULL);
 	SDL_RenderPresent(g_window.screen_renderer);
@@ -305,4 +396,24 @@ void Mainmenu::renderButton(SDL_Texture * tex, const int centreX, const int topY
 	SDL_RenderDrawRect(g_window.screen_renderer, &buttonRect);
 
 	renderText(tex, centreX, topY + 2);
+}
+
+Mainmenu::OBSValues Mainmenu::loadOBSValues(fs::path DATfilepath)
+{
+	std::ifstream f(DATfilepath, std::ios::binary);
+	if (!f)
+	{
+		SDL_Log("Failed to open '%s'\n", DATfilepath.generic_string().c_str());
+		return { 1000 , 1000 };
+	}
+
+	Uint16 temp;
+	Uint16 perm;
+
+	f.seekg(6);
+	f.read((char *)&temp, sizeof(temp));
+	f.read((char *)&perm, sizeof(perm));
+	f.close();
+
+	return { temp , perm };
 }

@@ -23,6 +23,10 @@
 
 #include "SDL.h"
 
+#include <experimental/filesystem>
+
+namespace fs = std::experimental::filesystem::v1;
+
 class Ini;
 class Editor;
 
@@ -46,6 +50,9 @@ private:
 	};
 	menuBox highlighting;
 
+	enum menuMode { NODIALOG, NEWLEVELDIALOG, COPYLEVELDIALOG, OPTIONSDIALOG };
+	menuMode menuDialog;
+
 	SDL_Texture * titleText;
 	SDL_Texture * loadingText;
 	SDL_Texture * NewLevelText;
@@ -62,6 +69,17 @@ private:
 
 	void renderText(SDL_Texture * tex, const int centreX, const int topY);
 	void renderButton(SDL_Texture * tex, const int centreX, const int topY, const bool highlight);
+
+	struct OBSValues {
+		Uint16 perm;
+		Uint16 temp;
+	};
+
+	OBSValues fileOBS;//check for {1000, 1000} or higher for invalid result
+	fs::path filePath;
+
+	//opens a DAT file and returns the values that reference the OBS files;
+	OBSValues loadOBSValues(fs::path DATfilepath);
 };
 
 #endif // MAINMENU_HPP
