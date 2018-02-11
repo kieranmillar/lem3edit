@@ -158,18 +158,11 @@ int main(int argc, char *argv[])
 		}
 	}
 
-	//NOTE to self: These should be destructors, but objects need to go out of scope before
-	//calling Quit functions below or else will crash on exit
-
-	editor.bar.destroy();
+	editor.closeLevel();
 	g_window.destroy();
 
 	TTF_Quit();
 	SDL_Quit();
-
-	editor.style.destroy_all_objects(PERM);
-	editor.style.destroy_all_objects(TEMP);
-	editor.style.destroy_all_objects(TOOL);
 
 	return EXIT_SUCCESS;
 }

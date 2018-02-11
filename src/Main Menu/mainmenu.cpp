@@ -41,9 +41,10 @@ Mainmenu::Mainmenu(Ini * i, Editor * e)
 	editor_ptr = e;
 	highlighting = NONE;
 
-	TTF_Font * titleFont = TTF_OpenFont("./gfx/DejaVuSansMono.ttf", 70);
-	titleText = Font::createTextureFromString(titleFont, "Lem3edit");
-	TTF_CloseFont(titleFont);
+	TTF_Font * bigFont = TTF_OpenFont("./gfx/DejaVuSansMono.ttf", 70);
+	titleText = Font::createTextureFromString(bigFont, "Lem3edit");
+	loadingText = Font::createTextureFromString(bigFont, "LOADING");
+	TTF_CloseFont(bigFont);
 
 	TTF_Font * buttonFont = TTF_OpenFont("./gfx/DejaVuSansMono.ttf", 30);
 	NewLevelText = Font::createTextureFromString(buttonFont, "New Single Level");
@@ -168,8 +169,16 @@ void Mainmenu::handleMainMenuEvents(SDL_Event event)
 				fileToOpen = tinyfd_openFileDialog("Open level", NULL, 1, filterPatterns, "Lemmings 3 Level File (LEVEL###.DAT)", 0);
 				if (fileToOpen)
 				{
-					editor_ptr->load(fileToOpen);
+					//draw loading banner to provide feedback that something is happening
+					SDL_SetRenderTarget(g_window.screen_renderer, g_window.screen_texture);
+					renderButton(loadingText, g_window.width / 2, 260, true);
+					SDL_SetRenderTarget(g_window.screen_renderer, NULL);
+					SDL_RenderCopy(g_window.screen_renderer, g_window.screen_texture, NULL, NULL);
+					SDL_RenderPresent(g_window.screen_renderer);
+
+					highlighting = NONE;
 					g_currentMode = EDITORMODE;
+					editor_ptr->load(fileToOpen);
 				}
 			}
 			break;

@@ -47,6 +47,7 @@ private:
 	menuBox highlighting;
 
 	SDL_Texture * titleText;
+	SDL_Texture * loadingText;
 	SDL_Texture * NewLevelText;
 	SDL_Texture * LoadLevelText;
 	SDL_Texture * CopyLevelText;

@@ -65,6 +65,18 @@ bool Editor::load(const fs::path filename)
 	return canvas.redraw = true;
 }
 
+void Editor::closeLevel(void)
+{
+	bar.destroy();
+	style.destroy_all_objects(PERM);
+	style.destroy_all_objects(TEMP);
+	style.destroy_all_objects(TOOL);
+	levelProperties.destroyTextures();
+	selection.clear();
+	clipboard.clear();
+	g_currentMode = MAINMENUMODE;
+}
+
 bool Editor::select(signed int x, signed int y, bool modify_selection)
 {
 	Level::Object::Index temp = level.get_object_by_position(x, y);

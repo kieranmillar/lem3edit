@@ -87,6 +87,8 @@ public:
 
 	bool load(const fs::path filename);
 
+	void closeLevel(void);
+
 	bool toggleCameraVisibility(void);
 	bool move_camera(signed int delta_x, signed int delta_y);
 

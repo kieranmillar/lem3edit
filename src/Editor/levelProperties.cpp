@@ -68,6 +68,22 @@ void LevelProperties::setup(void)
 	TTF_CloseFont(smallFont);
 }
 
+void LevelProperties::destroyTextures(void)
+{
+	if (titleText != NULL) SDL_DestroyTexture(titleText);
+	if (releaseRateText != NULL) SDL_DestroyTexture(releaseRateText);
+	if (spawnDelayText != NULL) SDL_DestroyTexture(spawnDelayText);
+	if (timeLimitText != NULL) SDL_DestroyTexture(timeLimitText);
+	if (timeLimitMinsText != NULL) SDL_DestroyTexture(timeLimitMinsText);
+	if (timeLimitSecsText != NULL) SDL_DestroyTexture(timeLimitSecsText);
+	if (OKButtonText != NULL) SDL_DestroyTexture(OKButtonText);
+	if (cancelButtonText != NULL) SDL_DestroyTexture(cancelButtonText);
+	for (int i = 0; i < 10; i++)
+	{
+		if (numbers[i] != NULL) SDL_DestroyTexture(numbers[i]);
+	}
+}
+
 void LevelProperties::resize(void)
 {
 	dialogX = (g_window.width / 2) - 150;
