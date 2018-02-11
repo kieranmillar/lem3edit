@@ -129,6 +129,52 @@ std::vector<int> Level::get_objects_in_area(int areaX, int areaY, int areaW, int
 	return tmp;
 }
 
+//Creates a new level.
+//You need to create all 3 files under the correct number BEFORE calling this function
+//then pass the LEVEL###.DAT filepath as an argument
+void Level::newLevel(const fs::path filename, const tribeName t)
+{
+	levelPath = filename.parent_path();
+
+	string levelNum = filename.stem().generic_string();
+	levelNum = levelNum.substr(5, 8);
+	level_id = atoi(levelNum.c_str());
+
+	object[TEMP].clear();
+	object[PERM].clear();
+	object[TOOL].clear();
+
+	switch (t)
+	{
+	case CLASSIC:
+		tribe = 4;
+		style = 1;
+		break;
+	case EGYPT:
+		tribe = 5;
+		style = 3;
+		break;
+	case SHADOW:
+		tribe = 10;
+		style = 2;
+		break;
+	}
+	cave_map = 0;
+	cave_raw = 0;
+	temp = level_id;
+	perm = level_id;
+	width = 320;
+	height = 160;
+	cameraX = 0;
+	cameraY = 0;
+	time = 420;
+	extra_lemmings = 0;
+	unknown = 2;
+	release_rate = 23;
+	release_delay = 46;
+	enemies = 0;
+}
+
 bool Level::load(const fs::path filename)
 {
 	levelPath = filename.parent_path();

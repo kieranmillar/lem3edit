@@ -28,6 +28,8 @@
 
 namespace fs = std::experimental::filesystem::v1;
 
+enum tribeName { CLASSIC, EGYPT, SHADOW };
+
 class Canvas;
 class Style;
 
@@ -82,6 +84,8 @@ public:
 	signed int get_object_by_position(signed int x, signed int y, int type) const;
 
 	std::vector<int> get_objects_in_area(int areaX, int areaY, int areaW, int areaH, int type) const;
+
+	void newLevel(const fs::path filename, const tribeName t);
 
 	bool load(const fs::path filename);
 	bool load_level(const std::string &path, const std::string &name, unsigned int n);
