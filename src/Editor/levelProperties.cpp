@@ -64,6 +64,8 @@ void LevelProperties::setup(void)
 		digit[0] += i;
 		numbers[i] = Font::createTextureFromString(smallFont, digit);
 	}
+	TTF_CloseFont(bigFont);
+	TTF_CloseFont(smallFont);
 }
 
 void LevelProperties::resize(void)
