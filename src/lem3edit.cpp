@@ -24,6 +24,7 @@
 #include "lem3edit.hpp"
 
 #include "Editor/editor.hpp"
+#include "Main Menu/mainmenu.hpp"
 #include "font.hpp"
 #include "ini.hpp"
 #include "level.hpp"
@@ -137,7 +138,9 @@ int main(int argc, char *argv[])
 	char const * filterPatterns[1] = { "LEVEL*.DAT" };
 	fileToOpen = tinyfd_openFileDialog("Open level", NULL, 1, filterPatterns, "Lemmings 3 Level File (LEVEL###.DAT)", 0);
 
-	g_currentMode = EDITORMODE;
+	g_currentMode = MAINMENU;
+
+	Mainmenu mainmenu(&ini);
 
 	Editor editor(ini.getLem3cdPath().parent_path());
 	if (!fileToOpen)
@@ -146,7 +149,7 @@ int main(int argc, char *argv[])
 	}
 	else
 	{
-		editor.load(fileToOpen);
+		//editor.load(fileToOpen);
 	}
 
 	SDL_Event event;
@@ -157,6 +160,9 @@ int main(int argc, char *argv[])
 	{
 		switch (g_currentMode)
 		{
+		case MAINMENU:
+
+			break;
 		case EDITORMODE:
 			editor.editor_input.handleEditorEvents(event);
 			break;
