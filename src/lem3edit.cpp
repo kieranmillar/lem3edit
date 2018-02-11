@@ -248,7 +248,7 @@ void version(void)
 {
 	SDL_Log("%s %s (%s)\n", prog_name, prog_ver, prog_date);
 	SDL_Log("Copyright(C) 2008 - 2009 Carl Reinke\n");
-	SDL_Log("Copyright (C) 2017 Kieran Millar\n");
+	SDL_Log("Copyright (C) 2017 - 2018 Kieran Millar\n");
 	SDL_Log("This is free software.  You may redistribute copies of it under the terms of\n");
 	SDL_Log("the GNU General Public License <http://www.gnu.org/licenses/gpl.html>.\n");
 	SDL_Log("There is NO WARRANTY, to the extent permitted by law.\n");
