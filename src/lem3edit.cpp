@@ -44,8 +44,8 @@ using namespace std;
 namespace fs = std::experimental::filesystem::v1;
 
 const char *prog_name = "lem3edit";
-const char *prog_ver = "1.2";
-const char *prog_date = "03/02/2018";
+const char *prog_ver = "1.3";
+const char *prog_date = "12/02/2018";
 
 void version(void);
 
