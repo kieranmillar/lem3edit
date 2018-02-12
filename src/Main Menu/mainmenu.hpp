@@ -110,7 +110,7 @@ private:
 	OBSValues loadOBSValues(fs::path DATfilepath);
 	bool updateOBSValues(fs::path DATfilepath, const int id);
 
-	bool confirmOverwrite(fs::path parentPath, int id);
+	bool confirmOverwrite(fs::path filePath, int id);
 
 	void loadLevel(void);
 	void copyLevelDialog(void);

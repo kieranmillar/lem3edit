@@ -630,21 +630,18 @@ bool Mainmenu::updateOBSValues(fs::path DATfilepath, const int id)
 	return true;
 }
 
-bool Mainmenu::confirmOverwrite(fs::path parentPath, int id)
+bool Mainmenu::confirmOverwrite(fs::path filePath, int id)
 {
-	fs::path levelPath = parentPath;
-	levelPath /= "LEVEL";
-	levelPath += l3_filename_number(id);
-	levelPath += ".DAT";
+	fs::path levelPath = filePath;
 	bool levelOverwrite = fs::exists(levelPath);
 
-	fs::path tempPath = parentPath;
+	fs::path tempPath = filePath.parent_path();
 	tempPath /= "TEMP";
 	tempPath += l3_filename_number(id);
 	tempPath += ".OBS";
 	bool tempOverwrite = fs::exists(tempPath);
 
-	fs::path permPath = parentPath;
+	fs::path permPath = filePath.parent_path();
 	permPath /= "PERM";
 	permPath += l3_filename_number(id);
 	permPath += ".OBS";
@@ -655,9 +652,7 @@ bool Mainmenu::confirmOverwrite(fs::path parentPath, int id)
 		std::string message = "You are about to overwrite the following files:\n";
 		if (levelOverwrite)
 		{
-			message += "LEVEL";
-			message += l3_filename_number(id);
-			message += ".DAT\n";
+			message += levelPath.stem().generic_string();
 		}
 		if (tempOverwrite)
 		{
@@ -693,8 +688,8 @@ bool Mainmenu::confirmOverwrite(fs::path parentPath, int id)
 void Mainmenu::loadLevel(void)
 {
 	char const * fileToOpen = NULL;
-	char const * filterPatterns[1] = { "LEVEL*.DAT" };
-	fileToOpen = tinyfd_openFileDialog("Open level", NULL, 1, filterPatterns, "Lemmings 3 Level File (LEVEL###.DAT)", 0);
+	char const * filterPatterns[1] = { "*.DAT" };
+	fileToOpen = tinyfd_openFileDialog("Open level", NULL, 1, filterPatterns, "Lemmings 3 Level File (*.DAT)", 0);
 	if (!fileToOpen)
 		return;
 	//draw loading banner to provide feedback that something is happening
@@ -714,8 +709,8 @@ void Mainmenu::loadLevel(void)
 void Mainmenu::copyLevelDialog(void)
 {
 	char const * fileToCopy = NULL;
-	char const * filterPatterns[1] = { "LEVEL*.DAT" };
-	fileToCopy = tinyfd_openFileDialog("Select level to Copy or Renumber", NULL, 1, filterPatterns, "Lemmings 3 Level File (LEVEL###.DAT)", 0);
+	char const * filterPatterns[1] = { "*.DAT" };
+	fileToCopy = tinyfd_openFileDialog("Select level to Copy or Renumber", NULL, 1, filterPatterns, "Lemmings 3 Level File (*.DAT)", 0);
 
 	if (!fileToCopy)
 		return;
@@ -739,19 +734,22 @@ void Mainmenu::copyLevelDialog(void)
 
 void Mainmenu::copyLevel(void)
 {
-	char const * folderToCopyTo = NULL;
-	char const * filterPatterns[1] = { "LEVEL*.DAT" };
-	std::string temporary = filePath.parent_path().generic_string();
-	char const * defaultFolder = temporary.c_str();
-	folderToCopyTo = tinyfd_selectFolderDialog("Select Folder to Save to", defaultFolder);
+	char const * fileToCopyTo = NULL;
+	char const * filterPatterns[1] = { "*.DAT" };
+	fs::path defaultPath = filePath.parent_path();
+	defaultPath /= "LEVEL";
+	defaultPath += l3_filename_number(level_id);
+	defaultPath += ".DAT";
+	std::string temporary = defaultPath.generic_string();
+	char const * defaultPath_c = temporary.c_str();
+	fileToCopyTo = tinyfd_saveFileDialog("Save New Copy", defaultPath_c, 1, filterPatterns, "Lemmings 3 Level File (*.DAT)");
 
-	if (!folderToCopyTo)
+	if (!fileToCopyTo)
 		return;
 
-	fs::path destinationPath = folderToCopyTo;
-	if (!fs::exists(destinationPath))
-		return;
-
+	fs::path destinationPath = fileToCopyTo;
+	if (!destinationPath.has_extension())
+		destinationPath += ".DAT";
 	if (!confirmOverwrite(destinationPath, level_id))
 		return;
 
@@ -761,13 +759,10 @@ void Mainmenu::copyLevel(void)
 
 	fromPath = filePath;
 	toPath = destinationPath;
-	toPath /= "LEVEL";
-	toPath += l3_filename_number(level_id);
-	toPath += ".DAT";
 	fs::copy(fromPath, toPath);
 	if (!updateOBSValues(toPath, level_id))
 	{
-		tinyfd_messageBox("Oh No!", "Lem3edit could not update the temp and perm file references in the new LEVEL###.DAT for some reason!\n\nLevel copying aborted.", "ok", "error", 1);
+		tinyfd_messageBox("Oh No!", "Lem3edit could not update the temp and perm file references in the new level file for some reason!\n\nLevel copying aborted.", "ok", "error", 1);
 		return;
 	}
 
@@ -778,7 +773,7 @@ void Mainmenu::copyLevel(void)
 	fromPath /= "TEMP";
 	fromPath += l3_filename_number(fileOBS.temp);
 	fromPath += ".OBS";
-	toPath = destinationPath;
+	toPath = destinationPath.parent_path();
 	toPath /= "TEMP";
 	toPath += l3_filename_number(level_id);
 	toPath += ".OBS";
@@ -790,7 +785,7 @@ void Mainmenu::copyLevel(void)
 	fromPath /= "PERM";
 	fromPath += l3_filename_number(fileOBS.perm);
 	fromPath += ".OBS";
-	toPath = destinationPath;
+	toPath = destinationPath.parent_path();
 	toPath /= "PERM";
 	toPath += l3_filename_number(level_id);
 	toPath += ".OBS";
@@ -804,8 +799,8 @@ void Mainmenu::copyLevel(void)
 void Mainmenu::deleteLevel(void)
 {
 	char const * fileToDelete = NULL;
-	char const * filterPatterns[1] = { "LEVEL*.DAT" };
-	fileToDelete = tinyfd_openFileDialog("Select level to Delete", NULL, 1, filterPatterns, "Lemmings 3 Level File (LEVEL###.DAT)", 0);
+	char const * filterPatterns[1] = { "*.DAT" };
+	fileToDelete = tinyfd_openFileDialog("Select level to Delete", NULL, 1, filterPatterns, "Lemmings 3 Level File (*.DAT)", 0);
 
 	if (!fileToDelete)
 		return;
