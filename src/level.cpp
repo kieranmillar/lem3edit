@@ -130,15 +130,12 @@ std::vector<int> Level::get_objects_in_area(int areaX, int areaY, int areaW, int
 }
 
 //Creates a new level.
-//You need to create all 3 files under the correct number BEFORE calling this function
-//then pass the LEVEL###.DAT filepath as an argument
-void Level::newLevel(const fs::path filename, const tribeName t)
+//You need to create the 2 OBS files under the correct number BEFORE calling this function
+//then pass the .DAT filepath as an argument
+void Level::newLevel(const fs::path filename, const tribeName t, const int n)
 {
-	levelPath = filename.parent_path();
-
-	string levelNum = filename.stem().generic_string();
-	levelNum = levelNum.substr(5, 8);
-	level_id = atoi(levelNum.c_str());
+	levelPath = filename;
+	level_id = n;
 
 	object[TEMP].clear();
 	object[PERM].clear();
@@ -173,21 +170,22 @@ void Level::newLevel(const fs::path filename, const tribeName t)
 	release_rate = 23;
 	release_delay = 46;
 	enemies = 0;
+
+	save(false);
 }
 
 bool Level::load(const fs::path filename)
 {
-	levelPath = filename.parent_path();
+	levelPath = filename;
+	level_id = 0;
 
 	string levelNum = filename.stem().generic_string();
 	levelNum = levelNum.substr(5, 8);
 	level_id = atoi(levelNum.c_str());
 
-	string parentPathStr = levelPath.generic_string();
-
 	return load_level(filename) &&
-		load_objects(PERM, parentPathStr, "PERM", perm) &&
-		load_objects(TEMP, parentPathStr, "TEMP", temp);
+		load_objects(PERM, levelPath.parent_path(), "PERM", perm) &&
+		load_objects(TEMP, levelPath.parent_path(), "TEMP", temp);
 }
 
 bool Level::load_level(const std::string &path, const std::string &name, unsigned int n)
@@ -224,6 +222,9 @@ bool Level::load_level(const fs::path filename)
 	f.read((char *)&enemies, sizeof(enemies));
 
 	SDL_Log("Loaded level from  '%s'\n", filename.generic_string().c_str());
+
+	if (temp == perm)
+		level_id = temp;
 
 	f.close();
 	return true;
@@ -314,23 +315,24 @@ bool Level::validate(const Object * o, const int type)
 	return true;
 }
 
-bool Level::save(void)
+bool Level::save(const bool giveFeedback)
 {
 	enemies = 0;
 	extra_lemmings = 0;
 
-	if (save_objects(PERM, levelPath, perm) &&
-		save_objects(TEMP, levelPath, temp) &&
-		save_level(levelPath, level_id) == true)
+	if (save_objects(PERM, levelPath.parent_path(), perm) &&
+		save_objects(TEMP, levelPath.parent_path(), temp) &&
+		save_level(levelPath) == true)
 	{
-		SDL_ShowSimpleMessageBox(0, "Save Complete", "Level saved!", NULL);
-		return true;
+		if (giveFeedback)
+			SDL_ShowSimpleMessageBox(0, "Save Complete", "Level saved!", NULL);
 	}
 	else
 	{
 		SDL_ShowSimpleMessageBox(0, "Oh no!", "Failed to save :(", NULL);
 		return false;
 	}
+	return true;
 }
 
 bool Level::save_level(const fs::path parentPath, unsigned int n)

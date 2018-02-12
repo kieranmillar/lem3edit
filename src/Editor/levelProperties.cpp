@@ -317,7 +317,6 @@ void LevelProperties::handleLevelPropertiesEvents(SDL_Event event)
 			break;
 		case SDLK_BACKSPACE:
 		case SDLK_DELETE:
-		case SDLK_KP_DECIMAL:
 			switch (highlighting)
 			{
 			case RELEASERATE:

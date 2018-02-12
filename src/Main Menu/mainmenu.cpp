@@ -142,7 +142,7 @@ void Mainmenu::handleMainMenuEvents(SDL_Event event)
 			if (mouse_y_window > 90
 				&& mouse_y_window < 130)
 			{
-				//highlighting = NEWLEVEL;
+				highlighting = NEWLEVEL;
 			}
 			if (mouse_y_window > 140
 				&& mouse_y_window < 180)
@@ -203,7 +203,7 @@ void Mainmenu::handleMainMenuEvents(SDL_Event event)
 				switch (highlighting)
 				{
 				case NEWLEVEL:
-
+					newLevelDialog();
 					break;
 
 				case LOADLEVEL:
@@ -247,6 +247,46 @@ void Mainmenu::handleMainMenuEvents(SDL_Event event)
 				default:
 
 					break;
+				}
+			}
+			break;
+
+			case NEWLEVELDIALOG:
+			{
+				if (mouse_x_window > (centreX - 190)
+					&& mouse_x_window < (centreX - 170)
+					&& mouse_y_window > 205
+					&& mouse_y_window < 225)
+				{
+					selectedTribe = CLASSIC;
+				}
+				if (mouse_x_window > (centreX - 190)
+					&& mouse_x_window < (centreX - 170)
+					&& mouse_y_window > 235
+					&& mouse_y_window < 255)
+				{
+					selectedTribe = SHADOW;
+				}
+				if (mouse_x_window > (centreX - 190)
+					&& mouse_x_window < (centreX - 170)
+					&& mouse_y_window > 265
+					&& mouse_y_window < 285)
+				{
+					selectedTribe = EGYPT;
+				}
+				if (mouse_x_window > (centreX - 150)
+					&& mouse_x_window < (centreX - 50)
+					&& mouse_y_window > 425
+					&& mouse_y_window < 465)
+				{
+					newLevel();
+				}
+				if (mouse_x_window > (centreX + 50)
+					&& mouse_x_window < (centreX + 150)
+					&& mouse_y_window > 425
+					&& mouse_y_window < 465)
+				{
+					menuDialog = NODIALOG;
 				}
 			}
 			break;
@@ -335,21 +375,16 @@ void Mainmenu::handleMainMenuEvents(SDL_Event event)
 			break;
 		case SDLK_BACKSPACE:
 		case SDLK_DELETE:
-		case SDLK_KP_DECIMAL:
-			switch (menuDialog)
-			{
-			case COPYLEVELDIALOG:
-				level_id /= 10;
-				if (level_id < 0) level_id = 0;
-				break;
-			default:
-				break;
-			}
+			level_id /= 10;
+			if (level_id < 0)
+				level_id = 0;
 			break;
 		case SDLK_ESCAPE:
 			menuDialog = NODIALOG;
 			break;
 		case SDLK_RETURN:
+			if (menuDialog == NEWLEVELDIALOG)
+				newLevel();
 			if (menuDialog == COPYLEVELDIALOG)
 				copyLevel();
 			break;
@@ -377,17 +412,10 @@ void Mainmenu::handleMainMenuEvents(SDL_Event event)
 
 void Mainmenu::typedNumber(const unsigned int value)
 {
-	switch (menuDialog)
+	if (level_id < 100)
 	{
-	case COPYLEVELDIALOG:
-		if (level_id < 100)
-		{
-			level_id *= 10;
-			level_id += value;
-		}
-		break;
-	default:
-		break;
+		level_id *= 10;
+		level_id += value;
 	}
 }
 
@@ -429,14 +457,105 @@ void Mainmenu::draw(void)
 	//draw strikes through all unimplemented features
 	{
 		SDL_SetRenderDrawColor(g_window.screen_renderer, 0, 0, 0, 255);
-		SDL_RenderDrawLine(g_window.screen_renderer, centreX - 300, 110, centreX + 300, 110);//new level
 		SDL_RenderDrawLine(g_window.screen_renderer, centreX - 300, 330, centreX + 300, 330);//new pack
 		SDL_RenderDrawLine(g_window.screen_renderer, centreX - 300, 380, centreX + 300, 380);//load pack
 		SDL_RenderDrawLine(g_window.screen_renderer, centreX - 300, 430, centreX + 300, 430);//previous pack
 		SDL_RenderDrawLine(g_window.screen_renderer, centreX - 300, 500, centreX + 300, 500);//options
 	}
 
-	if (menuDialog == COPYLEVELDIALOG)
+	switch (menuDialog)
+	{
+	case NEWLEVELDIALOG:
+	{
+		SDL_Rect r;
+		r.x = centreX - 200;
+		r.y = 125;
+		r.w = 400;
+		r.h = 350;
+		SDL_SetRenderDrawColor(g_window.screen_renderer, 220, 220, 220, 255);
+		SDL_RenderFillRect(g_window.screen_renderer, &r);
+		SDL_SetRenderDrawColor(g_window.screen_renderer, 0, 0, 0, 255);
+		SDL_RenderDrawRect(g_window.screen_renderer, &r);
+
+		renderText(NewLevelText, centreX, 129, CENTRE);
+
+		renderText(selectTribeText, centreX - 190, 175, LEFT);
+
+		r.x = centreX - 190;
+		r.y = 205;
+		r.w = 20;
+		r.h = 20;
+		SDL_RenderDrawRect(g_window.screen_renderer, &r);
+		if (selectedTribe == CLASSIC)
+		{
+			SDL_RenderDrawLine(g_window.screen_renderer, centreX - 190, 205, centreX - 171, 224);
+			SDL_RenderDrawLine(g_window.screen_renderer, centreX - 171, 205, centreX - 190, 224);
+		}
+		renderText(classicTribeText, centreX - 160, 205, LEFT);
+
+		r.x = centreX - 190;
+		r.y = 235;
+		r.w = 20;
+		r.h = 20;
+		SDL_RenderDrawRect(g_window.screen_renderer, &r);
+		if (selectedTribe == SHADOW)
+		{
+			SDL_RenderDrawLine(g_window.screen_renderer, centreX - 190, 235, centreX - 171, 254);
+			SDL_RenderDrawLine(g_window.screen_renderer, centreX - 171, 235, centreX - 190, 254);
+		}
+		renderText(shadowTribeText, centreX - 160, 235, LEFT);
+
+		r.x = centreX - 190;
+		r.y = 265;
+		r.w = 20;
+		r.h = 20;
+		SDL_RenderDrawRect(g_window.screen_renderer, &r);
+		if (selectedTribe == EGYPT)
+		{
+			SDL_RenderDrawLine(g_window.screen_renderer, centreX - 190, 265, centreX - 171, 284);
+			SDL_RenderDrawLine(g_window.screen_renderer, centreX - 171, 265, centreX - 190, 284);
+		}
+		renderText(egyptTribeText, centreX - 160, 265, LEFT);
+
+		renderText(newLevelIDText, centreX - 190, 295, LEFT);
+		r.x = centreX - 80;
+		r.y = 293;
+		r.w = 40;
+		r.h = 24;
+		SDL_SetRenderDrawColor(g_window.screen_renderer, 240, 240, 240, 255);
+		SDL_RenderFillRect(g_window.screen_renderer, &r);
+		SDL_SetRenderDrawColor(g_window.screen_renderer, 0, 0, 0, 255);
+		SDL_RenderDrawRect(g_window.screen_renderer, &r);
+		renderNumbers(level_id, centreX - 42, 295);
+
+		renderText(levelIDClassicText, centreX - 190, 315, LEFT);
+		renderText(levelIDShadowText, centreX - 190, 335, LEFT);
+		renderText(levelIDEgyptText, centreX - 190, 355, LEFT);
+		renderText(levelIDPracticeText, centreX - 190, 375, LEFT);
+		renderText(levelIDDemoText, centreX - 190, 395, LEFT);
+
+		r.x = centreX - 150;
+		r.y = 425;
+		r.w = 100;
+		r.h = 40;
+		SDL_SetRenderDrawColor(g_window.screen_renderer, 200, 200, 200, 255);
+		SDL_RenderFillRect(g_window.screen_renderer, &r);
+		SDL_SetRenderDrawColor(g_window.screen_renderer, 0, 0, 0, 255);
+		SDL_RenderDrawRect(g_window.screen_renderer, &r);
+		renderText(OKText, centreX - 100, 435, CENTRE);
+
+		r.x = centreX + 50;
+		r.y = 425;
+		r.w = 100;
+		r.h = 40;
+		SDL_SetRenderDrawColor(g_window.screen_renderer, 200, 200, 200, 255);
+		SDL_RenderFillRect(g_window.screen_renderer, &r);
+		SDL_SetRenderDrawColor(g_window.screen_renderer, 0, 0, 0, 255);
+		SDL_RenderDrawRect(g_window.screen_renderer, &r);
+		renderText(CancelText, centreX + 100, 435, CENTRE);
+	}
+	break;
+	case COPYLEVELDIALOG:
 	{
 		SDL_Rect r;
 		r.x = centreX - 300;
@@ -510,6 +629,8 @@ void Mainmenu::draw(void)
 		SDL_SetRenderDrawColor(g_window.screen_renderer, 0, 0, 0, 255);
 		SDL_RenderDrawRect(g_window.screen_renderer, &r);
 		renderText(CancelText, centreX + 100, 410, CENTRE);
+	}
+	break;
 	}
 
 	SDL_SetRenderTarget(g_window.screen_renderer, NULL);
@@ -652,7 +773,8 @@ bool Mainmenu::confirmOverwrite(fs::path filePath, int id)
 		std::string message = "You are about to overwrite the following files:\n";
 		if (levelOverwrite)
 		{
-			message += levelPath.stem().generic_string();
+			message += levelPath.filename().generic_string();
+			message += "\n";
 		}
 		if (tempOverwrite)
 		{
@@ -685,6 +807,76 @@ bool Mainmenu::confirmOverwrite(fs::path filePath, int id)
 	return true;
 }
 
+void Mainmenu::newLevelDialog(void)
+{
+	level_id = 1;
+	highlighting = NONE;
+	menuDialog = NEWLEVELDIALOG;
+	selectedTribe = CLASSIC;
+}
+
+void Mainmenu::newLevel(void)
+{
+	char const * fileToSaveTo = NULL;
+	char const * filterPatterns[1] = { "*.DAT" };
+	fileToSaveTo = tinyfd_saveFileDialog("Save New Level", NULL, 1, filterPatterns, "Lemmings 3 Level File (*.DAT)");
+
+	if (!fileToSaveTo)
+		return;
+
+	fs::path destinationPath = fileToSaveTo;
+	if (!destinationPath.has_extension())
+		destinationPath += ".DAT";
+	if (!confirmOverwrite(destinationPath, level_id))
+		return;
+
+	//create blank TEMP###.OBS file
+	fs::path tempPath = destinationPath.parent_path();
+	tempPath /= "TEMP";
+	tempPath += l3_filename_number(level_id);
+	tempPath += ".OBS";
+
+	{
+		Uint16 byte = 0;
+		std::ofstream f(tempPath, std::ios_base::binary | std::ios_base::in | std::ios_base::trunc);
+		if (!f)
+		{
+			SDL_Log("Failed to open '%s'\n", tempPath.generic_string().c_str());
+			return;
+		}
+		f.write((char *)&byte, sizeof(byte));
+		f.write((char *)&byte, sizeof(byte));
+		f.write((char *)&byte, sizeof(byte));
+		f.close();
+	}
+
+	//create blank PERM###.OBS file
+	fs::path permPath = destinationPath.parent_path();
+	permPath /= "PERM";
+	permPath += l3_filename_number(level_id);
+	permPath += ".OBS";
+
+	{
+		Uint16 byte = 0;
+		std::ofstream f(permPath, std::ios_base::binary | std::ios_base::in | std::ios_base::trunc);
+		if (!f)
+		{
+			SDL_Log("Failed to open '%s'\n", permPath.generic_string().c_str());
+			return;
+		}
+		f.write((char *)&byte, sizeof(byte));
+		f.write((char *)&byte, sizeof(byte));
+		f.write((char *)&byte, sizeof(byte));
+		f.close();
+	}
+
+	drawLoadingBanner();
+	highlighting = NONE;
+	menuDialog = NODIALOG;
+	g_currentMode = EDITORMODE;
+	editor_ptr->create(destinationPath, selectedTribe, level_id);
+}
+
 void Mainmenu::loadLevel(void)
 {
 	char const * fileToOpen = NULL;
@@ -692,15 +884,8 @@ void Mainmenu::loadLevel(void)
 	fileToOpen = tinyfd_openFileDialog("Open level", NULL, 1, filterPatterns, "Lemmings 3 Level File (*.DAT)", 0);
 	if (!fileToOpen)
 		return;
-	//draw loading banner to provide feedback that something is happening
-	SDL_SetRenderTarget(g_window.screen_renderer, g_window.screen_texture);
-	SDL_SetRenderDrawColor(g_window.screen_renderer, 0, 0, 0, 255);
-	SDL_RenderClear(g_window.screen_renderer);
-	renderButton(loadingText, g_window.width / 2, 260, true);
-	SDL_SetRenderTarget(g_window.screen_renderer, NULL);
-	SDL_RenderCopy(g_window.screen_renderer, g_window.screen_texture, NULL, NULL);
-	SDL_RenderPresent(g_window.screen_renderer);
 
+	drawLoadingBanner();
 	highlighting = NONE;
 	g_currentMode = EDITORMODE;
 	editor_ptr->load(fileToOpen);
@@ -854,4 +1039,16 @@ void Mainmenu::deleteLevel(void)
 		tinyfd_messageBox("Level Deleted", "Level deleted!", "ok", "info", 1);
 	else
 		tinyfd_messageBox("Oh No!", "Lem3edit could not delete one or more of these files!", "ok", "error", 1);
+}
+
+//draw loading banner to provide feedback that something is happening
+void Mainmenu::drawLoadingBanner(void)
+{
+	SDL_SetRenderTarget(g_window.screen_renderer, g_window.screen_texture);
+	SDL_SetRenderDrawColor(g_window.screen_renderer, 0, 0, 0, 255);
+	SDL_RenderClear(g_window.screen_renderer);
+	renderButton(loadingText, g_window.width / 2, 260, true);
+	SDL_SetRenderTarget(g_window.screen_renderer, NULL);
+	SDL_RenderCopy(g_window.screen_renderer, g_window.screen_texture, NULL, NULL);
+	SDL_RenderPresent(g_window.screen_renderer);
 }

@@ -21,6 +21,8 @@
 #ifndef MAINMENU_HPP
 #define MAINMENU_HPP
 
+#include "../level.hpp"
+
 #include "SDL.h"
 
 #include <experimental/filesystem>
@@ -56,6 +58,8 @@ private:
 	menuMode menuDialog;
 
 	bool selectedCopy;
+
+	tribeName selectedTribe;
 
 	// main menu text textures
 	SDL_Texture * titleText;
@@ -112,10 +116,14 @@ private:
 
 	bool confirmOverwrite(fs::path filePath, int id);
 
+	void newLevelDialog(void);
+	void newLevel(void);
 	void loadLevel(void);
 	void copyLevelDialog(void);
 	void copyLevel(void);
 	void deleteLevel(void);
+
+	void drawLoadingBanner(void);
 };
 
 #endif // MAINMENU_HPP
