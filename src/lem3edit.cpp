@@ -114,7 +114,7 @@ int main(int argc, char *argv[])
 		ini.save();
 		tinyfd_messageBox(
 			"Welcome to Lem3edit!",
-			"Excellent! You've successfully set up Lem3edit!\n\nThis was one-time installation. From now on, you'll be asked to open a level file when you load the program.",
+			"Excellent! You've successfully set up Lem3edit!\n\nThis was one-time installation.",
 			"ok",
 			"info",
 			0);
