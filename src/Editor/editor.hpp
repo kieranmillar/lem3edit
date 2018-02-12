@@ -85,7 +85,11 @@ public:
 	bool delete_selected(void);
 	bool move_selected(signed int delta_x, signed int delta_y);
 
+	void create(const fs::path filename, const tribeName t, const int n);
 	bool load(const fs::path filename);
+	void initiate(void);
+
+	void closeLevel(void);
 
 	bool toggleCameraVisibility(void);
 	bool move_camera(signed int delta_x, signed int delta_y);

@@ -24,6 +24,7 @@
 #include "lem3edit.hpp"
 
 #include "Editor/editor.hpp"
+#include "Main Menu/mainmenu.hpp"
 #include "font.hpp"
 #include "ini.hpp"
 #include "level.hpp"
@@ -59,13 +60,13 @@ int main(int argc, char *argv[])
 	if (SDL_Init(SDL_INIT_TIMER | SDL_INIT_VIDEO))
 	{
 		SDL_Log("failed to initialize SDL: %s\n", SDL_GetError());
-		return false;
+		return EXIT_FAILURE;
 	}
 
 	if (TTF_Init() == -1)
 	{
 		SDL_Log("failed to initialize SDL_ttf: %s\n", TTF_GetError());
-		return false;
+		return EXIT_FAILURE;
 	}
 
 	if (g_window.initialise(DEFAULT_WINDOW_WIDTH, DEFAULT_WINDOW_HEIGHT) == false) // Initialise the main program window
@@ -132,31 +133,19 @@ int main(int argc, char *argv[])
 		}
 	}
 
-	char const * fileToOpen = NULL;
-
-	char const * filterPatterns[1] = { "LEVEL*.DAT" };
-	fileToOpen = tinyfd_openFileDialog("Open level", NULL, 1, filterPatterns, "Lemmings 3 Level File (LEVEL###.DAT)", 0);
-
-	g_currentMode = EDITORMODE;
+	g_currentMode = MAINMENUMODE;
 
 	Editor editor(ini.getLem3cdPath().parent_path());
-	if (!fileToOpen)
-	{
-		return EXIT_SUCCESS;
-	}
-	else
-	{
-		editor.load(fileToOpen);
-	}
+	Mainmenu mainmenu(&ini, &editor);
 
 	SDL_Event event;
-	//prevent open file dialog mouse clicks from carrying over once level loaded
-	SDL_PumpEvents();
-	SDL_FlushEvents(SDL_MOUSEMOTION, SDL_MOUSEWHEEL);
 	while (SDL_WaitEvent(&event) && event.type != SDL_QUIT)
 	{
 		switch (g_currentMode)
 		{
+		case MAINMENUMODE:
+			mainmenu.handleMainMenuEvents(event);
+			break;
 		case EDITORMODE:
 			editor.editor_input.handleEditorEvents(event);
 			break;
@@ -166,18 +155,11 @@ int main(int argc, char *argv[])
 		}
 	}
 
-	//NOTE to self: These should be destructors, but objects need to go out of scope before
-	//calling Quit functions below or else will crash on exit
-
-	editor.bar.destroy();
+	editor.closeLevel();
 	g_window.destroy();
 
 	TTF_Quit();
 	SDL_Quit();
-
-	editor.style.destroy_all_objects(PERM);
-	editor.style.destroy_all_objects(TEMP);
-	editor.style.destroy_all_objects(TOOL);
 
 	return EXIT_SUCCESS;
 }

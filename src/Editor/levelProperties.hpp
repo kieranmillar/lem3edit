@@ -62,6 +62,7 @@ public:
 
 	void setReferences(Editor * e, Bar * b, Canvas * c, Level * l);
 	void setup(void);
+	void destroyTextures(void);
 	void resize(void);
 
 	void openDialog(void);

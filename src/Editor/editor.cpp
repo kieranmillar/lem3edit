@@ -33,6 +33,12 @@ namespace fs = std::experimental::filesystem::v1;
 Editor::Editor(fs::path data)
 {
 	dataPath = data;
+	bar.setReferences(this, &canvas, &style);
+	canvas.setReferences(this, &editor_input, &bar, &style, &level);
+	editor_input.setReferences(this, &bar, &canvas, &style, &level);
+	levelProperties.setReferences(this, &bar, &canvas, &level);
+	level.setReferences(&canvas, &style);
+	font.setReferences(&style);
 }
 
 void Editor::resize(int w, int h)
@@ -41,15 +47,22 @@ void Editor::resize(int w, int h)
 	bar.resizeBarScrollRect(w, h);
 }
 
+void Editor::create(const fs::path filename, const tribeName t, const int n)
+{
+	level.newLevel(filename, t, n);
+	initiate();
+	canvas.redraw = true;
+}
+
 bool Editor::load(const fs::path filename)
 {
-	bar.setReferences(this, &canvas, &style);
-	canvas.setReferences(this, &editor_input, &bar, &style, &level);
-	editor_input.setReferences(this, &bar, &canvas, &style, &level);
-	levelProperties.setReferences(this, &bar, &canvas, &level);
-	level.setReferences(&canvas, &style);
-	font.setReferences(&style);
 	level.load(filename);
+	initiate();
+	return canvas.redraw = true;
+}
+
+void Editor::initiate(void)
+{
 	tribe.load(level.tribe, dataPath);
 	style.load(level.style, tribe.palette, dataPath);
 	//font.load("FONT"); //The in-game font. Not very practical for the editor so commented out
@@ -62,7 +75,21 @@ bool Editor::load(const fs::path filename)
 	gameFrameTick = SDL_GetTicks();
 	startCameraOn = false;
 
-	return canvas.redraw = true;
+	//prevent open file dialog mouse clicks from carrying over once level loaded
+	SDL_PumpEvents();
+	SDL_FlushEvents(SDL_MOUSEMOTION, SDL_MOUSEWHEEL);
+}
+
+void Editor::closeLevel(void)
+{
+	bar.destroy();
+	style.destroy_all_objects(PERM);
+	style.destroy_all_objects(TEMP);
+	style.destroy_all_objects(TOOL);
+	levelProperties.destroyTextures();
+	selection.clear();
+	clipboard.clear();
+	g_currentMode = MAINMENUMODE;
 }
 
 bool Editor::select(signed int x, signed int y, bool modify_selection)

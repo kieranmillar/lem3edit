@@ -64,6 +64,24 @@ void LevelProperties::setup(void)
 		digit[0] += i;
 		numbers[i] = Font::createTextureFromString(smallFont, digit);
 	}
+	TTF_CloseFont(bigFont);
+	TTF_CloseFont(smallFont);
+}
+
+void LevelProperties::destroyTextures(void)
+{
+	if (titleText != NULL) SDL_DestroyTexture(titleText);
+	if (releaseRateText != NULL) SDL_DestroyTexture(releaseRateText);
+	if (spawnDelayText != NULL) SDL_DestroyTexture(spawnDelayText);
+	if (timeLimitText != NULL) SDL_DestroyTexture(timeLimitText);
+	if (timeLimitMinsText != NULL) SDL_DestroyTexture(timeLimitMinsText);
+	if (timeLimitSecsText != NULL) SDL_DestroyTexture(timeLimitSecsText);
+	if (OKButtonText != NULL) SDL_DestroyTexture(OKButtonText);
+	if (cancelButtonText != NULL) SDL_DestroyTexture(cancelButtonText);
+	for (int i = 0; i < 10; i++)
+	{
+		if (numbers[i] != NULL) SDL_DestroyTexture(numbers[i]);
+	}
 }
 
 void LevelProperties::resize(void)
@@ -298,6 +316,7 @@ void LevelProperties::handleLevelPropertiesEvents(SDL_Event event)
 			typedNumber(highlighting, 9);
 			break;
 		case SDLK_BACKSPACE:
+		case SDLK_DELETE:
 			switch (highlighting)
 			{
 			case RELEASERATE:
@@ -332,7 +351,8 @@ void LevelProperties::handleLevelPropertiesEvents(SDL_Event event)
 			closeDialog(true);
 			break;
 		case SDLK_q:
-			die();
+			closeDialog(false);
+			editor_ptr->closeLevel();
 			break;
 		default:
 			break;

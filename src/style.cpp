@@ -470,11 +470,17 @@ bool Style::destroy_all_objects(int type)
 {
 	assert((unsigned)type < COUNTOF(this->object));
 
-	/*for (vector<Object>::const_iterator i = object[type].begin(); i != object[type].end(); ++i)
+	if (object[type].empty())
+		return true;
+
+	for (vector<Object>::const_reverse_iterator i = object[type].rbegin(); i != object[type].rend(); ++i)
 	{
-	int j = object[type].begin() - i;
-	SDL_DestroyTexture(object[type][j].objTex);
-	}*/
+		int j = object[type].rend() - i - 1;
+		if (object[type][j].objTex != NULL)
+			SDL_DestroyTexture(object[type][j].objTex);
+	}
+
+	object[type].clear();
 
 	return true;
 }
