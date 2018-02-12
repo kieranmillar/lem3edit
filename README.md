@@ -13,7 +13,6 @@ Build instructions
 * Install SDL2 and its SDL_ttf 2.0 addon.
 * Optionally, install [CMake](https://cmake.org/); alternatively,
     build manually (see further down).
-* If using a compiler other than Visual Studio, you may need to change the fs namespace definitions found throughout the source files.
 
 **With CMake,** start in lem3edit's root directory, then enter:
 ```
