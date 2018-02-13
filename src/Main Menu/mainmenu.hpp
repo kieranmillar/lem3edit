@@ -21,7 +21,7 @@
 #ifndef MAINMENU_HPP
 #define MAINMENU_HPP
 
-#include "../level.hpp"
+#include "../lem3edit.hpp"
 
 #include "SDL.h"
 

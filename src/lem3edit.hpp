@@ -39,6 +39,8 @@ static const int PERM = 0, TEMP = 1, TOOL = 2;
 
 enum programMode { MAINMENUMODE, EDITORMODE, LEVELPROPERTIESMODE };
 
+enum tribeName { CLASSIC, EGYPT, SHADOW };
+
 extern programMode g_currentMode;
 
 extern Window g_window;

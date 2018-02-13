@@ -20,6 +20,8 @@
 #ifndef LEVEL_HPP
 #define LEVEL_HPP
 
+#include "lem3edit.hpp"
+
 #include "SDL.h"
 
 #include <vector>
@@ -27,8 +29,6 @@
 #include <experimental/filesystem>
 
 namespace fs = std::experimental::filesystem::v1;
-
-enum tribeName { CLASSIC, EGYPT, SHADOW };
 
 class Canvas;
 class Style;
