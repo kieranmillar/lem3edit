@@ -935,6 +935,14 @@ void Mainmenu::copyLevel(void)
 	fs::path destinationPath = fileToCopyTo;
 	if (!destinationPath.has_extension())
 		destinationPath += ".DAT";
+
+	//Check that we're not copying or renumbering over the same file
+	if (fs::equivalent(filePath, destinationPath) || fileOBS.temp == level_id || fileOBS.perm == level_id)
+	{
+		tinyfd_messageBox("Oh No!", "One or more of the files are trying to copy over itself!\n\nPlease choose a different level ID.", "ok", "error", 1);
+		return;
+	}
+
 	if (!confirmOverwrite(destinationPath, level_id))
 		return;
 
