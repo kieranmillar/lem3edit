@@ -22,7 +22,9 @@
 This file handles the level pack editor
 */
 
+#include "mainmenu.hpp"
 #include "packeditor.hpp"
+#include "../tinyfiledialogs.h"
 
 #include "SDL.h"
 #include "SDL_ttf.h"
@@ -33,18 +35,54 @@ This file handles the level pack editor
 
 namespace fs = std::experimental::filesystem::v1;
 
-void PackEditor::create(fs::path fileName)
+void PackEditor::setReferences(Ini * i, Editor * e)
 {
-	packPath = fileName;
+	ini_ptr = i;
+	editor_ptr = e;
+}
+
+bool PackEditor::create(void)
+{
+	char const * fileToSaveTo = NULL;
+	fs::path defaultPath = fs::current_path();
+	defaultPath /= "NewPack.l3pack";
+	std::string defaultString = defaultPath.generic_string();
+	char const * defaultChar = defaultString.c_str();
+	char const * filterPatterns[1] = { "*.l3pack" };
+	fileToSaveTo = tinyfd_saveFileDialog("Save New Level Pack", defaultChar, 1, filterPatterns, "Lem3Edit Level Pack (*.l3pack)");
+
+	if (!fileToSaveTo)
+		return false;
+
+	packPath = fileToSaveTo;
+	if (!packPath.has_extension())
+		packPath += ".l3pack";
+
+	//iterate through the folder looking for level or pack files
+	for (auto& iter : fs::directory_iterator(packPath.parent_path()))
+	{
+		std::string s = iter.path().extension().generic_string();
+		SDL_Log("%s\n", s.c_str());
+		if (s == ".l3pack" || s == ".DAT" || s == ".OBS")
+		{
+			tinyfd_messageBox("Oh No!", "Sorry, but you can't make a new level pack in a folder already containing a pack, or any level files.\n\nIt is reccommended that you make a new diectory to store your level pack.\n\nTrust me, it's for your own good.", "ok", "error", 1);
+			return false;
+		}
+	}
+
+	std::ofstream packFile(packPath);
+	packFile.close();
+
 	for (int i = 0; i < TRIBECOUNT; i++)
 	{
 		levels[i].clear();
 		totalLems[i] = 0;
 	}
 	g_currentMode = LEVELPACKMODE;
+	return true;
 }
 
-bool PackEditor::load(fs::path fileName)
+bool PackEditor::load(const fs::path fileName)
 {
 	for (int i = 0; i < TRIBECOUNT; i++)
 	{
@@ -106,7 +144,13 @@ bool PackEditor::load(fs::path fileName)
 				return false;
 			}
 
-			levels[loadingTribe].push_back(createLevelData(value, 0));
+			if (!levelExists(id))
+			{
+				//TODO: handle level fies not matching id
+
+				return false;
+			}
+			levels[loadingTribe].push_back(levelData(value, 0));
 		}
 	}
 
@@ -142,20 +186,46 @@ bool PackEditor::save(void)
 	return true;
 }
 
-PackEditor::levelData PackEditor::createLevelData(const std::string name, const int lems)
+bool PackEditor::levelExists(const int id)
 {
-	levelData data;
-	data.name = name;
-	data.lems = lems;
+	fs::path levelPath = packPath.parent_path();
+	levelPath /= "LEVEL";
+	levelPath += l3_filename_number(id);
+	levelPath += ".DAT";
+	bool datExists = fs::exists(levelPath);
 
-	return data;
+	Mainmenu::OBSValues levelOBS = Mainmenu::loadOBSValues(levelPath);
+	if (levelOBS.temp != id || levelOBS.perm != id)
+	{
+		return false;
+	}
+
+	fs::path tempPath = packPath.parent_path();
+	tempPath /= "TEMP";
+	tempPath += l3_filename_number(id);
+	tempPath += ".OBS";
+	bool tempExists = fs::exists(tempPath);
+
+	fs::path permPath = packPath.parent_path();
+	permPath /= "PERM";
+	permPath += l3_filename_number(id);
+	permPath += ".OBS";
+	bool permExists = fs::exists(permPath);
+
+	return datExists && tempExists && permExists;
+}
+
+PackEditor::levelData::levelData(const std::string s, const int n)
+{
+	name = s;
+	lems = n;
 }
 
 void PackEditor::refreshLemCounts(void)
 {
 	for (int i = 0; i < TRIBECOUNT; i++)
 	{
-		int count = 0;
+		int count = 20;
 		for (std::vector<levelData>::const_iterator iter = levels[i].begin(); iter != levels[i].end(); ++iter)
 		{
 			const levelData &data = *iter;

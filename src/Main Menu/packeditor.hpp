@@ -30,26 +30,38 @@
 
 namespace fs = std::experimental::filesystem::v1;
 
+class Ini;
+class Editor;
+
 class PackEditor
 {
 public:
-	void create(fs::path fileName);
-	bool load(fs::path fileName);
+	void setReferences(Ini * i, Editor * e);
+
+	bool create(void);
+	bool load(const fs::path fileName);
 	bool save(void);
 
 	//void createLevel(const int n, const tribeName tribe);
 	//void loadLevel(const int n, const tribeName tribe);
 	//void editLevel(const int n, const tribeName tribe);
 
+	bool levelExists(const int id);//returns if level files exist and all match expected id
+
 private:
+	Ini * ini_ptr;
+	Editor * editor_ptr;
+
 	fs::path packPath;
 
-	struct levelData
+	class levelData
 	{
+	public:
+		levelData(std::string s, int n);
+
 		std::string name;
 		int lems;
 	};
-	levelData createLevelData(const std::string name, const int lems);
 
 	std::vector<levelData> levels[TRIBECOUNT];
 
