@@ -175,8 +175,8 @@ void Mainmenu::handleMainMenuEvents(SDL_Event event)
 			if (mouse_y_window > 410
 				&& mouse_y_window < 450)
 			{
-				//if (ini_ptr->getLastLoadedPack() != "")
-					//highlighting = PREVIOUSPACK;
+				if (ini_ptr->getLastLoadedPack() != "")
+					highlighting = PREVIOUSPACK;
 			}
 			if (mouse_y_window > 480
 				&& mouse_y_window < 520)
@@ -237,6 +237,8 @@ void Mainmenu::handleMainMenuEvents(SDL_Event event)
 					break;
 
 				case PREVIOUSPACK:
+					if (ini_ptr->getLastLoadedPack() == "")
+						break;
 					//todo
 					break;
 
@@ -462,7 +464,6 @@ void Mainmenu::draw(void)
 	{
 		SDL_SetRenderDrawColor(g_window.screen_renderer, 0, 0, 0, 255);
 		SDL_RenderDrawLine(g_window.screen_renderer, centreX - 300, 380, centreX + 300, 380);//load pack
-		SDL_RenderDrawLine(g_window.screen_renderer, centreX - 300, 430, centreX + 300, 430);//previous pack
 		SDL_RenderDrawLine(g_window.screen_renderer, centreX - 300, 500, centreX + 300, 500);//options
 	}
 

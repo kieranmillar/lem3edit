@@ -24,6 +24,7 @@ This file handles the level pack editor
 
 #include "mainmenu.hpp"
 #include "packeditor.hpp"
+#include "../ini.hpp"
 #include "../tinyfiledialogs.h"
 
 #include "SDL.h"
@@ -62,7 +63,6 @@ bool PackEditor::create(void)
 	for (auto& iter : fs::directory_iterator(packPath.parent_path()))
 	{
 		std::string s = iter.path().extension().generic_string();
-		SDL_Log("%s\n", s.c_str());
 		if (s == ".l3pack" || s == ".DAT" || s == ".OBS")
 		{
 			tinyfd_messageBox("Oh No!", "Sorry, but you can't make a new level pack in a folder already containing a pack, or any level files.\n\nIt is reccommended that you make a new diectory to store your level pack.\n\nTrust me, it's for your own good.", "ok", "error", 1);
@@ -79,6 +79,7 @@ bool PackEditor::create(void)
 		totalLems[i] = 0;
 	}
 	g_currentMode = LEVELPACKMODE;
+	ini_ptr->setLastLoadedPack(packPath);
 	return true;
 }
 

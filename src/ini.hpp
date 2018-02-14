@@ -29,9 +29,9 @@ class Ini
 {
 public:
 	bool load(void);
-	bool save(void);
 
 	bool validateData(void);
+	bool validateData(const fs::path parentPath);
 
 	fs::path getLem3cdPath(void);
 	fs::path getLem3installPath(void);
@@ -48,6 +48,8 @@ private:
 	fs::path lem3installPath;
 	fs::path dosBoxPath;
 	fs::path lastLoadedPack;
+
+	bool save(void);
 };
 
 #endif // INI_HPP

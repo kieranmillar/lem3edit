@@ -36,10 +36,10 @@ namespace fs = std::experimental::filesystem::v1;
 bool Ini::load(void)
 {
 	//set defaults
-	setLem3cdPath("");
-	setLem3installPath("");
-	setDosBoxPath("");
-	setLastLoadedPack("");
+	lem3cdPath = "";
+	lem3installPath = "";
+	dosBoxPath = "";
+	lastLoadedPack = "";
 
 	fs::path iniPath = fs::current_path();
 	iniPath /= "lem3edit.ini";
@@ -87,34 +87,17 @@ bool Ini::load(void)
 	return true;
 }
 
-bool Ini::save(void)
-{
-	fs::path iniPath = fs::current_path();
-	iniPath /= "lem3edit.ini";
-
-	std::ofstream iniFile(iniPath, std::ios::in | std::ios::trunc);
-	if (iniFile.is_open())
-	{
-		iniFile << "CD=" << getLem3cdPath() << "\n";
-		iniFile << "INSTALL=" << getLem3installPath() << "\n";
-		iniFile << "DOSBOX=" << getDosBoxPath() << "\n";
-		iniFile << "LASTPACK=" << getLastLoadedPack() << "\n";
-		iniFile.close();
-	}
-	else
-	{
-		SDL_Log("Failed to save ini file.");
-		return false;
-	}
-	return true;
+bool Ini::validateData(void) {
+	return validateData(lem3cdPath.parent_path());
 }
 
 //check that every data file the program might need exists and return if successful
-bool Ini::validateData(void) {
-	fs::path parentPath = getLem3cdPath().parent_path();
+bool Ini::validateData(const fs::path parentPath) {
 	bool success = true;
 
-	if (!fs::exists(getLem3cdPath()))
+	fs::path l3cdPath = parentPath;
+	l3cdPath /= "L3CD.EXE";
+	if (!fs::exists(l3cdPath))
 		success = false;
 	if (!fs::exists(l3_filename_data(parentPath, "GRAPHICS", "TRIBE", 4, "PAL")))
 		success = false;
@@ -228,16 +211,42 @@ fs::path Ini::getLastLoadedPack(void) {
 
 void Ini::setLem3cdPath(fs::path p) {
 	lem3cdPath = p;
+	save();
 }
 
 void Ini::setLem3installPath(fs::path p) {
 	lem3installPath = p;
+	save();
 }
 
 void Ini::setDosBoxPath(fs::path p) {
 	dosBoxPath = p;
+	save();
 }
 
 void Ini::setLastLoadedPack(fs::path p) {
 	lastLoadedPack = p;
+	save();
+}
+
+bool Ini::save(void)
+{
+	fs::path iniPath = fs::current_path();
+	iniPath /= "lem3edit.ini";
+
+	std::ofstream iniFile(iniPath, std::ios::in | std::ios::trunc);
+	if (iniFile.is_open())
+	{
+		iniFile << "CD=" << getLem3cdPath() << "\n";
+		iniFile << "INSTALL=" << getLem3installPath() << "\n";
+		iniFile << "DOSBOX=" << getDosBoxPath() << "\n";
+		iniFile << "LASTPACK=" << getLastLoadedPack() << "\n";
+		iniFile.close();
+	}
+	else
+	{
+		SDL_Log("Failed to save ini file.");
+		return false;
+	}
+	return true;
 }

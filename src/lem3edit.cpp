@@ -100,8 +100,8 @@ int main(int argc, char *argv[])
 				0);
 			return EXIT_FAILURE;
 		}
-		ini.setLem3cdPath(lem3cd);
-		if (!ini.validateData())
+		fs::path lem3cdPath = lem3cd;
+		if (!ini.validateData(lem3cdPath.parent_path()))
 		{
 			tinyfd_messageBox(
 				"Fatal Error!",
@@ -111,7 +111,7 @@ int main(int argc, char *argv[])
 				0);
 			return EXIT_FAILURE;
 		}
-		ini.save();
+		ini.setLem3cdPath(lem3cdPath);
 		tinyfd_messageBox(
 			"Welcome to Lem3edit!",
 			"Excellent! You've successfully set up Lem3edit!\n\nThis was one-time installation.",
