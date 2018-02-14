@@ -93,7 +93,7 @@ private:
 
 	void refreshPreviousPackText(void);
 
-	void Mainmenu::typedNumber(const unsigned int value);
+	void typedNumber(const unsigned int value);
 
 	enum renderAlign { LEFT, CENTRE };
 
