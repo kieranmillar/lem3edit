@@ -37,7 +37,9 @@ namespace fs = std::experimental::filesystem::v1;
 
 static const int PERM = 0, TEMP = 1, TOOL = 2;
 
-enum programMode { MAINMENUMODE, EDITORMODE, LEVELPROPERTIESMODE };
+enum programMode { MAINMENUMODE, LEVELPACKMODE, EDITORMODE, LEVELPROPERTIESMODE };
+
+#define TRIBECOUNT 3
 
 enum tribeName { CLASSIC, EGYPT, SHADOW };
 

@@ -17,35 +17,56 @@
 * along with this program; if not, write to the Free Software
 * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
-#ifndef INI_HPP
-#define INI_HPP
+
+#ifndef PACKEDITOR_HPP
+#define PACKEDITOR_HPP
+
+#include "../lem3edit.hpp"
+
+#include "SDL.h"
 
 #include <string>
 #include <experimental/filesystem>
 
 namespace fs = std::experimental::filesystem::v1;
 
-class Ini
+class Ini;
+class Editor;
+
+class PackEditor
 {
 public:
-	fs::path lem3cdPath;
-	fs::path lem3installPath;
-	fs::path dosBoxPath;
-	fs::path lastLoadedPack;
+	void setReferences(Ini * i, Editor * e);
 
-	bool load(void);
+	bool create(void);
+	bool load(const fs::path fileName);
+	bool save(void);
 
-	bool validateData(void);
-	bool validateData(const fs::path parentPath);
+	//void createLevel(const int n, const tribeName tribe);
+	//void loadLevel(const int n, const tribeName tribe);
+	//void editLevel(const int n, const tribeName tribe);
 
-	void saveLem3cdPath(fs::path p);
-	void saveLem3installPath(fs::path p);
-	void saveDosBoxPath(fs::path p);
-	void saveLastLoadedPack(fs::path p);
+	bool levelExists(const int id);//returns if level files exist and all match expected id
 
 private:
+	Ini * ini_ptr;
+	Editor * editor_ptr;
 
-	bool save(void);
+	fs::path packPath;
+
+	class levelData
+	{
+	public:
+		levelData(std::string s, int n);
+
+		std::string name;
+		int lems;
+	};
+
+	std::vector<levelData> levels[TRIBECOUNT];
+
+	int totalLems[TRIBECOUNT];
+	void refreshLemCounts(void);
 };
 
-#endif // INI_HPP
+#endif // PACKEDITOR_HPP

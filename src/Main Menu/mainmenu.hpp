@@ -21,6 +21,7 @@
 #ifndef MAINMENU_HPP
 #define MAINMENU_HPP
 
+#include "packeditor.hpp"
 #include "../lem3edit.hpp"
 
 #include "SDL.h"
@@ -42,9 +43,20 @@ public:
 
 	void draw(void);
 
+	struct OBSValues {
+		Uint16 perm;
+		Uint16 temp;
+	};
+
+	//opens a DAT file and returns the values that reference the OBS files;
+	static OBSValues loadOBSValues(fs::path DATfilepath);
+	static bool updateOBSValues(fs::path DATfilepath, const int id);
+
 private:
 	Ini * ini_ptr;
 	Editor * editor_ptr;
+
+	PackEditor packEditor;
 
 	Uint32 lastFrameTick;
 
@@ -102,17 +114,8 @@ private:
 	void renderNumbers(int num, const int rightX, const int y);
 
 	int level_id;
-	struct OBSValues {
-		Uint16 perm;
-		Uint16 temp;
-	};
-
 	OBSValues fileOBS;//check for {1000, 1000} or higher for invalid result
 	fs::path filePath;
-
-	//opens a DAT file and returns the values that reference the OBS files;
-	OBSValues loadOBSValues(fs::path DATfilepath);
-	bool updateOBSValues(fs::path DATfilepath, const int id);
 
 	bool confirmOverwrite(fs::path filePath, int id);
 

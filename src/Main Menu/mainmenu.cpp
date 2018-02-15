@@ -41,6 +41,9 @@ Mainmenu::Mainmenu(Ini * i, Editor * e)
 {
 	ini_ptr = i;
 	editor_ptr = e;
+
+	packEditor.setReferences(ini_ptr, editor_ptr);
+
 	highlighting = NONE;
 
 	lastFrameTick = 0;
@@ -100,13 +103,13 @@ void Mainmenu::refreshPreviousPackText(void)
 	SDL_DestroyTexture(PreviousPackText);
 	PreviousPackText = NULL;
 	std::string s = "Load Last Pack: ";
-	if (ini_ptr->getLastLoadedPack() == "")
+	if (fs::exists(ini_ptr->lastLoadedPack))
 	{
-		s += "None!";
+		s += ini_ptr->lastLoadedPack.stem().generic_string();
 	}
 	else
 	{
-		s += ini_ptr->getLastLoadedPack().stem().generic_string();
+		s += "None!";
 	}
 
 	TTF_Font * buttonFont = TTF_OpenFont("./gfx/DejaVuSansMono.ttf", 30);
@@ -162,7 +165,7 @@ void Mainmenu::handleMainMenuEvents(SDL_Event event)
 			if (mouse_y_window > 310
 				&& mouse_y_window < 350)
 			{
-				//highlighting = NEWPACK;
+				highlighting = NEWPACK;
 			}
 			if (mouse_y_window > 360
 				&& mouse_y_window < 400)
@@ -172,8 +175,8 @@ void Mainmenu::handleMainMenuEvents(SDL_Event event)
 			if (mouse_y_window > 410
 				&& mouse_y_window < 450)
 			{
-				//if (ini_ptr->getLastLoadedPack() != "")
-					//highlighting = PREVIOUSPACK;
+				if (fs::exists(ini_ptr->lastLoadedPack))
+					highlighting = PREVIOUSPACK;
 			}
 			if (mouse_y_window > 480
 				&& mouse_y_window < 520)
@@ -225,7 +228,11 @@ void Mainmenu::handleMainMenuEvents(SDL_Event event)
 				break;
 
 				case NEWPACK:
-					//todo
+					if (packEditor.create())
+					{
+						highlighting = NONE;
+						refreshPreviousPackText();
+					}
 					break;
 
 				case LOADPACK:
@@ -233,6 +240,8 @@ void Mainmenu::handleMainMenuEvents(SDL_Event event)
 					break;
 
 				case PREVIOUSPACK:
+					if (!fs::exists(ini_ptr->lastLoadedPack))
+						break;
 					//todo
 					break;
 
@@ -457,9 +466,7 @@ void Mainmenu::draw(void)
 	//draw strikes through all unimplemented features
 	{
 		SDL_SetRenderDrawColor(g_window.screen_renderer, 0, 0, 0, 255);
-		SDL_RenderDrawLine(g_window.screen_renderer, centreX - 300, 330, centreX + 300, 330);//new pack
 		SDL_RenderDrawLine(g_window.screen_renderer, centreX - 300, 380, centreX + 300, 380);//load pack
-		SDL_RenderDrawLine(g_window.screen_renderer, centreX - 300, 430, centreX + 300, 430);//previous pack
 		SDL_RenderDrawLine(g_window.screen_renderer, centreX - 300, 500, centreX + 300, 500);//options
 	}
 
@@ -711,46 +718,6 @@ void Mainmenu::renderNumbers(int num, const int rightX, const int y)
 	}
 }
 
-Mainmenu::OBSValues Mainmenu::loadOBSValues(fs::path DATfilepath)
-{
-	std::ifstream f(DATfilepath, std::ios::binary);
-	if (!f)
-	{
-		SDL_Log("Failed to open '%s'\n", DATfilepath.generic_string().c_str());
-		return { 1000 , 1000 };
-	}
-
-	Uint16 temp;
-	Uint16 perm;
-
-	f.seekg(6);
-	f.read((char *)&temp, sizeof(temp));
-	f.read((char *)&perm, sizeof(perm));
-	f.close();
-
-	return { temp , perm };
-}
-
-bool Mainmenu::updateOBSValues(fs::path DATfilepath, const int id)
-{
-	std::fstream f(DATfilepath, std::ios_base::binary | std::ios_base::out | std::ios_base::in);
-	if (!f)
-	{
-		SDL_Log("Failed to open '%s'\n", DATfilepath.generic_string().c_str());
-		return false;
-	}
-
-	Uint16 temp = id;
-	Uint16 perm = id;
-
-	f.seekp(6);
-	f.write((char *)&temp, sizeof(temp));
-	f.write((char *)&perm, sizeof(perm));
-	f.close();
-
-	return true;
-}
-
 bool Mainmenu::confirmOverwrite(fs::path filePath, int id)
 {
 	fs::path levelPath = filePath;
@@ -935,6 +902,14 @@ void Mainmenu::copyLevel(void)
 	fs::path destinationPath = fileToCopyTo;
 	if (!destinationPath.has_extension())
 		destinationPath += ".DAT";
+
+	//Check that we're not copying or renumbering over the same file
+	if (fs::equivalent(filePath, destinationPath) || fileOBS.temp == level_id || fileOBS.perm == level_id)
+	{
+		tinyfd_messageBox("Oh No!", "One or more of the files are trying to copy over itself!\n\nPlease choose a different level ID.", "ok", "error", 1);
+		return;
+	}
+
 	if (!confirmOverwrite(destinationPath, level_id))
 		return;
 
@@ -1051,4 +1026,44 @@ void Mainmenu::drawLoadingBanner(void)
 	SDL_SetRenderTarget(g_window.screen_renderer, NULL);
 	SDL_RenderCopy(g_window.screen_renderer, g_window.screen_texture, NULL, NULL);
 	SDL_RenderPresent(g_window.screen_renderer);
+}
+
+Mainmenu::OBSValues Mainmenu::loadOBSValues(fs::path DATfilepath)
+{
+	std::ifstream f(DATfilepath, std::ios::binary);
+	if (!f)
+	{
+		SDL_Log("Failed to open '%s'\n", DATfilepath.generic_string().c_str());
+		return { 1000 , 1000 };
+	}
+
+	Uint16 temp;
+	Uint16 perm;
+
+	f.seekg(6);
+	f.read((char *)&temp, sizeof(temp));
+	f.read((char *)&perm, sizeof(perm));
+	f.close();
+
+	return { temp , perm };
+}
+
+bool Mainmenu::updateOBSValues(fs::path DATfilepath, const int id)
+{
+	std::fstream f(DATfilepath, std::ios_base::binary | std::ios_base::out | std::ios_base::in);
+	if (!f)
+	{
+		SDL_Log("Failed to open '%s'\n", DATfilepath.generic_string().c_str());
+		return false;
+	}
+
+	Uint16 temp = id;
+	Uint16 perm = id;
+
+	f.seekp(6);
+	f.write((char *)&temp, sizeof(temp));
+	f.write((char *)&perm, sizeof(perm));
+	f.close();
+
+	return true;
 }
