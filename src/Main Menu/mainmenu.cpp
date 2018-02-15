@@ -62,6 +62,7 @@ Mainmenu::Mainmenu(Ini * i, Editor * e)
 	DeleteLevelText = Font::createTextureFromString(buttonFont, "Delete Single Level");
 	NewPackText = Font::createTextureFromString(buttonFont, "New Level Pack");
 	LoadPackText = Font::createTextureFromString(buttonFont, "Load Level Pack");
+	PreviousPackText = NULL;
 	refreshPreviousPackText();
 	OptionsText = Font::createTextureFromString(buttonFont, "Set Testing Paths and Options");
 	QuitText = Font::createTextureFromString(buttonFont, "Quit");
@@ -100,8 +101,10 @@ Mainmenu::Mainmenu(Ini * i, Editor * e)
 
 void Mainmenu::refreshPreviousPackText(void)
 {
-	SDL_DestroyTexture(PreviousPackText);
+	if (PreviousPackText != NULL)
+		SDL_DestroyTexture(PreviousPackText);
 	PreviousPackText = NULL;
+
 	std::string s = "Load Last Pack: ";
 	if (fs::exists(ini_ptr->lastLoadedPack))
 	{

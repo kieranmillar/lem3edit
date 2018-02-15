@@ -42,7 +42,7 @@ public:
 		Uint16 id;
 		Uint8 width, height;
 
-		SDL_Texture * objTex;
+		SDL_Texture * objTex = NULL;
 
 		Uint16 frl, unknown[4];
 

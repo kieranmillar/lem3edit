@@ -45,7 +45,11 @@ public:
 	int type;
 	SDL_Rect barScrollRect;
 
-	struct buttonInfo { SDL_Texture * buttonTexUp; SDL_Texture * buttonTexDown; SDL_Texture * tooltip; };
+	struct buttonInfo {
+		SDL_Texture * buttonTexUp = NULL;
+		SDL_Texture * buttonTexDown = NULL;
+		SDL_Texture * tooltip = NULL;
+	};
 	enum buttonState { on, off };
 
 	buttonInfo button_layerBackground;
