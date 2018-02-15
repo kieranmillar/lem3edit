@@ -27,6 +27,6 @@ for its working directory, e.g., by `cd ..`, then `build/lem3edit`.
 If something goes wrong, delete the entire `build/` directory and start over.
 
 **Manual build:** If you do not wish to use CMake,
-give to your C++ compiler all `*.cpp` files in `src/` and link to
+give to your C++ compiler all `*.cpp` and `*.c` files in `src/` and link to
 `SDL2main` and `SDL2`.
 
