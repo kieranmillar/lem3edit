@@ -61,13 +61,13 @@ bool Ini::load(void)
 					key = line.substr(0, pos);
 					value = line.substr(pos + 1);
 					if (key == "CD")
-						setLem3cdPath(value);
+						lem3cdPath = value;
 					if (key == "INSTALL")
-						setLem3installPath(value);
+						lem3installPath = value;
 					if (key == "DOSBOX")
-						setDosBoxPath(value);
+						dosBoxPath = value;
 					if (key == "LASTPACK")
-						setLastLoadedPack(value);
+						lastLoadedPack = value;
 				}
 			}
 
@@ -193,38 +193,22 @@ bool Ini::validateData(const fs::path parentPath) {
 	return success;
 }
 
-fs::path Ini::getLem3cdPath(void) {
-	return lem3cdPath;
-}
-
-fs::path Ini::getLem3installPath(void) {
-	return lem3installPath;
-}
-
-fs::path Ini::getDosBoxPath(void) {
-	return dosBoxPath;
-}
-
-fs::path Ini::getLastLoadedPack(void) {
-	return lastLoadedPack;
-}
-
-void Ini::setLem3cdPath(fs::path p) {
+void Ini::saveLem3cdPath(fs::path p) {
 	lem3cdPath = p;
 	save();
 }
 
-void Ini::setLem3installPath(fs::path p) {
+void Ini::saveLem3installPath(fs::path p) {
 	lem3installPath = p;
 	save();
 }
 
-void Ini::setDosBoxPath(fs::path p) {
+void Ini::saveDosBoxPath(fs::path p) {
 	dosBoxPath = p;
 	save();
 }
 
-void Ini::setLastLoadedPack(fs::path p) {
+void Ini::saveLastLoadedPack(fs::path p) {
 	lastLoadedPack = p;
 	save();
 }
@@ -237,10 +221,10 @@ bool Ini::save(void)
 	std::ofstream iniFile(iniPath, std::ios::in | std::ios::trunc);
 	if (iniFile.is_open())
 	{
-		iniFile << "CD=" << getLem3cdPath() << "\n";
-		iniFile << "INSTALL=" << getLem3installPath() << "\n";
-		iniFile << "DOSBOX=" << getDosBoxPath() << "\n";
-		iniFile << "LASTPACK=" << getLastLoadedPack() << "\n";
+		iniFile << "CD=" << lem3cdPath.generic_string() << "\n";
+		iniFile << "INSTALL=" << lem3installPath.generic_string() << "\n";
+		iniFile << "DOSBOX=" << dosBoxPath.generic_string() << "\n";
+		iniFile << "LASTPACK=" << lastLoadedPack.generic_string() << "\n";
 		iniFile.close();
 	}
 	else

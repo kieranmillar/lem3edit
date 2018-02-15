@@ -79,7 +79,7 @@ bool PackEditor::create(void)
 		totalLems[i] = 0;
 	}
 	g_currentMode = LEVELPACKMODE;
-	ini_ptr->setLastLoadedPack(packPath);
+	ini_ptr->saveLastLoadedPack(packPath);
 	return true;
 }
 

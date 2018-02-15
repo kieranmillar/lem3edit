@@ -103,13 +103,13 @@ void Mainmenu::refreshPreviousPackText(void)
 	SDL_DestroyTexture(PreviousPackText);
 	PreviousPackText = NULL;
 	std::string s = "Load Last Pack: ";
-	if (ini_ptr->getLastLoadedPack() == "")
+	if (fs::exists(ini_ptr->lastLoadedPack))
 	{
-		s += "None!";
+		s += ini_ptr->lastLoadedPack.stem().generic_string();
 	}
 	else
 	{
-		s += ini_ptr->getLastLoadedPack().stem().generic_string();
+		s += "None!";
 	}
 
 	TTF_Font * buttonFont = TTF_OpenFont("./gfx/DejaVuSansMono.ttf", 30);
@@ -175,7 +175,7 @@ void Mainmenu::handleMainMenuEvents(SDL_Event event)
 			if (mouse_y_window > 410
 				&& mouse_y_window < 450)
 			{
-				if (ini_ptr->getLastLoadedPack() != "")
+				if (fs::exists(ini_ptr->lastLoadedPack))
 					highlighting = PREVIOUSPACK;
 			}
 			if (mouse_y_window > 480
@@ -237,7 +237,7 @@ void Mainmenu::handleMainMenuEvents(SDL_Event event)
 					break;
 
 				case PREVIOUSPACK:
-					if (ini_ptr->getLastLoadedPack() == "")
+					if (fs::exists(ini_ptr->lastLoadedPack))
 						break;
 					//todo
 					break;

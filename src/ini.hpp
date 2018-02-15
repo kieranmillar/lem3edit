@@ -28,26 +28,22 @@ namespace fs = std::experimental::filesystem::v1;
 class Ini
 {
 public:
+	fs::path lem3cdPath;
+	fs::path lem3installPath;
+	fs::path dosBoxPath;
+	fs::path lastLoadedPack;
+
 	bool load(void);
 
 	bool validateData(void);
 	bool validateData(const fs::path parentPath);
 
-	fs::path getLem3cdPath(void);
-	fs::path getLem3installPath(void);
-	fs::path getDosBoxPath(void);
-	fs::path getLastLoadedPack(void);
-
-	void setLem3cdPath(fs::path p);
-	void setLem3installPath(fs::path p);
-	void setDosBoxPath(fs::path p);
-	void setLastLoadedPack(fs::path p);
+	void saveLem3cdPath(fs::path p);
+	void saveLem3installPath(fs::path p);
+	void saveDosBoxPath(fs::path p);
+	void saveLastLoadedPack(fs::path p);
 
 private:
-	fs::path lem3cdPath;
-	fs::path lem3installPath;
-	fs::path dosBoxPath;
-	fs::path lastLoadedPack;
 
 	bool save(void);
 };
