@@ -229,7 +229,10 @@ void Mainmenu::handleMainMenuEvents(SDL_Event event)
 
 				case NEWPACK:
 					if (packEditor.create())
+					{
 						highlighting = NONE;
+						refreshPreviousPackText();
+					}
 					break;
 
 				case LOADPACK:
@@ -237,7 +240,7 @@ void Mainmenu::handleMainMenuEvents(SDL_Event event)
 					break;
 
 				case PREVIOUSPACK:
-					if (fs::exists(ini_ptr->lastLoadedPack))
+					if (!fs::exists(ini_ptr->lastLoadedPack))
 						break;
 					//todo
 					break;

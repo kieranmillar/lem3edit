@@ -76,9 +76,16 @@ bool PackEditor::create(void)
 	for (int i = 0; i < TRIBECOUNT; i++)
 	{
 		levels[i].clear();
-		totalLems[i] = 0;
+		totalLems[i] = 20;
 	}
-	g_currentMode = LEVELPACKMODE;
+
+	tinyfd_messageBox(
+		"Hooray!",
+		"Great, that all worked!\n\nTODO: Pack Editor.",
+		"ok",
+		"info",
+		0);
+	//g_currentMode = LEVELPACKMODE;
 	ini_ptr->saveLastLoadedPack(packPath);
 	return true;
 }
@@ -159,7 +166,14 @@ bool PackEditor::load(const fs::path fileName)
 
 	refreshLemCounts();
 
-	g_currentMode = LEVELPACKMODE;
+	tinyfd_messageBox(
+		"Hooray!",
+		"Great, that all worked!\n\nTODO: Pack Editor.",
+		"ok",
+		"info",
+		0);
+	//g_currentMode = LEVELPACKMODE;
+	ini_ptr->saveLastLoadedPack(packPath);
 	return true;
 }
 
