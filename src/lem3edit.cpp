@@ -148,6 +148,7 @@ int main(int argc, char *argv[])
 			break;
 		case LEVELPACKMODE:
 			mainmenu.packEditor.handlePackEditorEvents(event);
+			break;
 		case EDITORMODE:
 			editor.editor_input.handleEditorEvents(event);
 			break;

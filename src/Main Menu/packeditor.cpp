@@ -79,8 +79,9 @@ void PackEditor::handlePackEditorEvents(SDL_Event event)
 
 		switch (e.keysym.sym)
 		{
-		case SDLK_a:
-			//example
+		case SDLK_ESCAPE:
+			save();
+			g_currentMode = MAINMENUMODE;
 			break;
 		default:
 			break;
@@ -159,7 +160,7 @@ bool PackEditor::create(void)
 		"ok",
 		"info",
 		0);
-	//g_currentMode = LEVELPACKMODE;
+	g_currentMode = LEVELPACKMODE;
 	ini_ptr->saveLastLoadedPack(packPath);
 	return true;
 }
@@ -169,6 +170,7 @@ bool PackEditor::load(const fs::path fileName)
 	for (int i = 0; i < TRIBECOUNT; i++)
 	{
 		levels[i].clear();
+		totalLems[i] = 20;
 	}
 
 	if (!fs::exists(fileName))
@@ -211,6 +213,7 @@ bool PackEditor::load(const fs::path fileName)
 			else
 			{
 				packFile.close();
+				SDL_Log("Invalid pack file entry - Invalid id");
 				//TODO: handle invalid pack file entry
 				return false;
 			}
@@ -222,12 +225,14 @@ bool PackEditor::load(const fs::path fileName)
 			if (id != count)
 			{
 				packFile.close();
+				SDL_Log("Invalid pack file entry - Level id out of order");
 				//TODO: handle invalid pack file entry
 				return false;
 			}
 
 			if (!levelExists(id))
 			{
+				SDL_Log("Invalid pack file entry - Level does not have consistent file IDs");
 				//TODO: handle level fies not matching id
 
 				return false;
@@ -246,7 +251,7 @@ bool PackEditor::load(const fs::path fileName)
 		"ok",
 		"info",
 		0);
-	//g_currentMode = LEVELPACKMODE;
+	g_currentMode = LEVELPACKMODE;
 	ini_ptr->saveLastLoadedPack(packPath);
 	return true;
 }

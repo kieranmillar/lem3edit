@@ -54,7 +54,7 @@ private:
 	Ini * ini_ptr;
 	Editor * editor_ptr;
 
-	Uint32 lastFrameTick;
+	Uint32 lastFrameTick = 0;
 
 	fs::path packPath;
 
@@ -69,7 +69,7 @@ private:
 
 	std::vector<levelData> levels[TRIBECOUNT];
 
-	int totalLems[TRIBECOUNT];
+	int totalLems[TRIBECOUNT] = { 20, 20, 20 };
 	void refreshLemCounts(void);
 
 	void draw(void);

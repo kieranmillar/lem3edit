@@ -243,9 +243,13 @@ void Mainmenu::handleMainMenuEvents(SDL_Event event)
 					break;
 
 				case PREVIOUSPACK:
-					if (!fs::exists(ini_ptr->lastLoadedPack))
-						break;
-					//todo
+					if (fs::exists(ini_ptr->lastLoadedPack))
+					{
+						if (packEditor.load(ini_ptr->lastLoadedPack))
+						{
+							highlighting = NONE;
+						}
+					}
 					break;
 
 				case OPTIONS:
