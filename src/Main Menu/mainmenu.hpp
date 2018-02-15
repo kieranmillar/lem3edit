@@ -74,34 +74,34 @@ private:
 	tribeName selectedTribe;
 
 	// main menu text textures
-	SDL_Texture * titleText;
-	SDL_Texture * loadingText;
-	SDL_Texture * NewLevelText;
-	SDL_Texture * LoadLevelText;
-	SDL_Texture * CopyLevelText;
-	SDL_Texture * DeleteLevelText;
-	SDL_Texture * NewPackText;
-	SDL_Texture * LoadPackText;
-	SDL_Texture * PreviousPackText;
-	SDL_Texture * OptionsText;
-	SDL_Texture * QuitText;
+	SDL_Texture * titleText = NULL;
+	SDL_Texture * loadingText = NULL;
+	SDL_Texture * NewLevelText = NULL;
+	SDL_Texture * LoadLevelText = NULL;
+	SDL_Texture * CopyLevelText = NULL;
+	SDL_Texture * DeleteLevelText = NULL;
+	SDL_Texture * NewPackText = NULL;
+	SDL_Texture * LoadPackText = NULL;
+	SDL_Texture * PreviousPackText = NULL;
+	SDL_Texture * OptionsText = NULL;
+	SDL_Texture * QuitText = NULL;
 
 	//dialog text textures
-	SDL_Texture * numbers[10];
-	SDL_Texture * OKText;
-	SDL_Texture * CancelText;
-	SDL_Texture * selectTribeText;
-	SDL_Texture * classicTribeText;
-	SDL_Texture * shadowTribeText;
-	SDL_Texture * egyptTribeText;
-	SDL_Texture * newLevelIDText;
-	SDL_Texture * levelIDClassicText;
-	SDL_Texture * levelIDShadowText;
-	SDL_Texture * levelIDEgyptText;
-	SDL_Texture * levelIDPracticeText;
-	SDL_Texture * levelIDDemoText;
-	SDL_Texture * copyText;
-	SDL_Texture * renumberText;
+	SDL_Texture * numbers[10] = { NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL };
+	SDL_Texture * OKText = NULL;
+	SDL_Texture * CancelText = NULL;
+	SDL_Texture * selectTribeText = NULL;
+	SDL_Texture * classicTribeText = NULL;
+	SDL_Texture * shadowTribeText = NULL;
+	SDL_Texture * egyptTribeText = NULL;
+	SDL_Texture * newLevelIDText = NULL;
+	SDL_Texture * levelIDClassicText = NULL;
+	SDL_Texture * levelIDShadowText = NULL;
+	SDL_Texture * levelIDEgyptText = NULL;
+	SDL_Texture * levelIDPracticeText = NULL;
+	SDL_Texture * levelIDDemoText = NULL;
+	SDL_Texture * copyText = NULL;
+	SDL_Texture * renumberText = NULL;
 
 	void refreshPreviousPackText(void);
 

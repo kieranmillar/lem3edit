@@ -26,9 +26,12 @@
 #include "SDL.h"
 
 #include <string>
+#include <vector>
 #include <experimental/filesystem>
 
 namespace fs = std::experimental::filesystem::v1;
+
+#define CURRENTPACKFILEVERSION 1
 
 class Ini;
 class Editor;
@@ -56,15 +59,23 @@ private:
 
 	Uint32 lastFrameTick = 0;
 
+	int version = CURRENTPACKFILEVERSION;
+
 	fs::path packPath;
+
+	tribeName tribeTab = CLASSIC;
 
 	class levelData
 	{
 	public:
 		levelData(std::string s, int n);
+		~levelData(void);
+
+		void refreshTexture(void);
 
 		std::string name;
 		int lems;
+		SDL_Texture * tex = NULL;
 	};
 
 	std::vector<levelData> levels[TRIBECOUNT];

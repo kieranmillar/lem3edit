@@ -24,6 +24,7 @@ This file handles the level pack editor
 
 #include "mainmenu.hpp"
 #include "packeditor.hpp"
+#include "../font.hpp"
 #include "../ini.hpp"
 #include "../tinyfiledialogs.h"
 
@@ -32,6 +33,7 @@ This file handles the level pack editor
 
 #include <fstream>
 #include <string>
+#include <vector>
 #include <experimental/filesystem>
 
 namespace fs = std::experimental::filesystem::v1;
@@ -112,6 +114,24 @@ void PackEditor::draw(void)
 	SDL_SetRenderDrawColor(g_window.screen_renderer, 240, 240, 240, 255);
 	SDL_RenderClear(g_window.screen_renderer);
 
+	int count = 0;
+	for (std::vector<levelData>::const_iterator iter = levels[tribeTab].begin(); iter != levels[tribeTab].end(); ++iter)
+	{
+		const levelData &d = *iter;
+
+		int texW, texH;
+		SDL_Rect texRect;
+
+		SDL_QueryTexture(d.tex, NULL, NULL, &texW, &texH);
+		texRect.x = 100;
+		texRect.y = 100 + count;
+		texRect.w = texW;
+		texRect.h = texH;
+		SDL_RenderCopy(g_window.screen_renderer, d.tex, NULL, &texRect);
+
+		count += 30;
+	}
+
 	SDL_SetRenderTarget(g_window.screen_renderer, NULL);
 	SDL_RenderCopy(g_window.screen_renderer, g_window.screen_texture, NULL, NULL);
 	SDL_RenderPresent(g_window.screen_renderer);
@@ -153,6 +173,13 @@ bool PackEditor::create(void)
 		levels[i].clear();
 		totalLems[i] = 20;
 	}
+
+	version = CURRENTPACKFILEVERSION;
+	tribeTab = CLASSIC;
+
+	levels[0].emplace_back(levelData("Blah1", 2));
+	levels[0].emplace_back(levelData("Blah2", 2));
+	levels[0].emplace_back(levelData("Blah3", 2));
 
 	tinyfd_messageBox(
 		"Hooray!",
@@ -200,6 +227,14 @@ bool PackEditor::load(const fs::path fileName)
 		if (pos != std::string::npos)
 		{
 			key = line.substr(0, pos);
+
+			if (key == "VERSION")
+			{
+				//load pack version so we can handle backwards compatability if the format ever changes
+				version = atoi(value.c_str());
+				continue;
+			}
+
 			int id = atoi(key.c_str());
 			value = line.substr(pos + 1);
 
@@ -232,18 +267,21 @@ bool PackEditor::load(const fs::path fileName)
 
 			if (!levelExists(id))
 			{
+				packFile.close();
 				SDL_Log("Invalid pack file entry - Level does not have consistent file IDs");
 				//TODO: handle level fies not matching id
 
 				return false;
 			}
-			levels[loadingTribe].push_back(levelData(value, 0));
+			//TODO: Properly load lemming count instead of 0
+			levels[loadingTribe].emplace_back(levelData(value, 0));
 		}
 	}
 
 	packFile.close();
 
 	refreshLemCounts();
+	tribeTab = CLASSIC;
 
 	tinyfd_messageBox(
 		"Hooray!",
@@ -264,6 +302,9 @@ bool PackEditor::save(void)
 		SDL_Log("Failed to save pack file  %s\n.", packPath.generic_string().c_str());
 		return false;
 	}
+
+	//always save as latest version at top of file
+	packFile << "VERSION=" << CURRENTPACKFILEVERSION << std::endl;
 
 	for (int i = 0; i < TRIBECOUNT; i++)
 	{
@@ -313,6 +354,23 @@ PackEditor::levelData::levelData(const std::string s, const int n)
 {
 	name = s;
 	lems = n;
+	tex = NULL;
+	refreshTexture();
+}
+
+PackEditor::levelData::~levelData(void)
+{
+	if (tex != NULL)
+		SDL_DestroyTexture(tex);
+}
+
+void PackEditor::levelData::refreshTexture(void)
+{
+	if (tex != NULL)
+		SDL_DestroyTexture(tex);
+	TTF_Font * smallFont = TTF_OpenFont("./gfx/DejaVuSansMono.ttf", 20);
+	tex = Font::createTextureFromString(smallFont, name);
+	TTF_CloseFont(smallFont);
 }
 
 void PackEditor::refreshLemCounts(void)

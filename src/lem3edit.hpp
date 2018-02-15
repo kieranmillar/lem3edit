@@ -41,7 +41,7 @@ enum programMode { MAINMENUMODE, LEVELPACKMODE, EDITORMODE, LEVELPROPERTIESMODE 
 
 #define TRIBECOUNT 3
 
-enum tribeName { CLASSIC, EGYPT, SHADOW };
+enum tribeName { CLASSIC, SHADOW, EGYPT };
 
 extern programMode g_currentMode;
 
