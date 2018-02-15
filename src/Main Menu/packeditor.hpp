@@ -38,6 +38,8 @@ class PackEditor
 public:
 	void setReferences(Ini * i, Editor * e);
 
+	void handlePackEditorEvents(SDL_Event event);
+
 	bool create(void);
 	bool load(const fs::path fileName);
 	bool save(void);
@@ -51,6 +53,8 @@ public:
 private:
 	Ini * ini_ptr;
 	Editor * editor_ptr;
+
+	Uint32 lastFrameTick;
 
 	fs::path packPath;
 
@@ -67,6 +71,8 @@ private:
 
 	int totalLems[TRIBECOUNT];
 	void refreshLemCounts(void);
+
+	void draw(void);
 };
 
 #endif // PACKEDITOR_HPP

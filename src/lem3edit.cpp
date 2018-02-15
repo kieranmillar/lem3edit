@@ -146,6 +146,8 @@ int main(int argc, char *argv[])
 		case MAINMENUMODE:
 			mainmenu.handleMainMenuEvents(event);
 			break;
+		case LEVELPACKMODE:
+			mainmenu.packEditor.handlePackEditorEvents(event);
 		case EDITORMODE:
 			editor.editor_input.handleEditorEvents(event);
 			break;

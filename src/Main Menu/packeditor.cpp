@@ -42,6 +42,80 @@ void PackEditor::setReferences(Ini * i, Editor * e)
 	editor_ptr = e;
 }
 
+void PackEditor::handlePackEditorEvents(SDL_Event event)
+{
+	Sint32 mouse_x_window, mouse_y_window;
+	Uint8 mouse_state = SDL_GetMouseState(&mouse_x_window, &mouse_y_window);
+
+	switch (event.type)
+	{
+	case SDL_WINDOWEVENT:
+	{
+		SDL_WindowEvent &e = event.window;
+
+		if (e.event == SDL_WINDOWEVENT_RESIZED)
+		{
+			g_window.resize(e.data1, e.data2);
+		}
+		break;
+	}
+	case SDL_MOUSEMOTION:
+	{
+		break;
+	}
+	case SDL_MOUSEBUTTONDOWN://when pressed
+	{
+		SDL_MouseButtonEvent &e = event.button;
+
+		if (e.button == SDL_BUTTON_LEFT)
+		{
+			int centreX = g_window.width / 2;
+		}
+		break;
+	}
+	case SDL_KEYDOWN:
+	{
+		SDL_KeyboardEvent &e = event.key;
+
+		switch (e.keysym.sym)
+		{
+		case SDLK_a:
+			//example
+			break;
+		default:
+			break;
+		}
+		break;
+	}
+	case SDL_USEREVENT:// stuff here happens every frame. Watch out, timer produces events on a separate thread to rest of program!
+	{
+		Uint32 ticksSinceLastFrame = SDL_GetTicks() - lastFrameTick;
+		lastFrameTick = SDL_GetTicks();
+		if (ticksSinceLastFrame <= 36 && ticksSinceLastFrame >= 30)
+		{
+			draw();
+		}
+		break;
+	}
+	default:
+	{
+		break;
+	}
+	}
+}
+
+void PackEditor::draw(void)
+{
+	SDL_SetRenderDrawBlendMode(g_window.screen_renderer, SDL_BLENDMODE_BLEND);
+	SDL_SetRenderTarget(g_window.screen_renderer, g_window.screen_texture);
+	SDL_SetRenderDrawColor(g_window.screen_renderer, 240, 240, 240, 255);
+	SDL_RenderClear(g_window.screen_renderer);
+
+	SDL_SetRenderTarget(g_window.screen_renderer, NULL);
+	SDL_RenderCopy(g_window.screen_renderer, g_window.screen_texture, NULL, NULL);
+	SDL_RenderPresent(g_window.screen_renderer);
+}
+
 bool PackEditor::create(void)
 {
 	char const * fileToSaveTo = NULL;

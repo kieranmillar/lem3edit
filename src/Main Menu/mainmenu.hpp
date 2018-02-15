@@ -39,6 +39,8 @@ public:
 
 	Mainmenu(Ini * i, Editor * e);
 
+	PackEditor packEditor;
+
 	void handleMainMenuEvents(SDL_Event event);
 
 	void draw(void);
@@ -55,8 +57,6 @@ public:
 private:
 	Ini * ini_ptr;
 	Editor * editor_ptr;
-
-	PackEditor packEditor;
 
 	Uint32 lastFrameTick;
 
