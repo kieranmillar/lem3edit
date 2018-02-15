@@ -46,15 +46,15 @@ public:
 	bool redraw;
 	int dialogX, dialogY;
 
-	SDL_Texture * titleText;
-	SDL_Texture * releaseRateText;
-	SDL_Texture * spawnDelayText;
-	SDL_Texture * timeLimitText;
-	SDL_Texture * timeLimitMinsText;
-	SDL_Texture * timeLimitSecsText;
-	SDL_Texture * OKButtonText;
-	SDL_Texture * cancelButtonText;
-	SDL_Texture * numbers[10];
+	SDL_Texture * titleText = NULL;
+	SDL_Texture * releaseRateText = NULL;
+	SDL_Texture * spawnDelayText = NULL;
+	SDL_Texture * timeLimitText = NULL;
+	SDL_Texture * timeLimitMinsText = NULL;
+	SDL_Texture * timeLimitSecsText = NULL;
+	SDL_Texture * OKButtonText = NULL;
+	SDL_Texture * cancelButtonText = NULL;
+	SDL_Texture * numbers[10] = { NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL };
 
 	enum inputBox { NONE, RELEASERATE, SPAWNDELAY, TIMELIMITMINS, TIMELIMITSECS };
 
