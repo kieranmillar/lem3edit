@@ -5,8 +5,19 @@ build/
 bin/
 Debug/
 Release/
+Lem3Edit.opensdf
+Lem3Edit.sdf
+Lem3Edit.sln
+Lem3Edit.vcxproj
+Lem3Edit.vcxproj.filters
+.vs/
 
-# Files by Lemmings 3 that we instruct the user to add to our project's root
+# Files that the editor will create itself
+lem3edit.ini
+
+# Files by Lemmings 3 that might be added in the project root.
+# Ideally, these shouldn't be put into the project, but rather the
+# project should point to L3CD.EXE in a separate directory.
 AUDIO/
 FRONT/
 GRAPHICS/
@@ -19,9 +30,3 @@ L3CD.EXE
 L3CDGUS.EXE
 L3GUS.BAT
 USER.DAT
-Lem3Edit.opensdf
-Lem3Edit.sdf
-Lem3Edit.sln
-Lem3Edit.vcxproj
-Lem3Edit.vcxproj.filters
-.vs/
