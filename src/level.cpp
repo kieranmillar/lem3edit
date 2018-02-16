@@ -147,13 +147,13 @@ void Level::newLevel(const fs::path filename, const tribeName t, const int n)
 		tribe = 4;
 		style = 1;
 		break;
-	case EGYPT:
-		tribe = 5;
-		style = 3;
-		break;
 	case SHADOW:
 		tribe = 10;
 		style = 2;
+		break;
+	case EGYPT:
+		tribe = 5;
+		style = 3;
 		break;
 	}
 	cave_map = 0;

@@ -49,12 +49,6 @@ public:
 	bool load(const fs::path fileName);
 	bool save(void);
 
-	//void createLevel(const int n, const tribeName tribe);
-	//void loadLevel(const int n, const tribeName tribe);
-	//void editLevel(const int n, const tribeName tribe);
-
-	bool levelExists(const int id);//returns if level files exist and all match expected id
-
 private:
 	Ini * ini_ptr;
 	Editor * editor_ptr;
@@ -91,6 +85,11 @@ private:
 		SDL_Texture * tex = NULL;
 	};
 
+	void createLevel(const int n);
+	//void loadLevel(const int n, const tribeName tribe);
+	//void editLevel(const int n, const tribeName tribe);
+
+	bool levelExists(const int id);//returns if level files exist and all match expected id
 	void refreshTitleTexture(void);
 
 	std::vector<levelData> levels[TRIBECOUNT];

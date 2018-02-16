@@ -811,16 +811,12 @@ void Mainmenu::newLevel(void)
 	tempPath += ".OBS";
 
 	{
-		Uint16 byte = 0;
 		std::ofstream f(tempPath, std::ios_base::binary | std::ios_base::in | std::ios_base::trunc);
 		if (!f)
 		{
 			SDL_Log("Failed to open '%s'\n", tempPath.generic_string().c_str());
 			return;
 		}
-		f.write((char *)&byte, sizeof(byte));
-		f.write((char *)&byte, sizeof(byte));
-		f.write((char *)&byte, sizeof(byte));
 		f.close();
 	}
 
@@ -831,16 +827,12 @@ void Mainmenu::newLevel(void)
 	permPath += ".OBS";
 
 	{
-		Uint16 byte = 0;
 		std::ofstream f(permPath, std::ios_base::binary | std::ios_base::in | std::ios_base::trunc);
 		if (!f)
 		{
 			SDL_Log("Failed to open '%s'\n", permPath.generic_string().c_str());
 			return;
 		}
-		f.write((char *)&byte, sizeof(byte));
-		f.write((char *)&byte, sizeof(byte));
-		f.write((char *)&byte, sizeof(byte));
 		f.close();
 	}
 

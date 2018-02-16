@@ -128,6 +128,16 @@ void PackEditor::handlePackEditorEvents(SDL_Event event)
 				}
 			}
 
+			if (mouse_y_window > 88 + (levels[tribeTab].size() * 30) && mouse_y_window < 114 + (levels[tribeTab].size() * 30))
+			{
+				//add new level button
+				if (mouse_x_window > (windowThird - 100) && mouse_x_window < (windowThird + 100))
+				{
+					createLevel((levels[tribeTab].size() + 1) + (tribeTab * 100));
+					redraw = true;
+				}
+			}
+
 			//quit button
 			if (mouse_x_window > 20 &&
 				mouse_x_window < 120 &&
@@ -279,7 +289,7 @@ bool PackEditor::load(const fs::path fileName)
 
 			count++;
 			if (id % 100 == 1)
-				count = 1;
+				count = 1 + (loadingTribe * 100);
 
 			if (id != count)
 			{
@@ -339,6 +349,127 @@ bool PackEditor::save(void)
 	}
 	packFile.close();
 	return true;
+}
+
+void PackEditor::createLevel(const int n)
+{
+	fs::path parentPath = packPath.parent_path();
+	//create blank LEVEL###.DAT file
+	fs::path datPath = parentPath;
+	datPath /= "LEVEL";
+	datPath += l3_filename_number(n);
+	datPath += ".DAT";
+
+	Uint16 tribe;
+	Uint16 cave_map, cave_raw;
+	Uint16 temp, perm;
+	Uint16 style;
+	Uint16 width, height;
+	Sint16 cameraX, cameraY;
+	Uint16 time;
+	Uint8  extra_lemmings;
+	Uint8  unknown;
+	Uint16 release_rate, release_delay;
+	Uint16 enemies;
+
+	if (n >= 1 && n <= 30) //CLASSIC
+	{
+		tribe = 4;
+		style = 1;
+	}
+	else if (n >= 101 && n <= 130) //SHADOW
+	{
+		tribe = 10;
+		style = 2;
+	}
+	else if (n >= 201 && n <= 230) //EGYPT
+	{
+		tribe = 5;
+		style = 3;
+	}
+	else
+	{
+		SDL_Log("Invalid level id for making a level via pack editor");
+		return;
+	}
+
+	cave_map = 0;
+	cave_raw = 0;
+	temp = n;
+	perm = n;
+	width = 320;
+	height = 160;
+	cameraX = 0;
+	cameraY = 0;
+	time = 420;
+	extra_lemmings = 0;
+	unknown = 2;
+	release_rate = 23;
+	release_delay = 46;
+	enemies = 0;
+
+	std::ofstream f(datPath, std::ios::binary | std::ios::trunc);
+	if (!f)
+	{
+		SDL_Log("Failed to open '%s'\n", datPath.generic_string().c_str());
+		return;
+	}
+
+	f.write((char *)&tribe, sizeof(tribe));
+	f.write((char *)&cave_map, sizeof(cave_map));
+	f.write((char *)&cave_raw, sizeof(cave_raw));
+	f.write((char *)&temp, sizeof(temp));
+	f.write((char *)&perm, sizeof(perm));
+	f.write((char *)&style, sizeof(style));
+	f.write((char *)&width, sizeof(width));
+	f.write((char *)&height, sizeof(height));
+	f.write((char *)&cameraX, sizeof(cameraX));
+	f.write((char *)&cameraY, sizeof(cameraY));
+	f.write((char *)&time, sizeof(time));
+	f.write((char *)&extra_lemmings, sizeof(extra_lemmings));
+	f.write((char *)&unknown, sizeof(unknown));
+	f.write((char *)&release_rate, sizeof(release_rate));
+	f.write((char *)&release_delay, sizeof(release_delay));
+	f.write((char *)&enemies, sizeof(enemies));
+
+	f.close();
+
+	//create blank TEMP###.OBS file
+	fs::path tempPath = parentPath;
+	tempPath /= "TEMP";
+	tempPath += l3_filename_number(n);
+	tempPath += ".OBS";
+
+	{
+		std::ofstream f(tempPath, std::ios_base::binary | std::ios_base::in | std::ios_base::trunc);
+		if (!f)
+		{
+			SDL_Log("Failed to open '%s'\n", tempPath.generic_string().c_str());
+			return;
+		}
+		f.close();
+	}
+
+	//create blank PERM###.OBS file
+	fs::path permPath = parentPath;
+	permPath /= "PERM";
+	permPath += l3_filename_number(n);
+	permPath += ".OBS";
+
+	{
+		std::ofstream f(permPath, std::ios_base::binary | std::ios_base::in | std::ios_base::trunc);
+		if (!f)
+		{
+			SDL_Log("Failed to open '%s'\n", permPath.generic_string().c_str());
+			return;
+		}
+		f.close();
+	}
+
+	std::string name;
+	name = "New Level ";
+	name += std::to_string(n);
+	levels[(n / 100)].emplace_back(levelData(name, 0));
 }
 
 bool PackEditor::levelExists(const int id)
