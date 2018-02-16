@@ -53,6 +53,8 @@ PackEditor::PackEditor(void)
 		digit[0] += i;
 		numbers[i] = Font::createTextureFromString(smallFont, digit);
 	}
+	addNewLevelTex = Font::createTextureFromString(smallFont, "Add New Level");
+	loadLevelTex = Font::createTextureFromString(smallFont, "Load Level");
 	TTF_CloseFont(smallFont);
 }
 
@@ -101,7 +103,23 @@ void PackEditor::handlePackEditorEvents(SDL_Event event)
 
 		if (e.button == SDL_BUTTON_LEFT)
 		{
-			int centreX = g_window.width / 2;
+			int windowThird = g_window.width / 3;
+			//swap tabs
+			if (mouse_y_window >= 36 && mouse_y_window <= 76)
+			{
+				if (mouse_x_window > 4 && mouse_x_window < (4 + windowThird))
+				{
+					tribeTab = CLASSIC;
+				}
+				else if (mouse_x_window > (3 + windowThird) && mouse_x_window < (3 + (windowThird * 2)))
+				{
+					tribeTab = SHADOW;
+				}
+				else if (mouse_x_window > (g_window.width - windowThird - 2) && mouse_x_window < (g_window.width - 4))
+				{
+					tribeTab = EGYPT;
+				}
+			}
 		}
 		break;
 	}
@@ -437,15 +455,44 @@ void PackEditor::draw(void)
 			SDL_RenderDrawLine(g_window.screen_renderer, g_window.width - windowThird - 1, 75, (g_window.width - 4), 75);
 		}
 		renderText(egyptTabTex, (g_window.width / 6) * 5, 40, CENTRE);
+
+		r.x = 4;
+		r.y = 76;
+		r.w = g_window.width - 7;
+		r.h = g_window.height - 121;
+		if (tribeTab == CLASSIC)
+			SDL_SetRenderDrawColor(g_window.screen_renderer, 80, 200, 70, 255);
+		if (tribeTab == SHADOW)
+			SDL_SetRenderDrawColor(g_window.screen_renderer, 130, 140, 200, 255);
+		if (tribeTab == EGYPT)
+			SDL_SetRenderDrawColor(g_window.screen_renderer, 250, 230, 120, 255);
+		SDL_RenderFillRect(g_window.screen_renderer, &r);
+		SDL_SetRenderDrawColor(g_window.screen_renderer, 0, 0, 0, 255);
+		SDL_RenderDrawLine(g_window.screen_renderer, r.x, r.y, r.x, r.y + r.h); //left border
+		SDL_RenderDrawLine(g_window.screen_renderer, r.x, r.y + r.h, r.x + r.w, r.y + r.h); //bottom border
+		SDL_RenderDrawLine(g_window.screen_renderer, r.x + r.w, r.y, r.x + r.w, r.y + r.h); // right border
 	}
 
-	int count = 0;
-	for (std::vector<levelData>::const_iterator iter = levels[tribeTab].begin(); iter != levels[tribeTab].end(); ++iter)
+	//levels
 	{
-		const levelData &d = *iter;
+		int yPos = 90;
+		int count = 1;
+		for (std::vector<levelData>::const_iterator iter = levels[tribeTab].begin(); iter != levels[tribeTab].end(); ++iter)
+		{
+			const levelData &d = *iter;
 
-		renderText(d.tex, 100, 100 + count, LEFT);
-		count += 30;
+			renderNumbers(count, 35, yPos);
+			renderText(d.tex, 45, yPos, LEFT);
+
+			yPos += 30;
+			count++;
+		}
+		if (count < 30)
+		{
+			renderNumbers(count, 35, yPos);
+			renderText(addNewLevelTex, 45, yPos, LEFT);
+			renderText(loadLevelTex, 245, yPos, LEFT);
+		}
 	}
 
 	SDL_SetRenderTarget(g_window.screen_renderer, NULL);

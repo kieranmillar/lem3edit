@@ -72,6 +72,8 @@ private:
 	SDL_Texture * classicTabTex = NULL;
 	SDL_Texture * shadowTabTex = NULL;
 	SDL_Texture * egyptTabTex = NULL;
+	SDL_Texture * addNewLevelTex = NULL;
+	SDL_Texture * loadLevelTex = NULL;
 
 	class levelData
 	{
