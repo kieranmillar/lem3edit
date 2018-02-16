@@ -109,7 +109,7 @@ private:
 
 	enum renderAlign { LEFT, CENTRE };
 
-	void renderText(SDL_Texture * tex, const int centreX, const int topY, const renderAlign align);
+	void renderText(SDL_Texture * tex, const int x, const int topY, const renderAlign align);
 	void renderButton(SDL_Texture * tex, const int centreX, const int topY, const bool highlight);
 	void renderNumbers(int num, const int rightX, const int y);
 

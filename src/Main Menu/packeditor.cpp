@@ -38,6 +38,36 @@ This file handles the level pack editor
 
 namespace fs = std::experimental::filesystem::v1;
 
+PackEditor::PackEditor(void)
+{
+	TTF_Font * bigFont = TTF_OpenFont("./gfx/DejaVuSansMono.ttf", 30);
+	classicTabTex = Font::createTextureFromString(bigFont, "CLASSIC");
+	shadowTabTex = Font::createTextureFromString(bigFont, "SHADOW");
+	egyptTabTex = Font::createTextureFromString(bigFont, "EGYPT");
+	TTF_CloseFont(bigFont);
+
+	TTF_Font * smallFont = TTF_OpenFont("./gfx/DejaVuSansMono.ttf", 20);
+	for (int i = 0; i < 10; i++)
+	{
+		char digit[2] = "0";
+		digit[0] += i;
+		numbers[i] = Font::createTextureFromString(smallFont, digit);
+	}
+	TTF_CloseFont(smallFont);
+}
+
+void PackEditor::refreshTitleTexture(void)
+{
+	if (packTitleTex != NULL)
+		SDL_DestroyTexture(packTitleTex);
+	if (packPath.has_filename())
+	{
+		TTF_Font * bigFont = TTF_OpenFont("./gfx/DejaVuSansMono.ttf", 30);
+		packTitleTex = Font::createTextureFromString(bigFont, packPath.stem().generic_string());
+		TTF_CloseFont(bigFont);
+	}
+}
+
 void PackEditor::setReferences(Ini * i, Editor * e)
 {
 	ini_ptr = i;
@@ -107,36 +137,6 @@ void PackEditor::handlePackEditorEvents(SDL_Event event)
 	}
 }
 
-void PackEditor::draw(void)
-{
-	SDL_SetRenderDrawBlendMode(g_window.screen_renderer, SDL_BLENDMODE_BLEND);
-	SDL_SetRenderTarget(g_window.screen_renderer, g_window.screen_texture);
-	SDL_SetRenderDrawColor(g_window.screen_renderer, 240, 240, 240, 255);
-	SDL_RenderClear(g_window.screen_renderer);
-
-	int count = 0;
-	for (std::vector<levelData>::const_iterator iter = levels[tribeTab].begin(); iter != levels[tribeTab].end(); ++iter)
-	{
-		const levelData &d = *iter;
-
-		int texW, texH;
-		SDL_Rect texRect;
-
-		SDL_QueryTexture(d.tex, NULL, NULL, &texW, &texH);
-		texRect.x = 100;
-		texRect.y = 100 + count;
-		texRect.w = texW;
-		texRect.h = texH;
-		SDL_RenderCopy(g_window.screen_renderer, d.tex, NULL, &texRect);
-
-		count += 30;
-	}
-
-	SDL_SetRenderTarget(g_window.screen_renderer, NULL);
-	SDL_RenderCopy(g_window.screen_renderer, g_window.screen_texture, NULL, NULL);
-	SDL_RenderPresent(g_window.screen_renderer);
-}
-
 bool PackEditor::create(void)
 {
 	char const * fileToSaveTo = NULL;
@@ -168,11 +168,8 @@ bool PackEditor::create(void)
 	std::ofstream packFile(packPath);
 	packFile.close();
 
-	for (int i = 0; i < TRIBECOUNT; i++)
-	{
-		levels[i].clear();
-		totalLems[i] = 20;
-	}
+	clearLevels();
+	refreshTitleTexture();
 
 	version = CURRENTPACKFILEVERSION;
 	tribeTab = CLASSIC;
@@ -181,12 +178,6 @@ bool PackEditor::create(void)
 	levels[0].emplace_back(levelData("Blah2", 2));
 	levels[0].emplace_back(levelData("Blah3", 2));
 
-	tinyfd_messageBox(
-		"Hooray!",
-		"Great, that all worked!\n\nTODO: Pack Editor.",
-		"ok",
-		"info",
-		0);
 	g_currentMode = LEVELPACKMODE;
 	ini_ptr->saveLastLoadedPack(packPath);
 	return true;
@@ -194,11 +185,7 @@ bool PackEditor::create(void)
 
 bool PackEditor::load(const fs::path fileName)
 {
-	for (int i = 0; i < TRIBECOUNT; i++)
-	{
-		levels[i].clear();
-		totalLems[i] = 20;
-	}
+	clearLevels();
 
 	if (!fs::exists(fileName))
 	{
@@ -281,14 +268,9 @@ bool PackEditor::load(const fs::path fileName)
 	packFile.close();
 
 	refreshLemCounts();
+	refreshTitleTexture();
 	tribeTab = CLASSIC;
 
-	tinyfd_messageBox(
-		"Hooray!",
-		"Great, that all worked!\n\nTODO: Pack Editor.",
-		"ok",
-		"info",
-		0);
 	g_currentMode = LEVELPACKMODE;
 	ini_ptr->saveLastLoadedPack(packPath);
 	return true;
@@ -358,12 +340,6 @@ PackEditor::levelData::levelData(const std::string s, const int n)
 	refreshTexture();
 }
 
-PackEditor::levelData::~levelData(void)
-{
-	if (tex != NULL)
-		SDL_DestroyTexture(tex);
-}
-
 void PackEditor::levelData::refreshTexture(void)
 {
 	if (tex != NULL)
@@ -371,6 +347,21 @@ void PackEditor::levelData::refreshTexture(void)
 	TTF_Font * smallFont = TTF_OpenFont("./gfx/DejaVuSansMono.ttf", 20);
 	tex = Font::createTextureFromString(smallFont, name);
 	TTF_CloseFont(smallFont);
+}
+
+void PackEditor::clearLevels(void)
+{
+	for (int i = 0; i < TRIBECOUNT; i++)
+	{
+		for (std::vector<levelData>::iterator iter = levels[i].begin(); iter != levels[i].end(); ++iter)
+		{
+			levelData &data = *iter;
+			if (data.tex != NULL)
+				SDL_DestroyTexture(data.tex);
+		}
+		levels[i].clear();
+		totalLems[i] = 20;
+	}
 }
 
 void PackEditor::refreshLemCounts(void)
@@ -385,5 +376,130 @@ void PackEditor::refreshLemCounts(void)
 			count += data.lems;
 		}
 		totalLems[i] = count;
+	}
+}
+
+void PackEditor::draw(void)
+{
+	int centreX = g_window.width / 2;
+	int windowThird = g_window.width / 3;
+	SDL_SetRenderDrawBlendMode(g_window.screen_renderer, SDL_BLENDMODE_BLEND);
+	SDL_SetRenderTarget(g_window.screen_renderer, g_window.screen_texture);
+	SDL_SetRenderDrawColor(g_window.screen_renderer, 240, 240, 240, 255);
+	SDL_RenderClear(g_window.screen_renderer);
+
+	//title and tabs
+	{
+		renderText(packTitleTex, centreX, 4, CENTRE);
+		SDL_Rect r;
+
+		r.x = 4;
+		r.y = 36;
+		r.w = windowThird;
+		r.h = 40;
+		SDL_SetRenderDrawColor(g_window.screen_renderer, 80, 200, 70, 255);
+		SDL_RenderFillRect(g_window.screen_renderer, &r);
+		SDL_SetRenderDrawColor(g_window.screen_renderer, 0, 0, 0, 255);
+		SDL_RenderDrawRect(g_window.screen_renderer, &r);
+		if (tribeTab == CLASSIC)
+		{
+			SDL_SetRenderDrawColor(g_window.screen_renderer, 80, 200, 70, 255);
+			SDL_RenderDrawLine(g_window.screen_renderer, 5, 75, (2 + windowThird), 75);
+		}
+		renderText(classicTabTex, (g_window.width / 6), 40, CENTRE);
+
+		r.x = 3 + windowThird;
+		r.y = 36;
+		r.w = windowThird;
+		r.h = 40;
+		SDL_SetRenderDrawColor(g_window.screen_renderer, 130, 140, 200, 255);
+		SDL_RenderFillRect(g_window.screen_renderer, &r);
+		SDL_SetRenderDrawColor(g_window.screen_renderer, 0, 0, 0, 255);
+		SDL_RenderDrawRect(g_window.screen_renderer, &r);
+		if (tribeTab == SHADOW)
+		{
+			SDL_SetRenderDrawColor(g_window.screen_renderer, 130, 140, 200, 255);
+			SDL_RenderDrawLine(g_window.screen_renderer, 4 + windowThird, 75, (1 + (windowThird * 2)), 75);
+		}
+		renderText(shadowTabTex, centreX, 40, CENTRE);
+
+		r.x = (g_window.width - windowThird - 2);
+		r.y = 36;
+		r.w = windowThird;
+		r.h = 40;
+		SDL_SetRenderDrawColor(g_window.screen_renderer, 250, 230, 120, 255);
+		SDL_RenderFillRect(g_window.screen_renderer, &r);
+		SDL_SetRenderDrawColor(g_window.screen_renderer, 0, 0, 0, 255);
+		SDL_RenderDrawRect(g_window.screen_renderer, &r);
+		if (tribeTab == EGYPT)
+		{
+			SDL_SetRenderDrawColor(g_window.screen_renderer, 250, 230, 120, 255);
+			SDL_RenderDrawLine(g_window.screen_renderer, g_window.width - windowThird - 1, 75, (g_window.width - 4), 75);
+		}
+		renderText(egyptTabTex, (g_window.width / 6) * 5, 40, CENTRE);
+	}
+
+	int count = 0;
+	for (std::vector<levelData>::const_iterator iter = levels[tribeTab].begin(); iter != levels[tribeTab].end(); ++iter)
+	{
+		const levelData &d = *iter;
+
+		renderText(d.tex, 100, 100 + count, LEFT);
+		count += 30;
+	}
+
+	SDL_SetRenderTarget(g_window.screen_renderer, NULL);
+	SDL_RenderCopy(g_window.screen_renderer, g_window.screen_texture, NULL, NULL);
+	SDL_RenderPresent(g_window.screen_renderer);
+}
+
+void PackEditor::renderText(SDL_Texture * tex, const int x, const int topY, renderAlign align)
+{
+	int textW, textH;
+	SDL_Rect textRect;
+
+	SDL_QueryTexture(tex, NULL, NULL, &textW, &textH);
+	if (align == CENTRE)
+		textRect.x = x - (textW / 2);
+	else
+		textRect.x = x;
+	textRect.y = topY;
+	textRect.w = textW;
+	textRect.h = textH;
+	SDL_RenderCopy(g_window.screen_renderer, tex, NULL, &textRect);
+}
+
+void PackEditor::renderNumbers(int num, const int rightX, const int y)
+{
+	int numChars[3];
+	int size = 0;
+	if (num == 0)
+	{
+		size = 1;
+		numChars[0] = 0;
+	}
+	else
+	{
+		while (num != 0)
+		{
+			//load number characters into array in reverse order
+			numChars[size] = num % 10;
+			num /= 10;
+			size++;
+		}
+	}
+
+	int textW, textH, drawX;
+	SDL_Rect textRect;
+	drawX = rightX;
+	for (int i = 0; i < size; i++)
+	{
+		SDL_QueryTexture(numbers[numChars[i]], NULL, NULL, &textW, &textH);
+		drawX -= textW;
+		textRect.x = drawX;
+		textRect.y = y;
+		textRect.w = textW;
+		textRect.h = textH;
+		SDL_RenderCopy(g_window.screen_renderer, numbers[numChars[i]], NULL, &textRect);
 	}
 }

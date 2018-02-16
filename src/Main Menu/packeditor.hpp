@@ -39,6 +39,8 @@ class Editor;
 class PackEditor
 {
 public:
+	PackEditor(void);
+
 	void setReferences(Ini * i, Editor * e);
 
 	void handlePackEditorEvents(SDL_Event event);
@@ -65,11 +67,16 @@ private:
 
 	tribeName tribeTab = CLASSIC;
 
+	SDL_Texture * numbers[10] = { NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL };
+	SDL_Texture * packTitleTex = NULL;
+	SDL_Texture * classicTabTex = NULL;
+	SDL_Texture * shadowTabTex = NULL;
+	SDL_Texture * egyptTabTex = NULL;
+
 	class levelData
 	{
 	public:
 		levelData(std::string s, int n);
-		~levelData(void);
 
 		void refreshTexture(void);
 
@@ -78,12 +85,18 @@ private:
 		SDL_Texture * tex = NULL;
 	};
 
+	void refreshTitleTexture(void);
+
 	std::vector<levelData> levels[TRIBECOUNT];
+	void clearLevels(void);
 
 	int totalLems[TRIBECOUNT] = { 20, 20, 20 };
 	void refreshLemCounts(void);
 
 	void draw(void);
+	enum renderAlign { LEFT, CENTRE };
+	void renderText(SDL_Texture * tex, const int x, const int topY, const renderAlign align);
+	void renderNumbers(int num, const int rightX, const int y);
 };
 
 #endif // PACKEDITOR_HPP
