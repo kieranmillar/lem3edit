@@ -59,6 +59,8 @@ private:
 	Ini * ini_ptr;
 	Editor * editor_ptr;
 
+	bool redraw = false;
+
 	Uint32 lastFrameTick = 0;
 
 	int version = CURRENTPACKFILEVERSION;
@@ -72,6 +74,8 @@ private:
 	SDL_Texture * classicTabTex = NULL;
 	SDL_Texture * shadowTabTex = NULL;
 	SDL_Texture * egyptTabTex = NULL;
+	SDL_Texture * totalLemsTex = NULL;
+	SDL_Texture * quitTex = NULL;
 	SDL_Texture * addNewLevelTex = NULL;
 	SDL_Texture * loadLevelTex = NULL;
 
@@ -97,7 +101,8 @@ private:
 
 	void draw(void);
 	enum renderAlign { LEFT, CENTRE };
-	void renderText(SDL_Texture * tex, const int x, const int topY, const renderAlign align);
+	//Renders text, pass LEFT or CENTRE as alignment, pass 0 for no width restriction
+	void renderText(SDL_Texture * tex, const int x, const int topY, const renderAlign align, const int restrictWidth);
 	void renderNumbers(int num, const int rightX, const int y);
 };
 

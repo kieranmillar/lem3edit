@@ -55,6 +55,8 @@ PackEditor::PackEditor(void)
 	}
 	addNewLevelTex = Font::createTextureFromString(smallFont, "Add New Level");
 	loadLevelTex = Font::createTextureFromString(smallFont, "Load Level");
+	totalLemsTex = Font::createTextureFromString(smallFont, "Total Lemmings:");
+	quitTex = Font::createTextureFromString(smallFont, "Quit");
 	TTF_CloseFont(smallFont);
 }
 
@@ -90,6 +92,7 @@ void PackEditor::handlePackEditorEvents(SDL_Event event)
 		if (e.event == SDL_WINDOWEVENT_RESIZED)
 		{
 			g_window.resize(e.data1, e.data2);
+			redraw = true;
 		}
 		break;
 	}
@@ -104,21 +107,35 @@ void PackEditor::handlePackEditorEvents(SDL_Event event)
 		if (e.button == SDL_BUTTON_LEFT)
 		{
 			int windowThird = g_window.width / 3;
+
 			//swap tabs
-			if (mouse_y_window >= 36 && mouse_y_window <= 76)
+			if (mouse_y_window > 36 && mouse_y_window < 76)
 			{
 				if (mouse_x_window > 4 && mouse_x_window < (4 + windowThird))
 				{
 					tribeTab = CLASSIC;
+					redraw = true;
 				}
 				else if (mouse_x_window > (3 + windowThird) && mouse_x_window < (3 + (windowThird * 2)))
 				{
 					tribeTab = SHADOW;
+					redraw = true;
 				}
 				else if (mouse_x_window > (g_window.width - windowThird - 2) && mouse_x_window < (g_window.width - 4))
 				{
 					tribeTab = EGYPT;
+					redraw = true;
 				}
+			}
+
+			//quit button
+			if (mouse_x_window > 20 &&
+				mouse_x_window < 120 &&
+				mouse_y_window > g_window.height - 30 &&
+				mouse_y_window < g_window.height - 4)
+			{
+				save();
+				g_currentMode = MAINMENUMODE;
 			}
 		}
 		break;
@@ -130,6 +147,7 @@ void PackEditor::handlePackEditorEvents(SDL_Event event)
 		switch (e.keysym.sym)
 		{
 		case SDLK_ESCAPE:
+		case SDLK_q:
 			save();
 			g_currentMode = MAINMENUMODE;
 			break;
@@ -197,6 +215,7 @@ bool PackEditor::create(void)
 	levels[0].emplace_back(levelData("Blah3", 2));
 
 	g_currentMode = LEVELPACKMODE;
+	redraw = true;
 	ini_ptr->saveLastLoadedPack(packPath);
 	return true;
 }
@@ -279,7 +298,7 @@ bool PackEditor::load(const fs::path fileName)
 				return false;
 			}
 			//TODO: Properly load lemming count instead of 0
-			levels[loadingTribe].emplace_back(levelData(value, 0));
+			levels[loadingTribe].emplace_back(levelData(value, 1));
 		}
 	}
 
@@ -290,6 +309,7 @@ bool PackEditor::load(const fs::path fileName)
 	tribeTab = CLASSIC;
 
 	g_currentMode = LEVELPACKMODE;
+	redraw = true;
 	ini_ptr->saveLastLoadedPack(packPath);
 	return true;
 }
@@ -399,6 +419,9 @@ void PackEditor::refreshLemCounts(void)
 
 void PackEditor::draw(void)
 {
+	if (redraw == false)
+		return;
+
 	int centreX = g_window.width / 2;
 	int windowThird = g_window.width / 3;
 	SDL_SetRenderDrawBlendMode(g_window.screen_renderer, SDL_BLENDMODE_BLEND);
@@ -408,7 +431,7 @@ void PackEditor::draw(void)
 
 	//title and tabs
 	{
-		renderText(packTitleTex, centreX, 4, CENTRE);
+		renderText(packTitleTex, centreX, 4, CENTRE, 0);
 		SDL_Rect r;
 
 		r.x = 4;
@@ -424,7 +447,7 @@ void PackEditor::draw(void)
 			SDL_SetRenderDrawColor(g_window.screen_renderer, 80, 200, 70, 255);
 			SDL_RenderDrawLine(g_window.screen_renderer, 5, 75, (2 + windowThird), 75);
 		}
-		renderText(classicTabTex, (g_window.width / 6), 40, CENTRE);
+		renderText(classicTabTex, (g_window.width / 6), 40, CENTRE, 0);
 
 		r.x = 3 + windowThird;
 		r.y = 36;
@@ -439,7 +462,7 @@ void PackEditor::draw(void)
 			SDL_SetRenderDrawColor(g_window.screen_renderer, 130, 140, 200, 255);
 			SDL_RenderDrawLine(g_window.screen_renderer, 4 + windowThird, 75, (1 + (windowThird * 2)), 75);
 		}
-		renderText(shadowTabTex, centreX, 40, CENTRE);
+		renderText(shadowTabTex, centreX, 40, CENTRE, 0);
 
 		r.x = (g_window.width - windowThird - 2);
 		r.y = 36;
@@ -454,12 +477,12 @@ void PackEditor::draw(void)
 			SDL_SetRenderDrawColor(g_window.screen_renderer, 250, 230, 120, 255);
 			SDL_RenderDrawLine(g_window.screen_renderer, g_window.width - windowThird - 1, 75, (g_window.width - 4), 75);
 		}
-		renderText(egyptTabTex, (g_window.width / 6) * 5, 40, CENTRE);
+		renderText(egyptTabTex, (g_window.width / 6) * 5, 40, CENTRE, 0);
 
 		r.x = 4;
 		r.y = 76;
 		r.w = g_window.width - 7;
-		r.h = g_window.height - 121;
+		r.h = g_window.height - 111;
 		if (tribeTab == CLASSIC)
 			SDL_SetRenderDrawColor(g_window.screen_renderer, 80, 200, 70, 255);
 		if (tribeTab == SHADOW)
@@ -481,39 +504,97 @@ void PackEditor::draw(void)
 		{
 			const levelData &d = *iter;
 
+			SDL_Rect r;
+			r.x = 8;
+			r.y = (yPos - 2);
+			r.w = (g_window.width - 300);
+			r.h = 26;
+			SDL_SetRenderDrawColor(g_window.screen_renderer, 230, 230, 230, 255);
+			SDL_RenderFillRect(g_window.screen_renderer, &r);
+			SDL_SetRenderDrawColor(g_window.screen_renderer, 0, 0, 0, 255);
+			SDL_RenderDrawRect(g_window.screen_renderer, &r);
+			SDL_RenderDrawLine(g_window.screen_renderer, g_window.width - 340, r.y, g_window.width - 340, r.y + r.h - 1);
+
 			renderNumbers(count, 35, yPos);
-			renderText(d.tex, 45, yPos, LEFT);
+			renderText(d.tex, 45, yPos, LEFT, g_window.width - 390);
+			renderNumbers(d.lems, g_window.width - 305, yPos);
 
 			yPos += 30;
 			count++;
 		}
 		if (count < 30)
 		{
-			renderNumbers(count, 35, yPos);
-			renderText(addNewLevelTex, 45, yPos, LEFT);
-			renderText(loadLevelTex, 245, yPos, LEFT);
+			SDL_Rect r;
+			r.x = windowThird - 100;
+			r.y = (yPos - 2);
+			r.w = 200;
+			r.h = 26;
+			SDL_SetRenderDrawColor(g_window.screen_renderer, 230, 230, 230, 255);
+			SDL_RenderFillRect(g_window.screen_renderer, &r);
+			SDL_SetRenderDrawColor(g_window.screen_renderer, 0, 0, 0, 255);
+			SDL_RenderDrawRect(g_window.screen_renderer, &r);
+			renderText(addNewLevelTex, windowThird, yPos, CENTRE, 0);
+
+			r.x = (windowThird * 2) - 100;
+			r.y = (yPos - 2);
+			r.w = 200;
+			r.h = 26;
+			SDL_SetRenderDrawColor(g_window.screen_renderer, 230, 230, 230, 255);
+			SDL_RenderFillRect(g_window.screen_renderer, &r);
+			SDL_SetRenderDrawColor(g_window.screen_renderer, 0, 0, 0, 255);
+			SDL_RenderDrawRect(g_window.screen_renderer, &r);
+			renderText(loadLevelTex, windowThird * 2, yPos, CENTRE, 0);
 		}
+	}
+
+	//bottom bar
+	{
+		SDL_Rect r;
+		r.x = 20;
+		r.y = g_window.height - 30;
+		r.w = 100;
+		r.h = 26;
+		SDL_SetRenderDrawColor(g_window.screen_renderer, 0, 0, 0, 255);
+		SDL_RenderDrawRect(g_window.screen_renderer, &r);
+		renderText(quitTex, 70, g_window.height - 30, CENTRE, 0);
+
+		renderText(totalLemsTex, g_window.width - 530, g_window.height - 30, LEFT, 0);
+		renderNumbers(totalLems[tribeTab], g_window.width - 305, g_window.height - 30);
 	}
 
 	SDL_SetRenderTarget(g_window.screen_renderer, NULL);
 	SDL_RenderCopy(g_window.screen_renderer, g_window.screen_texture, NULL, NULL);
 	SDL_RenderPresent(g_window.screen_renderer);
+
+	redraw = false;
 }
 
-void PackEditor::renderText(SDL_Texture * tex, const int x, const int topY, renderAlign align)
+void PackEditor::renderText(SDL_Texture * tex, const int x, const int topY, renderAlign align, const int restrictWidth)
 {
 	int textW, textH;
-	SDL_Rect textRect;
-
+	SDL_Rect sourceRect;
+	SDL_Rect destinationRect;
 	SDL_QueryTexture(tex, NULL, NULL, &textW, &textH);
+
+	sourceRect.x = 0;
+	sourceRect.y = 0;
+	sourceRect.w = textW;
+	sourceRect.h = textH;
+
 	if (align == CENTRE)
-		textRect.x = x - (textW / 2);
+		destinationRect.x = x - (textW / 2);
 	else
-		textRect.x = x;
-	textRect.y = topY;
-	textRect.w = textW;
-	textRect.h = textH;
-	SDL_RenderCopy(g_window.screen_renderer, tex, NULL, &textRect);
+		destinationRect.x = x;
+	destinationRect.y = topY;
+	destinationRect.w = textW;
+	destinationRect.h = textH;
+
+	if (restrictWidth > 0)
+	{
+		if (textW > restrictWidth)
+			sourceRect.w = destinationRect.w = restrictWidth;
+	}
+	SDL_RenderCopy(g_window.screen_renderer, tex, &sourceRect, &destinationRect);
 }
 
 void PackEditor::renderNumbers(int num, const int rightX, const int y)
