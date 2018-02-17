@@ -305,7 +305,7 @@ bool PackEditor::load(const fs::path fileName)
 			if (!levelExists(id))
 			{
 				packFile.close();
-				SDL_Log("load: Invalid pack file entry - Level does not have consistent file IDs");
+				SDL_Log("load: Invalid pack file entry - Not all parts of level %d could be found!", id);
 				//TODO: handle level fies not matching id
 
 				return false;
@@ -526,6 +526,12 @@ void PackEditor::loadLevel(const int n, const tribeName t)
 	fs::path savingTempPath = l3_filename_level(savingParentPath, "TEMP", level_id, "OBS");
 	fs::path savingPermPath = l3_filename_level(savingParentPath, "PERM", level_id, "OBS");
 
+	if (levelExists(level_id))
+	{
+		SDL_Log("loadLevel: Trying to create level where files already exist!");
+		return;
+	}
+
 	if (fs::equivalent(loadingDatPath, savingDatPath) ||
 		fs::equivalent(loadingTempPath, savingTempPath) ||
 		fs::equivalent(loadingPermPath, savingPermPath))
@@ -534,9 +540,13 @@ void PackEditor::loadLevel(const int n, const tribeName t)
 		return;
 	}
 
-	fs::copy(loadingDatPath, savingDatPath);
-	fs::copy(loadingTempPath, savingTempPath);
-	fs::copy(loadingPermPath, savingPermPath);
+	if (fs::copy_file(loadingDatPath, savingDatPath) == false ||
+		fs::copy_file(loadingTempPath, savingTempPath) == false ||
+		fs::copy_file(loadingPermPath, savingPermPath) == false)
+	{
+		tinyfd_messageBox("Oh No!", "Lem3edit could not copy the level for some reason!\n\nLevel copying aborted.", "ok", "error", 1);
+		return;
+	}
 
 	if (!Mainmenu::updateOBSValues(savingDatPath, level_id))
 	{

@@ -173,7 +173,7 @@ void Mainmenu::handleMainMenuEvents(SDL_Event event)
 			if (mouse_y_window > 360
 				&& mouse_y_window < 400)
 			{
-				//highlighting = LOADPACK;
+				highlighting = LOADPACK;
 			}
 			if (mouse_y_window > 410
 				&& mouse_y_window < 450)
@@ -239,8 +239,18 @@ void Mainmenu::handleMainMenuEvents(SDL_Event event)
 					break;
 
 				case LOADPACK:
-					//todo
-					break;
+				{
+					char const * fileToOpen = NULL;
+					char const * filterPatterns[1] = { "*.l3pack" };
+					fileToOpen = tinyfd_openFileDialog("Open level pack", NULL, 1, filterPatterns, "Lem3Edit Level Pack (*.l3pack)", 0);
+					if (!fileToOpen)
+						break;
+					if (packEditor.load(fileToOpen))
+					{
+						highlighting = NONE;
+					}
+				}
+				break;
 
 				case PREVIOUSPACK:
 					if (fs::exists(ini_ptr->lastLoadedPack))
@@ -473,7 +483,6 @@ void Mainmenu::draw(void)
 	//draw strikes through all unimplemented features
 	{
 		SDL_SetRenderDrawColor(g_window.screen_renderer, 0, 0, 0, 255);
-		SDL_RenderDrawLine(g_window.screen_renderer, centreX - 300, 380, centreX + 300, 380);//load pack
 		SDL_RenderDrawLine(g_window.screen_renderer, centreX - 300, 500, centreX + 300, 500);//options
 	}
 
@@ -730,16 +739,10 @@ bool Mainmenu::confirmOverwrite(fs::path filePath, int id)
 	fs::path levelPath = filePath;
 	bool levelOverwrite = fs::exists(levelPath);
 
-	fs::path tempPath = filePath.parent_path();
-	tempPath /= "TEMP";
-	tempPath += l3_filename_number(id);
-	tempPath += ".OBS";
+	fs::path tempPath = l3_filename_level(filePath.parent_path(), "TEMP", id, "OBS");
 	bool tempOverwrite = fs::exists(tempPath);
 
-	fs::path permPath = filePath.parent_path();
-	permPath /= "PERM";
-	permPath += l3_filename_number(id);
-	permPath += ".OBS";
+	fs::path permPath = l3_filename_level(filePath.parent_path(), "PERM", id, "OBS");
 	bool permOverwrite = fs::exists(permPath);
 
 	if (levelOverwrite || tempOverwrite || permOverwrite)
@@ -793,7 +796,10 @@ void Mainmenu::newLevel(void)
 {
 	char const * fileToSaveTo = NULL;
 	char const * filterPatterns[1] = { "*.DAT" };
-	fileToSaveTo = tinyfd_saveFileDialog("Save New Level", NULL, 1, filterPatterns, "Lemmings 3 Level File (*.DAT)");
+	fs::path defaultPath = l3_filename_level(".", "LEVEL", level_id, "DAT");
+	std::string temporary = defaultPath.generic_string();
+	char const * defaultPath_c = temporary.c_str();
+	fileToSaveTo = tinyfd_saveFileDialog("Save New Level", defaultPath_c, 1, filterPatterns, "Lemmings 3 Level File (*.DAT)");
 
 	if (!fileToSaveTo)
 		return;
@@ -805,11 +811,7 @@ void Mainmenu::newLevel(void)
 		return;
 
 	//create blank TEMP###.OBS file
-	fs::path tempPath = destinationPath.parent_path();
-	tempPath /= "TEMP";
-	tempPath += l3_filename_number(level_id);
-	tempPath += ".OBS";
-
+	fs::path tempPath = l3_filename_level(destinationPath.parent_path(), "TEMP", level_id, "OBS");
 	{
 		std::ofstream f(tempPath, std::ios_base::binary | std::ios_base::in | std::ios_base::trunc);
 		if (!f)
@@ -821,11 +823,7 @@ void Mainmenu::newLevel(void)
 	}
 
 	//create blank PERM###.OBS file
-	fs::path permPath = destinationPath.parent_path();
-	permPath /= "PERM";
-	permPath += l3_filename_number(level_id);
-	permPath += ".OBS";
-
+	fs::path permPath = l3_filename_level(destinationPath.parent_path(), "PERM", level_id, "OBS");
 	{
 		std::ofstream f(permPath, std::ios_base::binary | std::ios_base::in | std::ios_base::trunc);
 		if (!f)
@@ -887,10 +885,7 @@ void Mainmenu::copyLevel(void)
 {
 	char const * fileToCopyTo = NULL;
 	char const * filterPatterns[1] = { "*.DAT" };
-	fs::path defaultPath = filePath.parent_path();
-	defaultPath /= "LEVEL";
-	defaultPath += l3_filename_number(level_id);
-	defaultPath += ".DAT";
+	fs::path defaultPath = l3_filename_level(filePath.parent_path(), "LEVEL", level_id, "DAT");
 	std::string temporary = defaultPath.generic_string();
 	char const * defaultPath_c = temporary.c_str();
 	fileToCopyTo = tinyfd_saveFileDialog("Save New Copy", defaultPath_c, 1, filterPatterns, "Lemmings 3 Level File (*.DAT)");
@@ -928,26 +923,14 @@ void Mainmenu::copyLevel(void)
 	if (!selectedCopy)
 		fs::remove(fromPath);
 
-	fromPath = sourcePath;
-	fromPath /= "TEMP";
-	fromPath += l3_filename_number(fileOBS.temp);
-	fromPath += ".OBS";
-	toPath = destinationPath.parent_path();
-	toPath /= "TEMP";
-	toPath += l3_filename_number(level_id);
-	toPath += ".OBS";
+	fromPath = l3_filename_level(sourcePath, "TEMP", fileOBS.temp, "OBS");
+	toPath = l3_filename_level(destinationPath.parent_path(), "TEMP", level_id, "OBS");
 	fs::copy(fromPath, toPath);
 	if (!selectedCopy)
 		fs::remove(fromPath);
 
-	fromPath = sourcePath;
-	fromPath /= "PERM";
-	fromPath += l3_filename_number(fileOBS.perm);
-	fromPath += ".OBS";
-	toPath = destinationPath.parent_path();
-	toPath /= "PERM";
-	toPath += l3_filename_number(level_id);
-	toPath += ".OBS";
+	fromPath = l3_filename_level(sourcePath, "PERM", fileOBS.perm, "OBS");
+	toPath = l3_filename_level(destinationPath.parent_path(), "PERM", level_id, "OBS");
 	fs::copy(fromPath, toPath);
 	if (!selectedCopy)
 		fs::remove(fromPath);
@@ -995,17 +978,13 @@ void Mainmenu::deleteLevel(void)
 	if (!fs::remove(filePath))
 		success = false;
 
-	fs::path tempPath = filePath.parent_path();
-	tempPath /= "TEMP";
-	tempPath += l3_filename_number(fileOBS.temp);
-	tempPath += ".OBS";
+	fs::path parentPath = filePath.parent_path();
+	fs::path tempPath = l3_filename_level(parentPath, "TEMP", fileOBS.temp, "OBS");
+
 	if (!fs::remove(tempPath))
 		success = false;
 
-	fs::path permPath = filePath.parent_path();
-	permPath /= "PERM";
-	permPath += l3_filename_number(fileOBS.perm);
-	permPath += ".OBS";
+	fs::path permPath = l3_filename_level(parentPath, "PERM", fileOBS.perm, "OBS");
 	if (!fs::remove(permPath))
 		success = false;
 
