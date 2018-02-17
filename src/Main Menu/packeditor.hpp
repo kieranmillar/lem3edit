@@ -85,8 +85,8 @@ private:
 		SDL_Texture * tex = NULL;
 	};
 
-	void createLevel(const int n);
-	//void loadLevel(const int n, const tribeName tribe);
+	void createLevel(const int n, const tribeName t);
+	void loadLevel(const int n, const tribeName t);
 	//void editLevel(const int n, const tribeName tribe);
 
 	bool levelExists(const int id);//returns if level files exist and all match expected id
@@ -96,6 +96,7 @@ private:
 	void clearLevels(void);
 
 	int totalLems[TRIBECOUNT] = { 20, 20, 20 };
+	int loadLemsFromFile(const int n, const tribeName t);
 	void refreshLemCounts(void);
 
 	void draw(void);

@@ -1032,7 +1032,7 @@ Mainmenu::OBSValues Mainmenu::loadOBSValues(fs::path DATfilepath)
 	std::ifstream f(DATfilepath, std::ios::binary);
 	if (!f)
 	{
-		SDL_Log("Failed to open '%s'\n", DATfilepath.generic_string().c_str());
+		SDL_Log("loadOBSValues: Failed to open '%s'\n", DATfilepath.generic_string().c_str());
 		return { 1000 , 1000 };
 	}
 
@@ -1049,20 +1049,30 @@ Mainmenu::OBSValues Mainmenu::loadOBSValues(fs::path DATfilepath)
 
 bool Mainmenu::updateOBSValues(fs::path DATfilepath, const int id)
 {
-	std::fstream f(DATfilepath, std::ios_base::binary | std::ios_base::out | std::ios_base::in);
+	std::fstream f(DATfilepath, std::ios_base::binary | std::ios_base::in | std::ios_base::out);
 	if (!f)
 	{
-		SDL_Log("Failed to open '%s'\n", DATfilepath.generic_string().c_str());
+		SDL_Log("updateOBSValues: Failed to open '%s'\n", DATfilepath.generic_string().c_str());
 		return false;
 	}
 
-	Uint16 temp = id;
-	Uint16 perm = id;
+	Uint16 fileStats[15];
 
-	f.seekp(6);
-	f.write((char *)&temp, sizeof(temp));
-	f.write((char *)&perm, sizeof(perm));
+	for (int i = 0; i < 15; i++)
+	{
+		f.read((char *)&fileStats[i], sizeof(fileStats[i]));
+	}
+
+	fileStats[3] = fileStats[4] = id;
+
+	f.clear();
+	f.seekg(0, std::ios::beg);
+
+	for (int i = 0; i < 15; i++)
+	{
+		f.write((char *)&fileStats[i], sizeof(fileStats[i]));
+	}
+
 	f.close();
-
 	return true;
 }

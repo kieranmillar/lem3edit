@@ -133,7 +133,14 @@ void PackEditor::handlePackEditorEvents(SDL_Event event)
 				//add new level button
 				if (mouse_x_window > (windowThird - 100) && mouse_x_window < (windowThird + 100))
 				{
-					createLevel((levels[tribeTab].size() + 1) + (tribeTab * 100));
+					createLevel(levels[tribeTab].size() + 1, tribeTab);
+					redraw = true;
+				}
+
+				//load level button
+				if (mouse_x_window > ((windowThird * 2) - 100) && mouse_x_window < ((windowThird * 2) + 100))
+				{
+					loadLevel(levels[tribeTab].size() + 1, tribeTab);
 					redraw = true;
 				}
 			}
@@ -220,10 +227,6 @@ bool PackEditor::create(void)
 	version = CURRENTPACKFILEVERSION;
 	tribeTab = CLASSIC;
 
-	levels[0].emplace_back(levelData("Blah1", 2));
-	levels[0].emplace_back(levelData("Blah2", 2));
-	levels[0].emplace_back(levelData("Blah3", 2));
-
 	g_currentMode = LEVELPACKMODE;
 	redraw = true;
 	ini_ptr->saveLastLoadedPack(packPath);
@@ -236,7 +239,7 @@ bool PackEditor::load(const fs::path fileName)
 
 	if (!fs::exists(fileName))
 	{
-		SDL_Log("Couldn't find level pack %s\n.", fileName.generic_string().c_str());
+		SDL_Log("load: Couldn't find level pack %s\n.", fileName.generic_string().c_str());
 		return false;
 	}
 
@@ -246,7 +249,7 @@ bool PackEditor::load(const fs::path fileName)
 
 	if (!packFile.is_open())
 	{
-		SDL_Log("Couldn't open level pack %s\n.", fileName.generic_string().c_str());
+		SDL_Log("load: Couldn't open level pack %s\n.", fileName.generic_string().c_str());
 		return false;
 	}
 	std::string line;
@@ -282,7 +285,7 @@ bool PackEditor::load(const fs::path fileName)
 			else
 			{
 				packFile.close();
-				SDL_Log("Invalid pack file entry - Invalid id");
+				SDL_Log("load: Invalid pack file entry - Invalid id");
 				//TODO: handle invalid pack file entry
 				return false;
 			}
@@ -294,7 +297,7 @@ bool PackEditor::load(const fs::path fileName)
 			if (id != count)
 			{
 				packFile.close();
-				SDL_Log("Invalid pack file entry - Level id out of order");
+				SDL_Log("load: Invalid pack file entry - Level id out of order");
 				//TODO: handle invalid pack file entry
 				return false;
 			}
@@ -302,13 +305,14 @@ bool PackEditor::load(const fs::path fileName)
 			if (!levelExists(id))
 			{
 				packFile.close();
-				SDL_Log("Invalid pack file entry - Level does not have consistent file IDs");
+				SDL_Log("load: Invalid pack file entry - Level does not have consistent file IDs");
 				//TODO: handle level fies not matching id
 
 				return false;
 			}
-			//TODO: Properly load lemming count instead of 0
-			levels[loadingTribe].emplace_back(levelData(value, 1));
+
+			int lems = loadLemsFromFile(id % 100, loadingTribe);
+			levels[loadingTribe].emplace_back(levelData(value, lems));
 		}
 	}
 
@@ -329,7 +333,7 @@ bool PackEditor::save(void)
 	std::ofstream packFile(packPath, std::ios::in | std::ios::trunc);
 	if (!packFile.is_open())
 	{
-		SDL_Log("Failed to save pack file  %s\n.", packPath.generic_string().c_str());
+		SDL_Log("save: Failed to save pack file  %s\n.", packPath.generic_string().c_str());
 		return false;
 	}
 
@@ -351,14 +355,25 @@ bool PackEditor::save(void)
 	return true;
 }
 
-void PackEditor::createLevel(const int n)
+void PackEditor::createLevel(const int n, const tribeName t)
 {
-	fs::path parentPath = packPath.parent_path();
+	if (n % 100 < 1 || n > 30 % 100)
+	{
+		SDL_Log("createLevel: Invalid level id for making a level via pack editor");
+		return;
+	}
+
+	int level_id = n + (t * 100);
+
+	if (levelExists(level_id))
+	{
+		SDL_Log("createLevel: Trying to create level where files already exist!");
+		return;
+	}
+
 	//create blank LEVEL###.DAT file
-	fs::path datPath = parentPath;
-	datPath /= "LEVEL";
-	datPath += l3_filename_number(n);
-	datPath += ".DAT";
+	fs::path parentPath = packPath.parent_path();
+	fs::path datPath = l3_filename_level(parentPath, "LEVEL", level_id, "DAT");
 
 	Uint16 tribe;
 	Uint16 cave_map, cave_raw;
@@ -372,31 +387,26 @@ void PackEditor::createLevel(const int n)
 	Uint16 release_rate, release_delay;
 	Uint16 enemies;
 
-	if (n >= 1 && n <= 30) //CLASSIC
+	switch (t)
 	{
+	case CLASSIC:
 		tribe = 4;
 		style = 1;
-	}
-	else if (n >= 101 && n <= 130) //SHADOW
-	{
+		break;
+	case SHADOW:
 		tribe = 10;
 		style = 2;
-	}
-	else if (n >= 201 && n <= 230) //EGYPT
-	{
+		break;
+	case EGYPT:
 		tribe = 5;
 		style = 3;
-	}
-	else
-	{
-		SDL_Log("Invalid level id for making a level via pack editor");
-		return;
+		break;
 	}
 
 	cave_map = 0;
 	cave_raw = 0;
-	temp = n;
-	perm = n;
+	temp = level_id;
+	perm = level_id;
 	width = 320;
 	height = 160;
 	cameraX = 0;
@@ -411,7 +421,7 @@ void PackEditor::createLevel(const int n)
 	std::ofstream f(datPath, std::ios::binary | std::ios::trunc);
 	if (!f)
 	{
-		SDL_Log("Failed to open '%s'\n", datPath.generic_string().c_str());
+		SDL_Log("createLevel: Failed to open '%s'\n", datPath.generic_string().c_str());
 		return;
 	}
 
@@ -434,33 +444,26 @@ void PackEditor::createLevel(const int n)
 
 	f.close();
 
-	//create blank TEMP###.OBS file
-	fs::path tempPath = parentPath;
-	tempPath /= "TEMP";
-	tempPath += l3_filename_number(n);
-	tempPath += ".OBS";
+	//create blank OBS files
+	fs::path tempPath = l3_filename_level(parentPath, "TEMP", level_id, "OBS");
 
 	{
 		std::ofstream f(tempPath, std::ios_base::binary | std::ios_base::in | std::ios_base::trunc);
 		if (!f)
 		{
-			SDL_Log("Failed to open '%s'\n", tempPath.generic_string().c_str());
+			SDL_Log("createLevel: Failed to open '%s'\n", tempPath.generic_string().c_str());
 			return;
 		}
 		f.close();
 	}
 
-	//create blank PERM###.OBS file
-	fs::path permPath = parentPath;
-	permPath /= "PERM";
-	permPath += l3_filename_number(n);
-	permPath += ".OBS";
+	fs::path permPath = l3_filename_level(parentPath, "PERM", level_id, "OBS");
 
 	{
 		std::ofstream f(permPath, std::ios_base::binary | std::ios_base::in | std::ios_base::trunc);
 		if (!f)
 		{
-			SDL_Log("Failed to open '%s'\n", permPath.generic_string().c_str());
+			SDL_Log("createLevel: Failed to open '%s'\n", permPath.generic_string().c_str());
 			return;
 		}
 		f.close();
@@ -468,34 +471,99 @@ void PackEditor::createLevel(const int n)
 
 	std::string name;
 	name = "New Level ";
-	name += std::to_string(n);
-	levels[(n / 100)].emplace_back(levelData(name, 0));
+	name += std::to_string(level_id);
+	levels[t].emplace_back(levelData(name, 0));
+	refreshLemCounts();
+}
+
+void PackEditor::loadLevel(const int n, const tribeName t)
+{
+	if (n % 100 < 1 || n > 30 % 100)
+	{
+		SDL_Log("loadLevel: Invalid level id for loading a level via pack editor");
+		return;
+	}
+
+	int level_id = n + (t * 100);
+
+	char const * fileToOpen = NULL;
+	char const * filterPatterns[1] = { "*.DAT" };
+	fileToOpen = tinyfd_openFileDialog("Open level", NULL, 1, filterPatterns, "Lemmings 3 Level File (*.DAT)", 0);
+	if (!fileToOpen)
+		return;
+
+	fs::path loadingDatPath = fileToOpen;
+
+	{
+		std::ifstream f(loadingDatPath, std::ios::binary);
+		if (!f)
+		{
+			SDL_Log("loadLevel: Failed to open '%s'\n", loadingDatPath.generic_string().c_str());
+			return;
+		}
+
+		Uint16 tribe;
+
+		f.read((char *)&tribe, sizeof(tribe));
+		f.close();
+
+		if (!((t == CLASSIC && tribe == 4) ||
+			(t == SHADOW && tribe == 10) ||
+			(t == EGYPT && tribe == 5)))
+		{
+			tinyfd_messageBox("Oh No!", "The level you're trying to load is the wrong tribe!", "ok", "error", 1);
+			return;
+		}
+	}
+
+	fs::path loadingParentPath = loadingDatPath.parent_path();
+	Mainmenu::OBSValues levelOBS = Mainmenu::loadOBSValues(loadingDatPath);
+	fs::path loadingTempPath = l3_filename_level(loadingParentPath, "TEMP", levelOBS.temp, "OBS");
+	fs::path loadingPermPath = l3_filename_level(loadingParentPath, "PERM", levelOBS.perm, "OBS");
+
+	fs::path savingParentPath = packPath.parent_path();
+	fs::path savingDatPath = l3_filename_level(savingParentPath, "LEVEL", level_id, "DAT");
+	fs::path savingTempPath = l3_filename_level(savingParentPath, "TEMP", level_id, "OBS");
+	fs::path savingPermPath = l3_filename_level(savingParentPath, "PERM", level_id, "OBS");
+
+	if (fs::equivalent(loadingDatPath, savingDatPath) ||
+		fs::equivalent(loadingTempPath, savingTempPath) ||
+		fs::equivalent(loadingPermPath, savingPermPath))
+	{
+		tinyfd_messageBox("Oh No!", "One or more of the files are trying to copy over itself!\n\nPlease don't try to load levels stored within your level pack folder.", "ok", "error", 1);
+		return;
+	}
+
+	fs::copy(loadingDatPath, savingDatPath);
+	fs::copy(loadingTempPath, savingTempPath);
+	fs::copy(loadingPermPath, savingPermPath);
+
+	if (!Mainmenu::updateOBSValues(savingDatPath, level_id))
+	{
+		tinyfd_messageBox("Oh No!", "Lem3edit could not update the temp and perm file references in the new level file for some reason!\n\nLevel copying aborted.", "ok", "error", 1);
+		return;
+	}
+
+	int lems;
+	lems = loadLemsFromFile(n, t);
+
+	std::string name;
+	name = "Loaded Level ";
+	name += std::to_string(level_id);
+	levels[t].emplace_back(levelData(name, lems));
+	refreshLemCounts();
 }
 
 bool PackEditor::levelExists(const int id)
 {
-	fs::path levelPath = packPath.parent_path();
-	levelPath /= "LEVEL";
-	levelPath += l3_filename_number(id);
-	levelPath += ".DAT";
-	bool datExists = fs::exists(levelPath);
+	fs::path parentPath = packPath.parent_path();
+	fs::path datPath = l3_filename_level(parentPath, "LEVEL", id, "DAT");
+	bool datExists = fs::exists(datPath);
 
-	Mainmenu::OBSValues levelOBS = Mainmenu::loadOBSValues(levelPath);
-	if (levelOBS.temp != id || levelOBS.perm != id)
-	{
-		return false;
-	}
-
-	fs::path tempPath = packPath.parent_path();
-	tempPath /= "TEMP";
-	tempPath += l3_filename_number(id);
-	tempPath += ".OBS";
+	fs::path tempPath = l3_filename_level(parentPath, "TEMP", id, "OBS");
 	bool tempExists = fs::exists(tempPath);
 
-	fs::path permPath = packPath.parent_path();
-	permPath /= "PERM";
-	permPath += l3_filename_number(id);
-	permPath += ".OBS";
+	fs::path permPath = l3_filename_level(parentPath, "PERM", id, "OBS");
 	bool permExists = fs::exists(permPath);
 
 	return datExists && tempExists && permExists;
@@ -531,6 +599,32 @@ void PackEditor::clearLevels(void)
 		levels[i].clear();
 		totalLems[i] = 20;
 	}
+}
+
+int PackEditor::loadLemsFromFile(const int n, const tribeName t)
+{
+	int level_id = n + (t * 100);
+	fs::path loadPath = l3_filename_level(packPath.parent_path(), "LEVEL", level_id, "DAT");
+	if (!fs::exists(loadPath))
+	{
+		SDL_Log("loadLemsFromFile: Tried to load lemming count but level %d doesn't exist!\n", level_id);
+		return -1;
+	}
+
+	std::ifstream f(loadPath, std::ios::binary | std::ios::in);
+	if (!f)
+	{
+		SDL_Log("loadLemsFromFile: Failed to open '%s'\n", loadPath.generic_string().c_str());
+		return -1;
+	}
+
+	Uint8 lems;
+
+	f.seekg(0x16);
+	f.read((char *)&lems, sizeof(lems));
+	f.close();
+
+	return lems;
 }
 
 void PackEditor::refreshLemCounts(void)
