@@ -40,24 +40,45 @@ namespace fs = std::experimental::filesystem::v1;
 
 PackEditor::PackEditor(void)
 {
-	TTF_Font * bigFont = TTF_OpenFont("./gfx/DejaVuSansMono.ttf", 30);
-	classicTabTex = Font::createTextureFromString(bigFont, "CLASSIC");
-	shadowTabTex = Font::createTextureFromString(bigFont, "SHADOW");
-	egyptTabTex = Font::createTextureFromString(bigFont, "EGYPT");
-	TTF_CloseFont(bigFont);
-
-	TTF_Font * smallFont = TTF_OpenFont("./gfx/DejaVuSansMono.ttf", 20);
-	for (int i = 0; i < 10; i++)
+	//load font graphics
 	{
-		char digit[2] = "0";
-		digit[0] += i;
-		numbers[i] = Font::createTextureFromString(smallFont, digit);
+		TTF_Font * bigFont = TTF_OpenFont("./gfx/DejaVuSansMono.ttf", 30);
+		classicTabTex = Font::createTextureFromString(bigFont, "CLASSIC");
+		shadowTabTex = Font::createTextureFromString(bigFont, "SHADOW");
+		egyptTabTex = Font::createTextureFromString(bigFont, "EGYPT");
+		TTF_CloseFont(bigFont);
+
+		TTF_Font * smallFont = TTF_OpenFont("./gfx/DejaVuSansMono.ttf", 20);
+		for (int i = 0; i < 10; i++)
+		{
+			char digit[2] = "0";
+			digit[0] += i;
+			numbers[i] = Font::createTextureFromString(smallFont, digit);
+		}
+		addNewLevelTex = Font::createTextureFromString(smallFont, "Add New Level");
+		loadLevelTex = Font::createTextureFromString(smallFont, "Load Level");
+		totalLemsTex = Font::createTextureFromString(smallFont, "Total Lemmings:");
+		quitTex = Font::createTextureFromString(smallFont, "Quit");
+		TTF_CloseFont(smallFont);
 	}
-	addNewLevelTex = Font::createTextureFromString(smallFont, "Add New Level");
-	loadLevelTex = Font::createTextureFromString(smallFont, "Load Level");
-	totalLemsTex = Font::createTextureFromString(smallFont, "Total Lemmings:");
-	quitTex = Font::createTextureFromString(smallFont, "Quit");
-	TTF_CloseFont(smallFont);
+
+	//load button graphics
+	{
+		SDL_SetRenderDrawColor(g_window.screen_renderer, 255, 255, 255, 255);
+		SDL_Surface* graphic = NULL;
+		//first load the botton's up graphic
+		graphic = SDL_LoadBMP("./gfx/pack_rename.bmp");
+		if (graphic == NULL)
+		{
+			SDL_Log("Unable to load rename button image! SDL Error: %s\n", SDL_GetError());
+		}
+		SDL_ConvertSurfaceFormat(graphic, SDL_PIXELFORMAT_RGBA8888, 0);
+
+		renameButtonTex = SDL_CreateTextureFromSurface(g_window.screen_renderer, graphic);
+
+		SDL_FreeSurface(graphic);
+		graphic = NULL;
+	}
 }
 
 void PackEditor::refreshTitleTexture(void)
@@ -125,6 +146,33 @@ void PackEditor::handlePackEditorEvents(SDL_Event event)
 				{
 					tribeTab = EGYPT;
 					redraw = true;
+				}
+			}
+
+			for (int i = 0; i < levels[tribeTab].size(); i++)
+			{
+				//level entry line
+				if (mouse_y_window > 88 + (i * 30) && mouse_y_window < 114 + (i * 30))
+				{
+					//rename button
+					if (mouse_x_window > g_window.width - 290 && mouse_x_window < g_window.width - 264)
+					{
+						char const * getRename = tinyfd_inputBox(
+							"Rename Level",
+							"Choose a new name for the level.",
+							levels[tribeTab][i].name.c_str());
+						if (getRename != NULL)
+						{
+							std::string s = getRename;
+							if (!s.empty() && s[s.length() - 1] == '\n') {
+								s.erase(s.length() - 1);
+							}
+							levels[tribeTab][i].name = s;
+							levels[tribeTab][i].refreshTexture();
+							save();
+							redraw = true;
+						}
+					}
 				}
 			}
 
@@ -744,7 +792,7 @@ void PackEditor::draw(void)
 			SDL_Rect r;
 			r.x = 8;
 			r.y = (yPos - 2);
-			r.w = (g_window.width - 300);
+			r.w = (g_window.width - 305);
 			r.h = 26;
 			SDL_SetRenderDrawColor(g_window.screen_renderer, 230, 230, 230, 255);
 			SDL_RenderFillRect(g_window.screen_renderer, &r);
@@ -755,6 +803,12 @@ void PackEditor::draw(void)
 			renderNumbers(count, 35, yPos);
 			renderText(d.tex, 45, yPos, LEFT, g_window.width - 390);
 			renderNumbers(d.lems, g_window.width - 305, yPos);
+
+			r.x = g_window.width - 290;
+			r.y = yPos - 2;
+			r.w = 26;
+			r.h = 26;
+			SDL_RenderCopy(g_window.screen_renderer, renameButtonTex, NULL, &r);
 
 			yPos += 30;
 			count++;
