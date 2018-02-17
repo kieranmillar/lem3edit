@@ -203,13 +203,15 @@ void PackEditor::handlePackEditorEvents(SDL_Event event)
 						//moveUp button
 						if (mouse_x_window > g_window.width - 197 && mouse_x_window < g_window.width - 171)
 						{
-							//todo
+							int id = i + 1 + scroll[tribeTab];
+							swapLevelPosition(id, id - 1, tribeTab);
 						}
 
 						//moveDown button
 						if (mouse_x_window > g_window.width - 167 && mouse_x_window < g_window.width - 141)
 						{
-							//todo
+							int id = i + 1 + scroll[tribeTab];
+							swapLevelPosition(id, id + 1, tribeTab);
 						}
 
 						//edit button
@@ -1141,4 +1143,57 @@ void PackEditor::renderNumbers(int num, const int rightX, const int y)
 		textRect.h = textH;
 		SDL_RenderCopy(g_window.screen_renderer, numbers[numChars[i]], NULL, &textRect);
 	}
+}
+
+void PackEditor::swapLevelPosition(int idFrom, int idTo, tribeName tribe)
+{
+	if (idFrom <= 0 || idTo <= 0 ||
+		idFrom > levels[tribe].size() || idTo > levels[tribe].size() ||
+		idFrom == idTo)
+		return;
+
+	int fullIdFrom = idFrom + (tribe * 100);
+	int fullIdTo = idTo + (tribe * 100);
+
+	fs::path temporaryPath = packPath.parent_path();
+	temporaryPath /= "temporary.temp";
+
+	fs::path fromDatPath = l3_filename_level(packPath.parent_path(), "LEVEL", fullIdFrom, "DAT");
+	fs::path toDatPath = l3_filename_level(packPath.parent_path(), "LEVEL", fullIdTo, "DAT");
+	fs::path fromTempPath = l3_filename_level(packPath.parent_path(), "TEMP", fullIdFrom, "OBS");
+	fs::path toTempPath = l3_filename_level(packPath.parent_path(), "TEMP", fullIdTo, "OBS");
+	fs::path fromPermPath = l3_filename_level(packPath.parent_path(), "PERM", fullIdFrom, "OBS");
+	fs::path toPermPath = l3_filename_level(packPath.parent_path(), "PERM", fullIdTo, "OBS");
+
+	if (!fs::exists(fromDatPath) || !fs::exists(toDatPath) ||
+		!fs::exists(fromTempPath) || !fs::exists(toTempPath) ||
+		!fs::exists(fromPermPath) || !fs::exists(toPermPath))
+	{
+		SDL_Log("PackEditor::swapLevelPosition: One or more files missing!");
+		return;
+	}
+
+	Mainmenu::updateOBSValues(fromDatPath, fullIdTo);
+	Mainmenu::updateOBSValues(toDatPath, fullIdFrom);
+	fs::rename(fromDatPath, temporaryPath);
+	fs::rename(toDatPath, fromDatPath);
+	fs::rename(temporaryPath, toDatPath);
+
+	fs::rename(fromTempPath, temporaryPath);
+	fs::rename(toTempPath, fromTempPath);
+	fs::rename(temporaryPath, toTempPath);
+
+	fs::rename(fromPermPath, temporaryPath);
+	fs::rename(toPermPath, fromPermPath);
+	fs::rename(temporaryPath, toPermPath);
+
+	fs::remove(temporaryPath);
+
+	if (idFrom < idTo)
+		std::swap(levels[tribe].at(idFrom - 1), levels[tribe].at(idTo - 1));
+	else
+		std::swap(levels[tribe].at(idTo - 1), levels[tribe].at(idFrom - 1));
+
+	save();
+	redraw = true;
 }

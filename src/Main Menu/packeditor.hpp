@@ -119,6 +119,8 @@ private:
 	//Renders text, pass LEFT or CENTRE as alignment, pass 0 for no width restriction
 	void renderText(SDL_Texture * tex, const int x, const int topY, const renderAlign align, const int restrictWidth);
 	void renderNumbers(int num, const int rightX, const int y);
+
+	void swapLevelPosition(int idFrom, int idTo, tribeName tribe);
 };
 
 #endif // PACKEDITOR_HPP
