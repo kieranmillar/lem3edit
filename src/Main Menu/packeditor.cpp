@@ -304,6 +304,27 @@ bool PackEditor::create(void)
 					Mainmenu::OBSValues levelOBS = Mainmenu::loadOBSValues(levelPath);
 					if (id == levelOBS.temp && id == levelOBS.perm)
 					{
+						{
+							std::ifstream f(levelPath, std::ios::binary);
+							if (!f)
+							{
+								SDL_Log("Packeditor::create: Autoload stopped on id %d as couldn't open file to check tribe'\n", id);
+								break;
+							}
+
+							Uint16 tribe;
+
+							f.read((char *)&tribe, sizeof(tribe));
+							f.close();
+
+							if (!((j == 0 && tribe == 4) ||
+								(j == 1 && tribe == 10) ||
+								(j == 2 && tribe == 5)))
+							{
+								SDL_Log("Packeditor::create: Autoload stopped on id %d as wrong tribe'\n", id);
+								break;
+							}
+						}
 						int lems;
 						if (j == 0)
 							lems = loadLemsFromFile(i + 1, CLASSIC);
@@ -319,13 +340,13 @@ bool PackEditor::create(void)
 					}
 					else
 					{
-						SDL_Log("Packeditor::create: Autoload failed on id %d as level file references not consistent. Temp = %d, Perm = %d", id, levelOBS.temp, levelOBS.perm);
+						SDL_Log("Packeditor::create: Autoload stopped on id %d as level file references not consistent. Temp = %d, Perm = %d\n", id, levelOBS.temp, levelOBS.perm);
 						break;
 					}
 				}
 				else
 				{
-					SDL_Log("Packeditor::create: Autoload failed on id %d as one or more level parts missing.", id);
+					SDL_Log("Packeditor::create: Autoload stopped on id %d as one or more level parts missing.\n", id);
 					break;
 				}
 			}
