@@ -352,7 +352,7 @@ void LevelProperties::handleLevelPropertiesEvents(SDL_Event event)
 			break;
 		case SDLK_q:
 			closeDialog(false);
-			editor_ptr->closeLevel();
+			editor_ptr->closeLevel(true);
 			break;
 		default:
 			break;

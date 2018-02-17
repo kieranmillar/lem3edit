@@ -158,7 +158,7 @@ int main(int argc, char *argv[])
 		}
 	}
 
-	editor.closeLevel();
+	editor.closeLevel(false);
 	g_window.destroy();
 
 	TTF_Quit();

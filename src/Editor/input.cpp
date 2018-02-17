@@ -328,7 +328,7 @@ void Editor_input::handleEditorEvents(SDL_Event event)
 					}
 					if (mouse_x_window > 111 && mouse_x_window < 143)
 					{
-						editor_ptr->closeLevel();
+						editor_ptr->closeLevel(true);
 					}
 				}
 			}
@@ -553,7 +553,7 @@ void Editor_input::handleEditorEvents(SDL_Event event)
 			editor_ptr->toggleCameraVisibility();
 			break;
 		case SDLK_q:
-			editor_ptr->closeLevel();
+			editor_ptr->closeLevel(true);
 			break;
 		default:
 			break;

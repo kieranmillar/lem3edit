@@ -22,6 +22,7 @@
  This file is the top level object of the editor and handles some general purpose functionality
  */
 #include "editor.hpp"
+#include "../tinyfiledialogs.h"
 
 #include <algorithm>
 #include <cassert>
@@ -82,8 +83,21 @@ void Editor::initiate(void)
 	SDL_FlushEvents(SDL_MOUSEMOTION, SDL_MOUSEWHEEL);
 }
 
-void Editor::closeLevel(void)
+void Editor::closeLevel(bool askToSave)
 {
+	if (askToSave)
+	{
+		int answer = tinyfd_messageBox(
+			"Save Level?",
+			"Save before quitting?",
+			"yesnocancel",
+			"question",
+			0);
+		if (answer == 0)
+			return;
+		else if (answer == 1)
+			level.save(false);
+	}
 	bar.destroy();
 	style.destroy_all_objects(PERM);
 	style.destroy_all_objects(TEMP);

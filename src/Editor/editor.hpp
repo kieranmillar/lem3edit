@@ -89,7 +89,7 @@ public:
 	bool load(const fs::path filename, programMode modeToReturnTo);
 	void initiate(void);
 
-	void closeLevel(void);
+	void closeLevel(bool askToSave);
 
 	bool toggleCameraVisibility(void);
 	bool move_camera(signed int delta_x, signed int delta_y);
