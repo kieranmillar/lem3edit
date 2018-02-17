@@ -24,6 +24,7 @@ This file handles the level pack editor
 
 #include "mainmenu.hpp"
 #include "packeditor.hpp"
+#include "../Editor/editor.hpp"
 #include "../font.hpp"
 #include "../ini.hpp"
 #include "../tinyfiledialogs.h"
@@ -131,10 +132,11 @@ void PackEditor::refreshTitleTexture(void)
 	}
 }
 
-void PackEditor::setReferences(Ini * i, Editor * e)
+void PackEditor::setReferences(Ini * i, Editor * e, Mainmenu * m)
 {
 	ini_ptr = i;
 	editor_ptr = e;
+	menu_ptr = m;
 }
 
 void PackEditor::handlePackEditorEvents(SDL_Event event)
@@ -207,7 +209,12 @@ void PackEditor::handlePackEditorEvents(SDL_Event event)
 					//edit button
 					if (mouse_x_window > g_window.width - 122 && mouse_x_window < g_window.width - 96)
 					{
-						//todo
+						int id = i + 1 + (tribeTab * 100);
+						menu_ptr->drawLoadingBanner();
+						g_currentMode = EDITORMODE;
+						redraw = true;
+						refreshID = id;
+						editor_ptr->load(l3_filename_level(packPath.parent_path(), "LEVEL", id, "DAT"), LEVELPACKMODE);
 					}
 
 					//rename button
@@ -857,6 +864,23 @@ void PackEditor::draw(void)
 {
 	if (redraw == false)
 		return;
+
+	//refresh a level lemming count if an ID is stored.
+	if (refreshID != 0)
+	{
+		tribeName refreshTribe;
+		int id = refreshID % 100;
+		int t = refreshID / 100;
+		if (t == 0)
+			refreshTribe = CLASSIC;
+		else if (t == 1)
+			refreshTribe = SHADOW;
+		else if (t == 2)
+			refreshTribe = EGYPT;
+		levels[t][id - 1].lems = loadLemsFromFile(id, refreshTribe);
+		refreshLemCounts();
+		refreshID = 0;
+	}
 
 	int centreX = g_window.width / 2;
 	int windowThird = g_window.width / 3;

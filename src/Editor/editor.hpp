@@ -86,7 +86,7 @@ public:
 	bool move_selected(signed int delta_x, signed int delta_y);
 
 	void create(const fs::path filename, const tribeName t, const int n);
-	bool load(const fs::path filename);
+	bool load(const fs::path filename, programMode modeToReturnTo);
 	void initiate(void);
 
 	void closeLevel(void);
@@ -97,9 +97,12 @@ public:
 	Editor(fs::path data);
 	~Editor(void) { /* nothing to do */ }
 
-	/*private:
-		Editor(const Editor &);
-		Editor & operator=(const Editor &);*/
+private:
+	//this variable tells us what program mode to return to when the editor closes
+	programMode returnMode = MAINMENUMODE;
+
+	/*Editor(const Editor &);
+	Editor & operator=(const Editor &);*/
 };
 
 #endif // EDITOR_HPP

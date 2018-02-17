@@ -35,13 +35,14 @@ namespace fs = std::experimental::filesystem::v1;
 
 class Ini;
 class Editor;
+class Mainmenu;
 
 class PackEditor
 {
 public:
 	PackEditor(void);
 
-	void setReferences(Ini * i, Editor * e);
+	void setReferences(Ini * i, Editor * e, Mainmenu * m);
 
 	void handlePackEditorEvents(SDL_Event event);
 
@@ -52,8 +53,12 @@ public:
 private:
 	Ini * ini_ptr;
 	Editor * editor_ptr;
+	Mainmenu * menu_ptr;
 
 	bool redraw = false;
+
+	//stores a level ID to refresh the lemming count for that level on next draw. 0 = no level.
+	int refreshID = 0;
 
 	Uint32 lastFrameTick = 0;
 

@@ -50,6 +50,8 @@ public:
 		Uint16 temp;
 	};
 
+	void drawLoadingBanner(void);
+
 	//opens a DAT file and returns the values that reference the OBS files;
 	static OBSValues loadOBSValues(fs::path DATfilepath);
 	static bool updateOBSValues(fs::path DATfilepath, const int id);
@@ -125,8 +127,6 @@ private:
 	void copyLevelDialog(void);
 	void copyLevel(void);
 	void deleteLevel(void);
-
-	void drawLoadingBanner(void);
 };
 
 #endif // MAINMENU_HPP

@@ -42,7 +42,7 @@ Mainmenu::Mainmenu(Ini * i, Editor * e)
 	ini_ptr = i;
 	editor_ptr = e;
 
-	packEditor.setReferences(ini_ptr, editor_ptr);
+	packEditor.setReferences(ini_ptr, editor_ptr, this);
 
 	highlighting = NONE;
 
@@ -852,7 +852,7 @@ void Mainmenu::loadLevel(void)
 	drawLoadingBanner();
 	highlighting = NONE;
 	g_currentMode = EDITORMODE;
-	editor_ptr->load(fileToOpen);
+	editor_ptr->load(fileToOpen, MAINMENUMODE);
 }
 
 void Mainmenu::copyLevelDialog(void)

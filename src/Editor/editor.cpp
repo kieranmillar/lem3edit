@@ -49,13 +49,15 @@ void Editor::resize(int w, int h)
 
 void Editor::create(const fs::path filename, const tribeName t, const int n)
 {
+	returnMode = MAINMENUMODE;
 	level.newLevel(filename, t, n);
 	initiate();
 	canvas.redraw = true;
 }
 
-bool Editor::load(const fs::path filename)
+bool Editor::load(const fs::path filename, programMode modeToReturnTo)
 {
+	returnMode = modeToReturnTo;
 	level.load(filename);
 	initiate();
 	return canvas.redraw = true;
@@ -89,7 +91,7 @@ void Editor::closeLevel(void)
 	levelProperties.destroyTextures();
 	selection.clear();
 	clipboard.clear();
-	g_currentMode = MAINMENUMODE;
+	g_currentMode = returnMode;
 }
 
 bool Editor::select(signed int x, signed int y, bool modify_selection)
