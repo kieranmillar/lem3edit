@@ -254,7 +254,7 @@ void PackEditor::handlePackEditorEvents(SDL_Event event)
 						//delete button
 						if (mouse_x_window > g_window.width - 47 && mouse_x_window < g_window.width - 21)
 						{
-							//todo
+							deleteLevel(i + 1 + scroll[tribeTab], tribeTab);
 						}
 					}
 				}
@@ -837,6 +837,48 @@ void PackEditor::saveLevel(const int n, const tribeName t)
 	fromPath = l3_filename_level(packPath.parent_path(), "PERM", level_id, "OBS");
 	toPath = l3_filename_level(destinationPath.parent_path(), "PERM", level_id, "OBS");
 	fs::copy(fromPath, toPath);
+}
+
+void PackEditor::deleteLevel(const int n, const tribeName t)
+{
+	int answer = tinyfd_messageBox(
+		"Delete Level?",
+		"Are you sure you want to delete this level?\n\nIt will delete the level from your harddrive too, so you might want to save a copy first.",
+		"okcancel",
+		"question",
+		0);
+	if (answer == 0)
+		return;
+
+	int level_id = n + (t * 100);
+
+	fs::remove(l3_filename_level(packPath.parent_path(), "LEVEL", level_id, "DAT"));
+	fs::remove(l3_filename_level(packPath.parent_path(), "TEMP", level_id, "OBS"));
+	fs::remove(l3_filename_level(packPath.parent_path(), "PERM", level_id, "OBS"));
+	levels[t].erase(levels[t].begin() + n - 1);
+
+	for (int i = n + 1; i < levels[t].size() + 2; i++)
+	{
+		fs::path datPath = l3_filename_level(packPath.parent_path(), "LEVEL", i, "DAT");
+		if (!Mainmenu::updateOBSValues(datPath, i - 1))
+		{
+			tinyfd_messageBox("Oh No!", "Lem3edit could not update the temp and perm file references in the new level file for some reason!\n\nLevel reorganising aborted.", "ok", "error", 1);
+			return;
+		}
+		fs::path destinationPath = l3_filename_level(packPath.parent_path(), "LEVEL", i - 1, "DAT");
+		fs::rename(datPath, destinationPath);
+
+		fs::path tempPath = l3_filename_level(packPath.parent_path(), "TEMP", i, "OBS");
+		destinationPath = l3_filename_level(packPath.parent_path(), "TEMP", i - 1, "OBS");
+		fs::rename(tempPath, destinationPath);
+
+		fs::path permPath = l3_filename_level(packPath.parent_path(), "PERM", i, "OBS");
+		destinationPath = l3_filename_level(packPath.parent_path(), "PERM", i - 1, "OBS");
+		fs::rename(permPath, destinationPath);
+	}
+
+	save();
+	redraw = true;
 }
 
 bool PackEditor::levelExists(const int id)

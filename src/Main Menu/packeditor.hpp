@@ -103,6 +103,7 @@ private:
 	void createLevel(const int n, const tribeName t);
 	void loadLevel(const int n, const tribeName t);
 	void saveLevel(const int n, const tribeName t);
+	void deleteLevel(const int n, const tribeName t);
 
 	bool levelExists(const int id);//returns if level files exist and all match expected id
 	void refreshTitleTexture(void);
