@@ -189,82 +189,89 @@ void PackEditor::handlePackEditorEvents(SDL_Event event)
 				}
 			}
 
-			for (int i = 0; i < levels[tribeTab].size(); i++)
+			if (mouse_y_window + 26 < g_window.height - 35)
 			{
-				//level entry line
-				if (mouse_y_window > 88 + (i * 30) && mouse_y_window < 114 + (i * 30))
+				for (int i = 0; i < levels[tribeTab].size(); i++)
 				{
-					//moveUp button
-					if (mouse_x_window > g_window.width - 182 && mouse_x_window < g_window.width - 156)
+					if (i + scroll[tribeTab] >= levels[tribeTab].size())
 					{
-						//todo
+						break;
 					}
-
-					//moveDown button
-					if (mouse_x_window > g_window.width - 152 && mouse_x_window < g_window.width - 126)
+					//level entry line
+					if (mouse_y_window > 88 + (i * 30) && mouse_y_window < 114 + (i * 30))
 					{
-						//todo
-					}
-
-					//edit button
-					if (mouse_x_window > g_window.width - 122 && mouse_x_window < g_window.width - 96)
-					{
-						int id = i + 1 + (tribeTab * 100);
-						menu_ptr->drawLoadingBanner();
-						g_currentMode = EDITORMODE;
-						redraw = true;
-						refreshID = id;
-						editor_ptr->load(l3_filename_level(packPath.parent_path(), "LEVEL", id, "DAT"), LEVELPACKMODE);
-					}
-
-					//rename button
-					if (mouse_x_window > g_window.width - 92 && mouse_x_window < g_window.width - 66)
-					{
-						char const * getRename = tinyfd_inputBox(
-							"Rename Level",
-							"Choose a new name for the level.",
-							levels[tribeTab][i].name.c_str());
-						if (getRename != NULL)
+						//moveUp button
+						if (mouse_x_window > g_window.width - 197 && mouse_x_window < g_window.width - 171)
 						{
-							std::string s = getRename;
-							if (!s.empty() && s[s.length() - 1] == '\n') {
-								s.erase(s.length() - 1);
-							}
-							levels[tribeTab][i].name = s;
-							levels[tribeTab][i].refreshTexture();
-							save();
+							//todo
+						}
+
+						//moveDown button
+						if (mouse_x_window > g_window.width - 167 && mouse_x_window < g_window.width - 141)
+						{
+							//todo
+						}
+
+						//edit button
+						if (mouse_x_window > g_window.width - 137 && mouse_x_window < g_window.width - 111)
+						{
+							int id = i + 1 + scroll[tribeTab] + (tribeTab * 100);
+							menu_ptr->drawLoadingBanner();
+							g_currentMode = EDITORMODE;
 							redraw = true;
+							refreshID = id;
+							editor_ptr->load(l3_filename_level(packPath.parent_path(), "LEVEL", id, "DAT"), LEVELPACKMODE);
+						}
+
+						//rename button
+						if (mouse_x_window > g_window.width - 107 && mouse_x_window < g_window.width - 81)
+						{
+							char const * getRename = tinyfd_inputBox(
+								"Rename Level",
+								"Choose a new name for the level.",
+								levels[tribeTab][i + scroll[tribeTab]].name.c_str());
+							if (getRename != NULL)
+							{
+								std::string s = getRename;
+								if (!s.empty() && s[s.length() - 1] == '\n') {
+									s.erase(s.length() - 1);
+								}
+								levels[tribeTab][i + scroll[tribeTab]].name = s;
+								levels[tribeTab][i + scroll[tribeTab]].refreshTexture();
+								save();
+								redraw = true;
+							}
+						}
+
+						//save as button
+						if (mouse_x_window > g_window.width - 77 && mouse_x_window < g_window.width - 51)
+						{
+							//todo
+						}
+
+						//delete button
+						if (mouse_x_window > g_window.width - 47 && mouse_x_window < g_window.width - 21)
+						{
+							//todo
 						}
 					}
-
-					//save as button
-					if (mouse_x_window > g_window.width - 62 && mouse_x_window < g_window.width - 36)
-					{
-						//todo
-					}
-
-					//delete button
-					if (mouse_x_window > g_window.width - 32 && mouse_x_window < g_window.width - 6)
-					{
-						//todo
-					}
-				}
-			}
-
-			if (mouse_y_window > 88 + (levels[tribeTab].size() * 30) && mouse_y_window < 114 + (levels[tribeTab].size() * 30))
-			{
-				//add new level button
-				if (mouse_x_window > (windowThird - 100) && mouse_x_window < (windowThird + 100))
-				{
-					createLevel(levels[tribeTab].size() + 1, tribeTab);
-					redraw = true;
 				}
 
-				//load level button
-				if (mouse_x_window > ((windowThird * 2) - 100) && mouse_x_window < ((windowThird * 2) + 100))
+				if (mouse_y_window > 88 + ((levels[tribeTab].size() - scroll[tribeTab]) * 30) && mouse_y_window < 114 + ((levels[tribeTab].size() - scroll[tribeTab]) * 30))
 				{
-					loadLevel(levels[tribeTab].size() + 1, tribeTab);
-					redraw = true;
+					//add new level button
+					if (mouse_x_window > (windowThird - 100) && mouse_x_window < (windowThird + 100))
+					{
+						createLevel(levels[tribeTab].size() + 1, tribeTab);
+						redraw = true;
+					}
+
+					//load level button
+					if (mouse_x_window > ((windowThird * 2) - 100) && mouse_x_window < ((windowThird * 2) + 100))
+					{
+						loadLevel(levels[tribeTab].size() + 1, tribeTab);
+						redraw = true;
+					}
 				}
 			}
 
@@ -286,6 +293,18 @@ void PackEditor::handlePackEditorEvents(SDL_Event event)
 
 		switch (e.keysym.sym)
 		{
+		case SDLK_UP:
+			scroll[tribeTab] --;
+			if (scroll[tribeTab] < 0)
+				scroll[tribeTab] = 0;
+			redraw = true;
+			break;
+		case SDLK_DOWN:
+			scroll[tribeTab] ++;
+			if (scroll[tribeTab] >= levels[tribeTab].size())
+				scroll[tribeTab] = levels[tribeTab].size() - 1;
+			redraw = true;
+			break;
 		case SDLK_ESCAPE:
 		case SDLK_q:
 			save();
@@ -816,6 +835,7 @@ void PackEditor::clearLevels(void)
 		}
 		levels[i].clear();
 		totalLems[i] = 20;
+		scroll[i] = 0;
 	}
 }
 
@@ -962,48 +982,58 @@ void PackEditor::draw(void)
 		int count = 1;
 		for (std::vector<levelData>::const_iterator iter = levels[tribeTab].begin(); iter != levels[tribeTab].end(); ++iter)
 		{
+			if (count <= scroll[tribeTab])
+			{
+				count++;
+				continue;//don't process the first X
+			}
+			if (yPos + 26 > g_window.height - 35)
+			{
+				break;//stop processing once at the bottom of the tab
+			}
+
 			const levelData &d = *iter;
 
 			SDL_Rect r;
 			r.x = 8;
 			r.y = (yPos - 2);
-			r.w = (g_window.width - 195);
+			r.w = (g_window.width - 210);
 			r.h = 26;
 			SDL_SetRenderDrawColor(g_window.screen_renderer, 230, 230, 230, 255);
 			SDL_RenderFillRect(g_window.screen_renderer, &r);
 			SDL_SetRenderDrawColor(g_window.screen_renderer, 0, 0, 0, 255);
 			SDL_RenderDrawRect(g_window.screen_renderer, &r);
-			SDL_RenderDrawLine(g_window.screen_renderer, g_window.width - 230, r.y, g_window.width - 230, r.y + r.h - 1);
+			SDL_RenderDrawLine(g_window.screen_renderer, g_window.width - 245, r.y, g_window.width - 245, r.y + r.h - 1);
 
 			renderNumbers(count, 35, yPos);
-			renderText(d.tex, 45, yPos, LEFT, g_window.width - 280);
-			renderNumbers(d.lems, g_window.width - 195, yPos);
+			renderText(d.tex, 45, yPos, LEFT, g_window.width - 295);
+			renderNumbers(d.lems, g_window.width - 210, yPos);
 
-			r.x = g_window.width - 182;
+			r.x = g_window.width - 197;
 			r.y = yPos - 2;
 			r.w = 26;
 			r.h = 26;
 			SDL_RenderCopy(g_window.screen_renderer, moveUpButtonTex, NULL, &r);
 
-			r.x = g_window.width - 152;
+			r.x = g_window.width - 167;
 			SDL_RenderCopy(g_window.screen_renderer, moveDownButtonTex, NULL, &r);
 
-			r.x = g_window.width - 122;
+			r.x = g_window.width - 137;
 			SDL_RenderCopy(g_window.screen_renderer, editButtonTex, NULL, &r);
 
-			r.x = g_window.width - 92;
+			r.x = g_window.width - 107;
 			SDL_RenderCopy(g_window.screen_renderer, renameButtonTex, NULL, &r);
 
-			r.x = g_window.width - 62;
+			r.x = g_window.width - 77;
 			SDL_RenderCopy(g_window.screen_renderer, saveAsButtonTex, NULL, &r);
 
-			r.x = g_window.width - 32;
+			r.x = g_window.width - 47;
 			SDL_RenderCopy(g_window.screen_renderer, deleteButtonTex, NULL, &r);
 
 			yPos += 30;
 			count++;
 		}
-		if (count < 30)
+		if (count < 30 && yPos + 26 < g_window.height - 35)
 		{
 			SDL_Rect r;
 			r.x = windowThird - 100;
@@ -1039,8 +1069,8 @@ void PackEditor::draw(void)
 		SDL_RenderDrawRect(g_window.screen_renderer, &r);
 		renderText(quitTex, 70, g_window.height - 30, CENTRE, 0);
 
-		renderText(totalLemsTex, g_window.width - 420, g_window.height - 30, LEFT, 0);
-		renderNumbers(totalLems[tribeTab], g_window.width - 195, g_window.height - 30);
+		renderText(totalLemsTex, g_window.width - 435, g_window.height - 30, LEFT, 0);
+		renderNumbers(totalLems[tribeTab], g_window.width - 210, g_window.height - 30);
 	}
 
 	SDL_SetRenderTarget(g_window.screen_renderer, NULL);

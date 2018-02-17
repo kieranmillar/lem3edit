@@ -62,6 +62,9 @@ private:
 
 	Uint32 lastFrameTick = 0;
 
+	int scroll[TRIBECOUNT] = { 0, 0, 0 };
+	SDL_Rect scrollBarRect;
+
 	int version = CURRENTPACKFILEVERSION;
 
 	fs::path packPath;
