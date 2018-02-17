@@ -73,7 +73,12 @@ private:
 	SDL_Texture * addNewLevelTex = NULL;
 	SDL_Texture * loadLevelTex = NULL;
 
+	SDL_Texture * moveUpButtonTex = NULL;
+	SDL_Texture * moveDownButtonTex = NULL;
+	SDL_Texture * editButtonTex = NULL;
 	SDL_Texture * renameButtonTex = NULL;
+	SDL_Texture * saveAsButtonTex = NULL;
+	SDL_Texture * deleteButtonTex = NULL;
 
 	class levelData
 	{

@@ -66,18 +66,56 @@ PackEditor::PackEditor(void)
 	{
 		SDL_SetRenderDrawColor(g_window.screen_renderer, 255, 255, 255, 255);
 		SDL_Surface* graphic = NULL;
-		//first load the botton's up graphic
+
+		graphic = SDL_LoadBMP("./gfx/pack_moveUp.bmp");
+		if (graphic == NULL)
+		{
+			SDL_Log("PackEditor::PackEditor: Unable to load moveUp button image! SDL Error: %s\n", SDL_GetError());
+		}
+		SDL_ConvertSurfaceFormat(graphic, SDL_PIXELFORMAT_RGBA8888, 0);
+		moveUpButtonTex = SDL_CreateTextureFromSurface(g_window.screen_renderer, graphic);
+
+		graphic = SDL_LoadBMP("./gfx/pack_moveDown.bmp");
+		if (graphic == NULL)
+		{
+			SDL_Log("PackEditor::PackEditor: Unable to load moveDown button image! SDL Error: %s\n", SDL_GetError());
+		}
+		SDL_ConvertSurfaceFormat(graphic, SDL_PIXELFORMAT_RGBA8888, 0);
+		moveDownButtonTex = SDL_CreateTextureFromSurface(g_window.screen_renderer, graphic);
+
+		graphic = SDL_LoadBMP("./gfx/pack_edit.bmp");
+		if (graphic == NULL)
+		{
+			SDL_Log("PackEditor::PackEditor: Unable to load edit button image! SDL Error: %s\n", SDL_GetError());
+		}
+		SDL_ConvertSurfaceFormat(graphic, SDL_PIXELFORMAT_RGBA8888, 0);
+		editButtonTex = SDL_CreateTextureFromSurface(g_window.screen_renderer, graphic);
+
 		graphic = SDL_LoadBMP("./gfx/pack_rename.bmp");
 		if (graphic == NULL)
 		{
-			SDL_Log("Unable to load rename button image! SDL Error: %s\n", SDL_GetError());
+			SDL_Log("PackEditor::PackEditor: Unable to load rename button image! SDL Error: %s\n", SDL_GetError());
 		}
 		SDL_ConvertSurfaceFormat(graphic, SDL_PIXELFORMAT_RGBA8888, 0);
-
 		renameButtonTex = SDL_CreateTextureFromSurface(g_window.screen_renderer, graphic);
 
+		graphic = SDL_LoadBMP("./gfx/pack_saveAs.bmp");
+		if (graphic == NULL)
+		{
+			SDL_Log("PackEditor::PackEditor: Unable to load saveAs button image! SDL Error: %s\n", SDL_GetError());
+		}
+		SDL_ConvertSurfaceFormat(graphic, SDL_PIXELFORMAT_RGBA8888, 0);
+		saveAsButtonTex = SDL_CreateTextureFromSurface(g_window.screen_renderer, graphic);
+
+		graphic = SDL_LoadBMP("./gfx/pack_delete.bmp");
+		if (graphic == NULL)
+		{
+			SDL_Log("PackEditor::PackEditor: Unable to load delete button image! SDL Error: %s\n", SDL_GetError());
+		}
+		SDL_ConvertSurfaceFormat(graphic, SDL_PIXELFORMAT_RGBA8888, 0);
+		deleteButtonTex = SDL_CreateTextureFromSurface(g_window.screen_renderer, graphic);
+
 		SDL_FreeSurface(graphic);
-		graphic = NULL;
 	}
 }
 
@@ -154,8 +192,26 @@ void PackEditor::handlePackEditorEvents(SDL_Event event)
 				//level entry line
 				if (mouse_y_window > 88 + (i * 30) && mouse_y_window < 114 + (i * 30))
 				{
+					//moveUp button
+					if (mouse_x_window > g_window.width - 182 && mouse_x_window < g_window.width - 156)
+					{
+						//todo
+					}
+
+					//moveDown button
+					if (mouse_x_window > g_window.width - 152 && mouse_x_window < g_window.width - 126)
+					{
+						//todo
+					}
+
+					//edit button
+					if (mouse_x_window > g_window.width - 122 && mouse_x_window < g_window.width - 96)
+					{
+						//todo
+					}
+
 					//rename button
-					if (mouse_x_window > g_window.width - 290 && mouse_x_window < g_window.width - 264)
+					if (mouse_x_window > g_window.width - 92 && mouse_x_window < g_window.width - 66)
 					{
 						char const * getRename = tinyfd_inputBox(
 							"Rename Level",
@@ -172,6 +228,18 @@ void PackEditor::handlePackEditorEvents(SDL_Event event)
 							save();
 							redraw = true;
 						}
+					}
+
+					//save as button
+					if (mouse_x_window > g_window.width - 62 && mouse_x_window < g_window.width - 36)
+					{
+						//todo
+					}
+
+					//delete button
+					if (mouse_x_window > g_window.width - 32 && mouse_x_window < g_window.width - 6)
+					{
+						//todo
 					}
 				}
 			}
@@ -875,23 +943,38 @@ void PackEditor::draw(void)
 			SDL_Rect r;
 			r.x = 8;
 			r.y = (yPos - 2);
-			r.w = (g_window.width - 305);
+			r.w = (g_window.width - 195);
 			r.h = 26;
 			SDL_SetRenderDrawColor(g_window.screen_renderer, 230, 230, 230, 255);
 			SDL_RenderFillRect(g_window.screen_renderer, &r);
 			SDL_SetRenderDrawColor(g_window.screen_renderer, 0, 0, 0, 255);
 			SDL_RenderDrawRect(g_window.screen_renderer, &r);
-			SDL_RenderDrawLine(g_window.screen_renderer, g_window.width - 340, r.y, g_window.width - 340, r.y + r.h - 1);
+			SDL_RenderDrawLine(g_window.screen_renderer, g_window.width - 230, r.y, g_window.width - 230, r.y + r.h - 1);
 
 			renderNumbers(count, 35, yPos);
-			renderText(d.tex, 45, yPos, LEFT, g_window.width - 390);
-			renderNumbers(d.lems, g_window.width - 305, yPos);
+			renderText(d.tex, 45, yPos, LEFT, g_window.width - 280);
+			renderNumbers(d.lems, g_window.width - 195, yPos);
 
-			r.x = g_window.width - 290;
+			r.x = g_window.width - 182;
 			r.y = yPos - 2;
 			r.w = 26;
 			r.h = 26;
+			SDL_RenderCopy(g_window.screen_renderer, moveUpButtonTex, NULL, &r);
+
+			r.x = g_window.width - 152;
+			SDL_RenderCopy(g_window.screen_renderer, moveDownButtonTex, NULL, &r);
+
+			r.x = g_window.width - 122;
+			SDL_RenderCopy(g_window.screen_renderer, editButtonTex, NULL, &r);
+
+			r.x = g_window.width - 92;
 			SDL_RenderCopy(g_window.screen_renderer, renameButtonTex, NULL, &r);
+
+			r.x = g_window.width - 62;
+			SDL_RenderCopy(g_window.screen_renderer, saveAsButtonTex, NULL, &r);
+
+			r.x = g_window.width - 32;
+			SDL_RenderCopy(g_window.screen_renderer, deleteButtonTex, NULL, &r);
 
 			yPos += 30;
 			count++;
@@ -932,8 +1015,8 @@ void PackEditor::draw(void)
 		SDL_RenderDrawRect(g_window.screen_renderer, &r);
 		renderText(quitTex, 70, g_window.height - 30, CENTRE, 0);
 
-		renderText(totalLemsTex, g_window.width - 530, g_window.height - 30, LEFT, 0);
-		renderNumbers(totalLems[tribeTab], g_window.width - 305, g_window.height - 30);
+		renderText(totalLemsTex, g_window.width - 420, g_window.height - 30, LEFT, 0);
+		renderNumbers(totalLems[tribeTab], g_window.width - 195, g_window.height - 30);
 	}
 
 	SDL_SetRenderTarget(g_window.screen_renderer, NULL);
