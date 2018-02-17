@@ -255,14 +255,32 @@ bool PackEditor::create(void)
 	if (!packPath.has_extension())
 		packPath += ".l3pack";
 
-	//iterate through the folder looking for level or pack files
+	//iterate through the folder looking for other pack files, and levels
+	bool askedAboutDat = false;
+	bool autoLoad = false;
 	for (auto& iter : fs::directory_iterator(packPath.parent_path()))
 	{
 		std::string s = iter.path().extension().generic_string();
-		if (s == ".l3pack" || s == ".DAT" || s == ".OBS")
+		if (s == ".l3pack")
 		{
-			tinyfd_messageBox("Oh No!", "Sorry, but you can't make a new level pack in a folder already containing a pack, or any level files.\n\nIt is reccommended that you make a new diectory to store your level pack.\n\nTrust me, it's for your own good.", "ok", "error", 1);
+			tinyfd_messageBox("Oh No!", "Sorry, but you can't make a new level pack in a folder already containing a pack.", "ok", "error", 1);
 			return false;
+		}
+
+		if (s == ".DAT")
+		{
+			if (!askedAboutDat)
+			{
+				askedAboutDat = true;
+				if (tinyfd_messageBox(
+					"Autoload levels?",
+					"It looks like this folder already contains levels. Do you want to try and automatically load them into the pack file?",
+					"okcancel",
+					"question",
+					0
+				) == 1)
+					autoLoad = true;
+			}
 		}
 	}
 
@@ -272,8 +290,52 @@ bool PackEditor::create(void)
 	clearLevels();
 	refreshTitleTexture();
 
+	//autoload levels
+	if (autoLoad)
+	{
+		for (int j = 0; j < TRIBECOUNT; j++)
+		{
+			for (int i = 0; i < 30; i++)
+			{
+				int id = i + 1 + (j * 100);
+				if (levelExists(id))
+				{
+					fs::path levelPath = l3_filename_level(packPath.parent_path(), "LEVEL", id, "DAT");
+					Mainmenu::OBSValues levelOBS = Mainmenu::loadOBSValues(levelPath);
+					if (id == levelOBS.temp && id == levelOBS.perm)
+					{
+						int lems;
+						if (j == 0)
+							lems = loadLemsFromFile(i + 1, CLASSIC);
+						if (j == 1)
+							lems = loadLemsFromFile(i + 1, SHADOW);
+						if (j == 2)
+							lems = loadLemsFromFile(i + 1, EGYPT);
+
+						std::string name;
+						name = "Existing Level ";
+						name += std::to_string(id);
+						levels[j].emplace_back(levelData(name, lems));
+					}
+					else
+					{
+						SDL_Log("Packeditor::create: Autoload failed on id %d as level file references not consistent. Temp = %d, Perm = %d", id, levelOBS.temp, levelOBS.perm);
+						break;
+					}
+				}
+				else
+				{
+					SDL_Log("Packeditor::create: Autoload failed on id %d as one or more level parts missing.", id);
+					break;
+				}
+			}
+		}
+	}
+
 	version = CURRENTPACKFILEVERSION;
 	tribeTab = CLASSIC;
+	save();
+	refreshLemCounts();
 
 	g_currentMode = LEVELPACKMODE;
 	redraw = true;
