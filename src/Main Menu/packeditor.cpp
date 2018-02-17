@@ -474,6 +474,7 @@ void PackEditor::createLevel(const int n, const tribeName t)
 	name += std::to_string(level_id);
 	levels[t].emplace_back(levelData(name, 0));
 	refreshLemCounts();
+	save();
 }
 
 void PackEditor::loadLevel(const int n, const tribeName t)
@@ -562,6 +563,7 @@ void PackEditor::loadLevel(const int n, const tribeName t)
 	name += std::to_string(level_id);
 	levels[t].emplace_back(levelData(name, lems));
 	refreshLemCounts();
+	save();
 }
 
 bool PackEditor::levelExists(const int id)
