@@ -203,15 +203,15 @@ void PackEditor::handlePackEditorEvents(SDL_Event event)
 						//moveUp button
 						if (mouse_x_window > g_window.width - 197 && mouse_x_window < g_window.width - 171)
 						{
-							int id = i + 1 + scroll[tribeTab];
-							swapLevelPosition(id, id - 1, tribeTab);
+							int n = i + 1 + scroll[tribeTab];
+							swapLevelPosition(n, n - 1, tribeTab);
 						}
 
 						//moveDown button
 						if (mouse_x_window > g_window.width - 167 && mouse_x_window < g_window.width - 141)
 						{
-							int id = i + 1 + scroll[tribeTab];
-							swapLevelPosition(id, id + 1, tribeTab);
+							int n = i + 1 + scroll[tribeTab];
+							swapLevelPosition(n, n + 1, tribeTab);
 						}
 
 						//edit button
@@ -248,7 +248,7 @@ void PackEditor::handlePackEditorEvents(SDL_Event event)
 						//save as button
 						if (mouse_x_window > g_window.width - 77 && mouse_x_window < g_window.width - 51)
 						{
-							//todo
+							saveLevel(i + 1 + scroll[tribeTab], tribeTab);
 						}
 
 						//delete button
@@ -793,6 +793,52 @@ void PackEditor::loadLevel(const int n, const tribeName t)
 	save();
 }
 
+void PackEditor::saveLevel(const int n, const tribeName t)
+{
+	int level_id = n + (t * 100);
+
+	char const * fileToSaveTo = NULL;
+	char const * filterPatterns[1] = { "*.DAT" };
+	fs::path defaultPath = l3_filename_level(packPath.parent_path(), "LEVEL", level_id, "DAT");
+	std::string temporary = defaultPath.generic_string();
+	char const * defaultPath_c = temporary.c_str();
+	fileToSaveTo = tinyfd_saveFileDialog("Save Standalone Copy", defaultPath_c, 1, filterPatterns, "Lemmings 3 Level File (*.DAT)");
+
+	if (!fileToSaveTo)
+		return;
+
+	fs::path destinationPath = fileToSaveTo;
+	if (!destinationPath.has_extension())
+		destinationPath += ".DAT";
+
+	//Check that we're not saving to the pack directory
+	if (fs::equivalent(packPath.parent_path(), destinationPath.parent_path()))
+	{
+		tinyfd_messageBox("Oh No!", "Sorry, you're not allowed to save standalone levels to the same directory as the level pack.", "ok", "error", 1);
+		return;
+	}
+
+	if (!Mainmenu::confirmOverwrite(destinationPath, level_id))
+		return;
+
+	fs::path fromPath = l3_filename_level(packPath.parent_path(), "LEVEL", level_id, "DAT");
+	fs::path toPath = destinationPath;
+	fs::copy(fromPath, toPath);
+	if (!Mainmenu::updateOBSValues(toPath, level_id))
+	{
+		tinyfd_messageBox("Oh No!", "Lem3edit could not update the temp and perm file references in the new level file for some reason!\n\nLevel copying aborted.", "ok", "error", 1);
+		return;
+	}
+
+	fromPath = l3_filename_level(packPath.parent_path(), "TEMP", level_id, "OBS");
+	toPath = l3_filename_level(destinationPath.parent_path(), "TEMP", level_id, "OBS");
+	fs::copy(fromPath, toPath);
+
+	fromPath = l3_filename_level(packPath.parent_path(), "PERM", level_id, "OBS");
+	toPath = l3_filename_level(destinationPath.parent_path(), "PERM", level_id, "OBS");
+	fs::copy(fromPath, toPath);
+}
+
 bool PackEditor::levelExists(const int id)
 {
 	fs::path parentPath = packPath.parent_path();
@@ -1155,8 +1201,11 @@ void PackEditor::swapLevelPosition(int idFrom, int idTo, tribeName tribe)
 	int fullIdFrom = idFrom + (tribe * 100);
 	int fullIdTo = idTo + (tribe * 100);
 
-	fs::path temporaryPath = packPath.parent_path();
-	temporaryPath /= "temporary.temp";
+	if (!levelExists(fullIdFrom) || !levelExists(fullIdTo))
+	{
+		SDL_Log("PackEditor::swapLevelPosition: One or more files missing!");
+		return;
+	}
 
 	fs::path fromDatPath = l3_filename_level(packPath.parent_path(), "LEVEL", fullIdFrom, "DAT");
 	fs::path toDatPath = l3_filename_level(packPath.parent_path(), "LEVEL", fullIdTo, "DAT");
@@ -1165,13 +1214,8 @@ void PackEditor::swapLevelPosition(int idFrom, int idTo, tribeName tribe)
 	fs::path fromPermPath = l3_filename_level(packPath.parent_path(), "PERM", fullIdFrom, "OBS");
 	fs::path toPermPath = l3_filename_level(packPath.parent_path(), "PERM", fullIdTo, "OBS");
 
-	if (!fs::exists(fromDatPath) || !fs::exists(toDatPath) ||
-		!fs::exists(fromTempPath) || !fs::exists(toTempPath) ||
-		!fs::exists(fromPermPath) || !fs::exists(toPermPath))
-	{
-		SDL_Log("PackEditor::swapLevelPosition: One or more files missing!");
-		return;
-	}
+	fs::path temporaryPath = packPath.parent_path();
+	temporaryPath /= "temporary.temp";
 
 	Mainmenu::updateOBSValues(fromDatPath, fullIdTo);
 	Mainmenu::updateOBSValues(toDatPath, fullIdFrom);

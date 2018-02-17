@@ -50,6 +50,8 @@ public:
 		Uint16 temp;
 	};
 
+	static bool confirmOverwrite(fs::path filePath, int id);
+
 	void drawLoadingBanner(void);
 
 	//opens a DAT file and returns the values that reference the OBS files;
@@ -118,8 +120,6 @@ private:
 	int level_id;
 	OBSValues fileOBS;//check for {1000, 1000} or higher for invalid result
 	fs::path filePath;
-
-	bool confirmOverwrite(fs::path filePath, int id);
 
 	void newLevelDialog(void);
 	void newLevel(void);
