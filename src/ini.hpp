@@ -29,8 +29,6 @@ class Ini
 {
 public:
 	fs::path lem3cdPath;
-	fs::path lem3installPath;
-	fs::path dosBoxPath;
 	fs::path lastLoadedPack;
 
 	bool load(void);
@@ -39,8 +37,6 @@ public:
 	bool validateData(const fs::path parentPath);
 
 	void saveLem3cdPath(fs::path p);
-	void saveLem3installPath(fs::path p);
-	void saveDosBoxPath(fs::path p);
 	void saveLastLoadedPack(fs::path p);
 
 private:

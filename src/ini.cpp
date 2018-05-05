@@ -37,8 +37,6 @@ bool Ini::load(void)
 {
 	//set defaults
 	lem3cdPath = "";
-	lem3installPath = "";
-	dosBoxPath = "";
 	lastLoadedPack = "";
 
 	fs::path iniPath = fs::current_path();
@@ -62,10 +60,6 @@ bool Ini::load(void)
 					value = line.substr(pos + 1);
 					if (key == "CD")
 						lem3cdPath = value;
-					if (key == "INSTALL")
-						lem3installPath = value;
-					if (key == "DOSBOX")
-						dosBoxPath = value;
 					if (key == "LASTPACK")
 						lastLoadedPack = value;
 				}
@@ -198,16 +192,6 @@ void Ini::saveLem3cdPath(fs::path p) {
 	save();
 }
 
-void Ini::saveLem3installPath(fs::path p) {
-	lem3installPath = p;
-	save();
-}
-
-void Ini::saveDosBoxPath(fs::path p) {
-	dosBoxPath = p;
-	save();
-}
-
 void Ini::saveLastLoadedPack(fs::path p) {
 	lastLoadedPack = p;
 	save();
@@ -222,8 +206,6 @@ bool Ini::save(void)
 	if (iniFile.is_open())
 	{
 		iniFile << "CD=" << lem3cdPath.generic_string() << "\n";
-		iniFile << "INSTALL=" << lem3installPath.generic_string() << "\n";
-		iniFile << "DOSBOX=" << dosBoxPath.generic_string() << "\n";
 		iniFile << "LASTPACK=" << lastLoadedPack.generic_string() << "\n";
 		iniFile.close();
 	}
