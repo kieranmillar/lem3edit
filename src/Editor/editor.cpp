@@ -383,16 +383,16 @@ bool Editor::move_camera(signed int delta_x, signed int delta_y)
 	delta_x += canvas.mouse_remainder_x;
 	delta_y += canvas.mouse_remainder_y;
 	canvas.mouse_remainder_x = delta_x % (8 * canvas.zoom);
-	canvas.mouse_remainder_y = delta_y % (2 * canvas.zoom);
+	canvas.mouse_remainder_y = delta_y % (4 * canvas.zoom);
 
 	delta_x /= (8 * canvas.zoom);
-	delta_y /= (2 * canvas.zoom);
+	delta_y /= (4 * canvas.zoom);
 
 	if (delta_x == 0 && delta_y == 0)
 		return false;
 
 	level.cameraX += delta_x * 8;
-	level.cameraY += delta_y * 2;
+	level.cameraY += delta_y * 4;
 
 	if (level.cameraX < 0)
 		level.cameraX = 0;
