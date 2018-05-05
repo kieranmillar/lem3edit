@@ -44,8 +44,8 @@ using namespace std;
 namespace fs = std::experimental::filesystem::v1;
 
 const char *prog_name = "lem3edit";
-const char *prog_ver = "2.0";
-const char *prog_date = "17/02/2018";
+const char *prog_ver = "2.1";
+const char *prog_date = "05/05/2018";
 
 void version(void);
 
@@ -75,6 +75,17 @@ int main(int argc, char *argv[])
 	}
 
 	//SDL_EnableKeyboardRepeat(SDL_DEFAULT_REPEAT_DELAY, SDL_DEFAULT_REPEAT_INTERVAL);
+
+	if (!fs::exists("./gfx/"))
+	{
+		tinyfd_messageBox(
+			"Fatal Error!",
+			"Oh no! Lem3edit could not find the gfx folder. It should be located in the same folder as lem3edit.exe.",
+			"ok",
+			"error",
+			0);
+		return EXIT_FAILURE;
+	}
 
 	//load ini file
 	Ini ini;
