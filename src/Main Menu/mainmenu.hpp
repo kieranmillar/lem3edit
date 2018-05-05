@@ -66,11 +66,11 @@ private:
 
 	enum menuBox {
 		NONE, NEWLEVEL, LOADLEVEL, COPYLEVEL, DELETELEVEL,
-		NEWPACK, LOADPACK, PREVIOUSPACK, OPTIONS, QUIT
+		NEWPACK, LOADPACK, PREVIOUSPACK, QUIT
 	};
 	menuBox highlighting;
 
-	enum menuMode { NODIALOG, NEWLEVELDIALOG, COPYLEVELDIALOG, OPTIONSDIALOG };
+	enum menuMode { NODIALOG, NEWLEVELDIALOG, COPYLEVELDIALOG };
 	menuMode menuDialog;
 
 	bool selectedCopy;
@@ -87,7 +87,6 @@ private:
 	SDL_Texture * NewPackText = NULL;
 	SDL_Texture * LoadPackText = NULL;
 	SDL_Texture * PreviousPackText = NULL;
-	SDL_Texture * OptionsText = NULL;
 	SDL_Texture * QuitText = NULL;
 
 	//dialog text textures

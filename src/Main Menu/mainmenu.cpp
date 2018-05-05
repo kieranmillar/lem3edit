@@ -64,7 +64,6 @@ Mainmenu::Mainmenu(Ini * i, Editor * e)
 	LoadPackText = Font::createTextureFromString(buttonFont, "Load Level Pack");
 	PreviousPackText = NULL;
 	refreshPreviousPackText();
-	OptionsText = Font::createTextureFromString(buttonFont, "Set Testing Paths and Options");
 	QuitText = Font::createTextureFromString(buttonFont, "Quit");
 	TTF_CloseFont(buttonFont);
 
@@ -181,11 +180,6 @@ void Mainmenu::handleMainMenuEvents(SDL_Event event)
 				if (fs::exists(ini_ptr->lastLoadedPack))
 					highlighting = PREVIOUSPACK;
 			}
-			if (mouse_y_window > 480
-				&& mouse_y_window < 520)
-			{
-				//highlighting = OPTIONS;
-			}
 			if (mouse_y_window > 530
 				&& mouse_y_window < 570)
 			{
@@ -260,10 +254,6 @@ void Mainmenu::handleMainMenuEvents(SDL_Event event)
 							highlighting = NONE;
 						}
 					}
-					break;
-
-				case OPTIONS:
-					//todo
 					break;
 
 				case QUIT:
@@ -476,14 +466,7 @@ void Mainmenu::draw(void)
 
 	//other buttons
 	{
-		renderButton(OptionsText, centreX, 480, highlighting == OPTIONS);
 		renderButton(QuitText, centreX, 530, highlighting == QUIT);
-	}
-
-	//draw strikes through all unimplemented features
-	{
-		SDL_SetRenderDrawColor(g_window.screen_renderer, 0, 0, 0, 255);
-		SDL_RenderDrawLine(g_window.screen_renderer, centreX - 300, 500, centreX + 300, 500);//options
 	}
 
 	switch (menuDialog)
