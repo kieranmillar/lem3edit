@@ -289,6 +289,28 @@ void PackEditor::handlePackEditorEvents(SDL_Event event)
 		}
 		break;
 	}
+	case SDL_MOUSEWHEEL:
+	{
+		SDL_MouseWheelEvent &e = event.wheel;
+		if (!mouse_state & SDL_BUTTON(SDL_BUTTON_LEFT))
+		{
+			if (e.y == 1)
+			{
+				scroll[tribeTab] --;
+				if (scroll[tribeTab] < 0)
+					scroll[tribeTab] = 0;
+				redraw = true;
+			}
+			if (e.y == -1)
+			{
+				scroll[tribeTab] ++;
+				if (scroll[tribeTab] >= levels[tribeTab].size())
+					scroll[tribeTab] = levels[tribeTab].size() - 1;
+				redraw = true;
+			}
+		}
+		break;
+	}
 	case SDL_KEYDOWN:
 	{
 		SDL_KeyboardEvent &e = event.key;
